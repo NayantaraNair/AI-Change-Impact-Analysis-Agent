@@ -1,0 +1,1569 @@
+{
+  "story": {
+    "id": "ST-115",
+    "title": "Update the footer text on monthly statement PDFs",
+    "description": "Update the monthly statement PDF footer text rendered by the document service to read: Thank you for banking with us. Apply the approved sentence to the English statement template and retain the existing font, alignment and page margins. The reporting service continues selecting the same template family and supplying the existing render payload. This is a presentation-only template update with fixed wording and a versioned layout asset. The existing rendering workflow remains unchanged. Publish a versioned template after preview approval; rollback consists of selecting the previous template version for subsequent statement rendering.",
+    "type": "story",
+    "acceptance_criteria": [
+      "Every page of newly rendered English monthly statement PDFs shows exactly: Thank you for banking with us.",
+      "Footer font, alignment, margins, page numbering and all other template content remain unchanged, including multi-page statements.",
+      "document-service and reporting-service use the existing render payload and template selection interfaces without modification.",
+      "An approved PDF preview confirms the footer fits the existing layout, and selecting the previous template version restores the prior footer."
+    ]
+  },
+  "requirement": {
+    "business_summary": "Requested banking change: Update the footer text on monthly statement PDFs.",
+    "technical_summary": "Apply the enhancement to document-service, reporting-service according to the supplied criteria.",
+    "business_domain": "Statements and documents",
+    "affected_capabilities": [
+      "Document Service",
+      "Reporting Service"
+    ],
+    "affected_services": [
+      "document-service",
+      "reporting-service"
+    ],
+    "change_type": "enhancement",
+    "touches_customer_data": false,
+    "touches_card_data": false,
+    "touches_financial_data": false,
+    "changes_auth_flow": false,
+    "changes_external_api_contract": false,
+    "changes_db_schema": false,
+    "ambiguity": "low",
+    "engineering_scope": "Implement Update the footer text on monthly statement PDFs across document-service, reporting-service; verify 4 acceptance criteria.",
+    "source": "keyword-fallback"
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "account-service",
+        "label": "Account Service",
+        "type": "core",
+        "hop": null,
+        "severity": null,
+        "x": 253.4,
+        "y": 779.9,
+        "criticality": 9,
+        "owner_team": "Core Banking",
+        "data_classes": [
+          "financial",
+          "pii"
+        ]
+      },
+      {
+        "id": "api-gateway",
+        "label": "API Gateway",
+        "type": "platform",
+        "hop": 1,
+        "severity": "high",
+        "x": -310.0,
+        "y": 0.0,
+        "criticality": 10,
+        "owner_team": "Identity & Access",
+        "data_classes": [
+          "pii",
+          "financial"
+        ]
+      },
+      {
+        "id": "atm",
+        "label": "ATM Network",
+        "type": "channel",
+        "hop": 2,
+        "severity": "low",
+        "x": 480.0,
+        "y": 0.0,
+        "criticality": 7,
+        "owner_team": "Assisted Channels",
+        "data_classes": [
+          "card",
+          "financial"
+        ]
+      },
+      {
+        "id": "audit-db",
+        "label": "Audit Database",
+        "type": "database",
+        "hop": 1,
+        "severity": "medium",
+        "x": 310.0,
+        "y": 0.0,
+        "criticality": 8,
+        "owner_team": "Data & Analytics",
+        "data_classes": [
+          "audit"
+        ]
+      },
+      {
+        "id": "authentication-service",
+        "label": "Authentication Service",
+        "type": "platform",
+        "hop": 1,
+        "severity": "high",
+        "x": -0.0,
+        "y": -310.0,
+        "criticality": 10,
+        "owner_team": "Identity & Access",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "branch-portal",
+        "label": "Branch Portal",
+        "type": "channel",
+        "hop": 2,
+        "severity": "low",
+        "x": 148.3,
+        "y": 456.5,
+        "criticality": 6,
+        "owner_team": "Assisted Channels",
+        "data_classes": [
+          "pii",
+          "financial"
+        ]
+      },
+      {
+        "id": "card-service",
+        "label": "Card Service",
+        "type": "core",
+        "hop": null,
+        "severity": null,
+        "x": -253.4,
+        "y": 779.9,
+        "criticality": 9,
+        "owner_team": "Cards Platform",
+        "data_classes": [
+          "card",
+          "pii"
+        ]
+      },
+      {
+        "id": "crm",
+        "label": "Customer Relationship Management",
+        "type": "core",
+        "hop": null,
+        "severity": null,
+        "x": -663.4,
+        "y": 482.0,
+        "criticality": 6,
+        "owner_team": "Customer Platform",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "customer-db",
+        "label": "Customer Database",
+        "type": "database",
+        "hop": 2,
+        "severity": "medium",
+        "x": 148.3,
+        "y": -456.5,
+        "criticality": 9,
+        "owner_team": "Customer Platform",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "customer-service",
+        "label": "Customer Service",
+        "type": "core",
+        "hop": null,
+        "severity": null,
+        "x": -820.0,
+        "y": 0.0,
+        "criticality": 8,
+        "owner_team": "Customer Platform",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "document-service",
+        "label": "Document Service",
+        "type": "platform",
+        "hop": 0,
+        "severity": "medium",
+        "x": -70.0,
+        "y": 0.0,
+        "criticality": 4,
+        "owner_team": "Document Operations",
+        "data_classes": []
+      },
+      {
+        "id": "fraud-engine",
+        "label": "Fraud Engine",
+        "type": "analytics",
+        "hop": null,
+        "severity": null,
+        "x": 820.0,
+        "y": 0.0,
+        "criticality": 9,
+        "owner_team": "Payments Platform",
+        "data_classes": [
+          "financial",
+          "card"
+        ]
+      },
+      {
+        "id": "loan-service",
+        "label": "Loan Service",
+        "type": "core",
+        "hop": null,
+        "severity": null,
+        "x": -663.4,
+        "y": -482.0,
+        "criticality": 8,
+        "owner_team": "Core Banking",
+        "data_classes": [
+          "financial",
+          "pii"
+        ]
+      },
+      {
+        "id": "mobile-banking",
+        "label": "Mobile Banking",
+        "type": "channel",
+        "hop": 2,
+        "severity": "medium",
+        "x": -388.3,
+        "y": 282.1,
+        "criticality": 8,
+        "owner_team": "Digital Channels",
+        "data_classes": [
+          "pii",
+          "financial"
+        ]
+      },
+      {
+        "id": "notification-service",
+        "label": "Notification Service",
+        "type": "platform",
+        "hop": null,
+        "severity": null,
+        "x": 663.4,
+        "y": -482.0,
+        "criticality": 6,
+        "owner_team": "Customer Platform",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "payment-service",
+        "label": "Payment Service",
+        "type": "core",
+        "hop": null,
+        "severity": null,
+        "x": -253.4,
+        "y": -779.9,
+        "criticality": 10,
+        "owner_team": "Payments Platform",
+        "data_classes": [
+          "financial"
+        ]
+      },
+      {
+        "id": "reporting-db",
+        "label": "Reporting Database",
+        "type": "database",
+        "hop": 1,
+        "severity": "medium",
+        "x": 0.0,
+        "y": 310.0,
+        "criticality": 6,
+        "owner_team": "Data & Analytics",
+        "data_classes": [
+          "financial"
+        ]
+      },
+      {
+        "id": "reporting-service",
+        "label": "Reporting Service",
+        "type": "analytics",
+        "hop": 0,
+        "severity": "medium",
+        "x": 70.0,
+        "y": 0.0,
+        "criticality": 5,
+        "owner_team": "Data & Analytics",
+        "data_classes": []
+      },
+      {
+        "id": "risk-engine",
+        "label": "Risk Engine",
+        "type": "analytics",
+        "hop": null,
+        "severity": null,
+        "x": 663.4,
+        "y": 482.0,
+        "criticality": 8,
+        "owner_team": "Data & Analytics",
+        "data_classes": [
+          "financial"
+        ]
+      },
+      {
+        "id": "transaction-db",
+        "label": "Transaction Ledger Database",
+        "type": "database",
+        "hop": null,
+        "severity": null,
+        "x": 253.4,
+        "y": -779.9,
+        "criticality": 10,
+        "owner_team": "Core Banking",
+        "data_classes": [
+          "financial"
+        ]
+      },
+      {
+        "id": "web-banking",
+        "label": "Web Banking",
+        "type": "channel",
+        "hop": 2,
+        "severity": "medium",
+        "x": -388.3,
+        "y": -282.1,
+        "criticality": 8,
+        "owner_team": "Digital Channels",
+        "data_classes": [
+          "pii",
+          "financial"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "id": "account-service->audit-db",
+        "source": "account-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "account-service->authentication-service",
+        "source": "account-service",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "account-service->customer-db",
+        "source": "account-service",
+        "target": "customer-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "account-service->transaction-db",
+        "source": "account-service",
+        "target": "transaction-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->account-service",
+        "source": "api-gateway",
+        "target": "account-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->audit-db",
+        "source": "api-gateway",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->authentication-service",
+        "source": "api-gateway",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->card-service",
+        "source": "api-gateway",
+        "target": "card-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->crm",
+        "source": "api-gateway",
+        "target": "crm",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->customer-service",
+        "source": "api-gateway",
+        "target": "customer-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->document-service",
+        "source": "api-gateway",
+        "target": "document-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->loan-service",
+        "source": "api-gateway",
+        "target": "loan-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->payment-service",
+        "source": "api-gateway",
+        "target": "payment-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "atm->api-gateway",
+        "source": "atm",
+        "target": "api-gateway",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "atm->audit-db",
+        "source": "atm",
+        "target": "audit-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "atm->authentication-service",
+        "source": "atm",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "authentication-service->audit-db",
+        "source": "authentication-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "authentication-service->customer-db",
+        "source": "authentication-service",
+        "target": "customer-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "branch-portal->api-gateway",
+        "source": "branch-portal",
+        "target": "api-gateway",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "branch-portal->audit-db",
+        "source": "branch-portal",
+        "target": "audit-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "branch-portal->authentication-service",
+        "source": "branch-portal",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "card-service->account-service",
+        "source": "card-service",
+        "target": "account-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "card-service->audit-db",
+        "source": "card-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "card-service->authentication-service",
+        "source": "card-service",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "card-service->customer-db",
+        "source": "card-service",
+        "target": "customer-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "card-service->fraud-engine",
+        "source": "card-service",
+        "target": "fraud-engine",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "card-service->transaction-db",
+        "source": "card-service",
+        "target": "transaction-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "crm->audit-db",
+        "source": "crm",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "crm->authentication-service",
+        "source": "crm",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "crm->customer-db",
+        "source": "crm",
+        "target": "customer-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "crm->notification-service",
+        "source": "crm",
+        "target": "notification-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "customer-service->audit-db",
+        "source": "customer-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "customer-service->authentication-service",
+        "source": "customer-service",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "customer-service->crm",
+        "source": "customer-service",
+        "target": "crm",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "customer-service->customer-db",
+        "source": "customer-service",
+        "target": "customer-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "customer-service->notification-service",
+        "source": "customer-service",
+        "target": "notification-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "document-service->audit-db",
+        "source": "document-service",
+        "target": "audit-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "document-service->authentication-service",
+        "source": "document-service",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "document-service->reporting-service",
+        "source": "document-service",
+        "target": "reporting-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "fraud-engine->audit-db",
+        "source": "fraud-engine",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "fraud-engine->authentication-service",
+        "source": "fraud-engine",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "fraud-engine->risk-engine",
+        "source": "fraud-engine",
+        "target": "risk-engine",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "fraud-engine->transaction-db",
+        "source": "fraud-engine",
+        "target": "transaction-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->account-service",
+        "source": "loan-service",
+        "target": "account-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->audit-db",
+        "source": "loan-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->authentication-service",
+        "source": "loan-service",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->customer-db",
+        "source": "loan-service",
+        "target": "customer-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->risk-engine",
+        "source": "loan-service",
+        "target": "risk-engine",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->transaction-db",
+        "source": "loan-service",
+        "target": "transaction-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "mobile-banking->api-gateway",
+        "source": "mobile-banking",
+        "target": "api-gateway",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "mobile-banking->audit-db",
+        "source": "mobile-banking",
+        "target": "audit-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "mobile-banking->authentication-service",
+        "source": "mobile-banking",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "notification-service->audit-db",
+        "source": "notification-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "notification-service->authentication-service",
+        "source": "notification-service",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "notification-service->customer-db",
+        "source": "notification-service",
+        "target": "customer-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->account-service",
+        "source": "payment-service",
+        "target": "account-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->audit-db",
+        "source": "payment-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->authentication-service",
+        "source": "payment-service",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->fraud-engine",
+        "source": "payment-service",
+        "target": "fraud-engine",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->notification-service",
+        "source": "payment-service",
+        "target": "notification-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->transaction-db",
+        "source": "payment-service",
+        "target": "transaction-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "reporting-service->audit-db",
+        "source": "reporting-service",
+        "target": "audit-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "reporting-service->authentication-service",
+        "source": "reporting-service",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "reporting-service->reporting-db",
+        "source": "reporting-service",
+        "target": "reporting-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "risk-engine->audit-db",
+        "source": "risk-engine",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "risk-engine->authentication-service",
+        "source": "risk-engine",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "risk-engine->transaction-db",
+        "source": "risk-engine",
+        "target": "transaction-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "transaction-db->reporting-db",
+        "source": "transaction-db",
+        "target": "reporting-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "web-banking->api-gateway",
+        "source": "web-banking",
+        "target": "api-gateway",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "web-banking->audit-db",
+        "source": "web-banking",
+        "target": "audit-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "web-banking->authentication-service",
+        "source": "web-banking",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      }
+    ],
+    "impacted_services": [
+      "api-gateway",
+      "atm",
+      "audit-db",
+      "authentication-service",
+      "branch-portal",
+      "customer-db",
+      "document-service",
+      "mobile-banking",
+      "reporting-db",
+      "reporting-service",
+      "web-banking"
+    ],
+    "impacted_databases": [
+      "audit-db",
+      "customer-db",
+      "reporting-db"
+    ],
+    "impacted_apis": [
+      "GET /accounts/{id}/limits",
+      "GET /documents/templates/{id}",
+      "GET /internal/audit/events",
+      "GET /internal/reporting-store/statements/{id}",
+      "GET /reports/monthly-statements/{id}",
+      "GET /reports/statement-template",
+      "PATCH /cards/{id}/status",
+      "PATCH /customers/{id}/profile",
+      "POST /auth/biometric/challenges",
+      "POST /auth/introspect",
+      "POST /auth/step-up",
+      "POST /auth/token",
+      "POST /documents/statements/render",
+      "POST /internal/audit/events",
+      "POST /internal/reporting-store/projections",
+      "POST /loans/applications",
+      "POST /payments",
+      "POST /reports/monthly-statements/jobs",
+      "PUT /documents/templates/{id}"
+    ],
+    "downstream_systems": [
+      "api-gateway",
+      "atm",
+      "audit-db",
+      "authentication-service",
+      "branch-portal",
+      "customer-db",
+      "mobile-banking",
+      "reporting-db",
+      "web-banking"
+    ],
+    "deployment_groups": [
+      "channels-access",
+      "channels-mobile",
+      "customer-platform",
+      "data-platform",
+      "documents",
+      "identity"
+    ]
+  },
+  "risk": {
+    "dimensions": [
+      {
+        "name": "security",
+        "score": 28,
+        "level": "low",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 8,
+            "node_ids": []
+          },
+          {
+            "label": "critical identity path",
+            "points": 10,
+            "node_ids": [
+              "api-gateway",
+              "authentication-service"
+            ]
+          },
+          {
+            "label": "blast radius size",
+            "points": 10,
+            "node_ids": [
+              "api-gateway",
+              "atm",
+              "audit-db",
+              "authentication-service",
+              "branch-portal",
+              "customer-db",
+              "document-service",
+              "mobile-banking",
+              "reporting-db",
+              "reporting-service",
+              "web-banking"
+            ]
+          }
+        ],
+        "explanation": "Security risk is low (28) because critical identity path (+10) on api-gateway, authentication-service and blast radius size (+10) on api-gateway, atm, audit-db, authentication-service, branch-portal, customer-db, document-service, mobile-banking, reporting-db, reporting-service, web-banking."
+      },
+      {
+        "name": "compliance",
+        "score": 27,
+        "level": "low",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 5,
+            "node_ids": []
+          },
+          {
+            "label": "nearby pii data",
+            "points": 8,
+            "node_ids": [
+              "api-gateway",
+              "authentication-service"
+            ]
+          },
+          {
+            "label": "nearby financial data",
+            "points": 8,
+            "node_ids": [
+              "api-gateway",
+              "reporting-db"
+            ]
+          },
+          {
+            "label": "nearby audit data",
+            "points": 6,
+            "node_ids": [
+              "audit-db"
+            ]
+          }
+        ],
+        "explanation": "Compliance risk is low (27) because nearby pii data (+8) on api-gateway, authentication-service and nearby financial data (+8) on api-gateway, reporting-db and nearby audit data (+6) on audit-db."
+      },
+      {
+        "name": "technical",
+        "score": 27,
+        "level": "low",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 5,
+            "node_ids": []
+          },
+          {
+            "label": "direct services",
+            "points": 12,
+            "node_ids": [
+              "document-service",
+              "reporting-service"
+            ]
+          },
+          {
+            "label": "dependency depth",
+            "points": 10,
+            "node_ids": [
+              "atm",
+              "branch-portal",
+              "customer-db",
+              "mobile-banking",
+              "web-banking"
+            ]
+          }
+        ],
+        "explanation": "Technical risk is low (27) because direct services (+12) on document-service, reporting-service and dependency depth (+10) on atm, branch-portal, customer-db, mobile-banking, web-banking."
+      },
+      {
+        "name": "operational",
+        "score": 49,
+        "level": "medium",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 5,
+            "node_ids": []
+          },
+          {
+            "label": "service criticality",
+            "points": 20,
+            "node_ids": [
+              "reporting-service"
+            ]
+          },
+          {
+            "label": "downstream systems",
+            "points": 18,
+            "node_ids": [
+              "api-gateway",
+              "atm",
+              "audit-db",
+              "authentication-service",
+              "branch-portal",
+              "customer-db",
+              "mobile-banking",
+              "reporting-db",
+              "web-banking"
+            ]
+          },
+          {
+            "label": "deployment groups",
+            "points": 6,
+            "node_ids": [
+              "api-gateway",
+              "atm",
+              "audit-db",
+              "authentication-service",
+              "branch-portal",
+              "customer-db",
+              "document-service",
+              "mobile-banking",
+              "reporting-db",
+              "reporting-service",
+              "web-banking"
+            ]
+          }
+        ],
+        "explanation": "Operational risk is medium (49) because service criticality (+20) on reporting-service and downstream systems (+18) on api-gateway, atm, audit-db, authentication-service, branch-portal, customer-db, mobile-banking, reporting-db, web-banking and deployment groups (+6) on api-gateway, atm, audit-db, authentication-service, branch-portal, customer-db, document-service, mobile-banking, reporting-db, reporting-service, web-banking."
+      },
+      {
+        "name": "performance",
+        "score": 20,
+        "level": "low",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 5,
+            "node_ids": []
+          },
+          {
+            "label": "channel path",
+            "points": 15,
+            "node_ids": [
+              "api-gateway",
+              "mobile-banking",
+              "web-banking"
+            ]
+          }
+        ],
+        "explanation": "Performance risk is low (20) because channel path (+15) on api-gateway, mobile-banking, web-banking."
+      },
+      {
+        "name": "delivery",
+        "score": 45,
+        "level": "medium",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 5,
+            "node_ids": []
+          },
+          {
+            "label": "low ambiguity",
+            "points": 10,
+            "node_ids": [
+              "document-service",
+              "reporting-service"
+            ]
+          },
+          {
+            "label": "direct services",
+            "points": 10,
+            "node_ids": [
+              "document-service",
+              "reporting-service"
+            ]
+          },
+          {
+            "label": "owner coordination",
+            "points": 20,
+            "node_ids": [
+              "api-gateway",
+              "atm",
+              "audit-db",
+              "authentication-service",
+              "branch-portal",
+              "customer-db",
+              "document-service",
+              "mobile-banking",
+              "reporting-db",
+              "reporting-service",
+              "web-banking"
+            ]
+          }
+        ],
+        "explanation": "Delivery risk is medium (45) because owner coordination (+20) on api-gateway, atm, audit-db, authentication-service, branch-portal, customer-db, document-service, mobile-banking, reporting-db, reporting-service, web-banking and low ambiguity (+10) on document-service, reporting-service and direct services (+10) on document-service, reporting-service."
+      }
+    ],
+    "overall": 41,
+    "highest": "operational"
+  },
+  "tests": {
+    "tests": [
+      {
+        "id": "TC-022",
+        "title": "Token introspection rejects expired and revoked sessions",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "authentication-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Token introspection rejects expired and revoked sessions.",
+          "Execute the scenario: Token introspection rejects expired and revoked sessions.",
+          "Check the documented outcome for Token introspection rejects expired and revoked sessions."
+        ],
+        "expected": "Token introspection rejects expired and revoked sessions meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-026",
+        "title": "Gateway card status route enforces the required authorization scope",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "api-gateway"
+        ],
+        "steps": [
+          "Prepare fixtures for Gateway card status route enforces the required authorization scope.",
+          "Execute the scenario: Gateway card status route enforces the required authorization scope.",
+          "Check the documented outcome for Gateway card status route enforces the required authorization scope."
+        ],
+        "expected": "Gateway card status route enforces the required authorization scope meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-021",
+        "title": "Biometric login verifies a device-bound challenge before issuing a token",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "authentication-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Biometric login verifies a device-bound challenge before issuing a token.",
+          "Execute the scenario: Biometric login verifies a device-bound challenge before issuing a token.",
+          "Check the documented outcome for Biometric login verifies a device-bound challenge before issuing a token."
+        ],
+        "expected": "Biometric login verifies a device-bound challenge before issuing a token meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-025",
+        "title": "Gateway routes payment requests with the original correlation identifier",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "api-gateway"
+        ],
+        "steps": [
+          "Prepare fixtures for Gateway routes payment requests with the original correlation identifier.",
+          "Execute the scenario: Gateway routes payment requests with the original correlation identifier.",
+          "Check the documented outcome for Gateway routes payment requests with the original correlation identifier."
+        ],
+        "expected": "Gateway routes payment requests with the original correlation identifier meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-046",
+        "title": "Mobile card freeze propagates through gateway to card lifecycle state",
+        "type": "integration",
+        "priority": "P1",
+        "covers": [
+          "api-gateway",
+          "authentication-service",
+          "mobile-banking"
+        ],
+        "steps": [
+          "Prepare fixtures for Mobile card freeze propagates through gateway to card lifecycle state.",
+          "Execute the scenario: Mobile card freeze propagates through gateway to card lifecycle state.",
+          "Check the documented outcome for Mobile card freeze propagates through gateway to card lifecycle state."
+        ],
+        "expected": "Mobile card freeze propagates through gateway to card lifecycle state meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-048",
+        "title": "Biometric challenge completion creates an authorized mobile session",
+        "type": "integration",
+        "priority": "P1",
+        "covers": [
+          "api-gateway",
+          "authentication-service",
+          "mobile-banking"
+        ],
+        "steps": [
+          "Prepare fixtures for Biometric challenge completion creates an authorized mobile session.",
+          "Execute the scenario: Biometric challenge completion creates an authorized mobile session.",
+          "Check the documented outcome for Biometric challenge completion creates an authorized mobile session."
+        ],
+        "expected": "Biometric challenge completion creates an authorized mobile session meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-059",
+        "title": "ATM and branch servicing keep existing terminal and staff session behavior",
+        "type": "regression",
+        "priority": "P1",
+        "covers": [
+          "api-gateway",
+          "atm",
+          "authentication-service",
+          "branch-portal"
+        ],
+        "steps": [
+          "Prepare fixtures for ATM and branch servicing keep existing terminal and staff session behavior.",
+          "Execute the scenario: ATM and branch servicing keep existing terminal and staff session behavior.",
+          "Check the documented outcome for ATM and branch servicing keep existing terminal and staff session behavior."
+        ],
+        "expected": "ATM and branch servicing keep existing terminal and staff session behavior meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": false
+      },
+      {
+        "id": "TC-051",
+        "title": "Step-up proof cannot be replayed across devices or different card actions",
+        "type": "security",
+        "priority": "P1",
+        "covers": [
+          "authentication-service",
+          "mobile-banking"
+        ],
+        "steps": [
+          "Prepare fixtures for Step-up proof cannot be replayed across devices or different card actions.",
+          "Execute the scenario: Step-up proof cannot be replayed across devices or different card actions.",
+          "Check the documented outcome for Step-up proof cannot be replayed across devices or different card actions."
+        ],
+        "expected": "Step-up proof cannot be replayed across devices or different card actions meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-052",
+        "title": "Gateway denies card controls when token introspection is unavailable",
+        "type": "security",
+        "priority": "P1",
+        "covers": [
+          "api-gateway",
+          "authentication-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Gateway denies card controls when token introspection is unavailable.",
+          "Execute the scenario: Gateway denies card controls when token introspection is unavailable.",
+          "Check the documented outcome for Gateway denies card controls when token introspection is unavailable."
+        ],
+        "expected": "Gateway denies card controls when token introspection is unavailable meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-054",
+        "title": "Privileged limit changes require authorized staff scope and an audit event",
+        "type": "security",
+        "priority": "P1",
+        "covers": [
+          "audit-db",
+          "authentication-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Privileged limit changes require authorized staff scope and an audit event.",
+          "Execute the scenario: Privileged limit changes require authorized staff scope and an audit event.",
+          "Check the documented outcome for Privileged limit changes require authorized staff scope and an audit event."
+        ],
+        "expected": "Privileged limit changes require authorized staff scope and an audit event meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-055",
+        "title": "Biometric enrollment rejects mismatched device keys and revoked challenges",
+        "type": "security",
+        "priority": "P1",
+        "covers": [
+          "authentication-service",
+          "mobile-banking"
+        ],
+        "steps": [
+          "Prepare fixtures for Biometric enrollment rejects mismatched device keys and revoked challenges.",
+          "Execute the scenario: Biometric enrollment rejects mismatched device keys and revoked challenges.",
+          "Check the documented outcome for Biometric enrollment rejects mismatched device keys and revoked challenges."
+        ],
+        "expected": "Biometric enrollment rejects mismatched device keys and revoked challenges meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-002",
+        "title": "Mobile card status route requires a valid device session",
+        "type": "api",
+        "priority": "P2",
+        "covers": [
+          "mobile-banking"
+        ],
+        "steps": [
+          "Prepare fixtures for Mobile card status route requires a valid device session.",
+          "Execute the scenario: Mobile card status route requires a valid device session.",
+          "Check the documented outcome for Mobile card status route requires a valid device session."
+        ],
+        "expected": "Mobile card status route requires a valid device session meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-004",
+        "title": "Web profile update rejects unsupported fields",
+        "type": "api",
+        "priority": "P2",
+        "covers": [
+          "web-banking"
+        ],
+        "steps": [
+          "Prepare fixtures for Web profile update rejects unsupported fields.",
+          "Execute the scenario: Web profile update rejects unsupported fields.",
+          "Check the documented outcome for Web profile update rejects unsupported fields."
+        ],
+        "expected": "Web profile update rejects unsupported fields meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-028",
+        "title": "Statement render endpoint rejects an unknown template version",
+        "type": "api",
+        "priority": "P2",
+        "covers": [
+          "document-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Statement render endpoint rejects an unknown template version.",
+          "Execute the scenario: Statement render endpoint rejects an unknown template version.",
+          "Check the documented outcome for Statement render endpoint rejects an unknown template version."
+        ],
+        "expected": "Statement render endpoint rejects an unknown template version meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-030",
+        "title": "Customer store adapter rejects stale profile versions",
+        "type": "api",
+        "priority": "P2",
+        "covers": [
+          "customer-db"
+        ],
+        "steps": [
+          "Prepare fixtures for Customer store adapter rejects stale profile versions.",
+          "Execute the scenario: Customer store adapter rejects stale profile versions.",
+          "Check the documented outcome for Customer store adapter rejects stale profile versions."
+        ],
+        "expected": "Customer store adapter rejects stale profile versions meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "GEN-1",
+        "title": "Verify GET /internal/reporting-store/statements/{id} persists valid changes and rejects invalid writes",
+        "type": "integration",
+        "priority": "P2",
+        "covers": [
+          "reporting-db"
+        ],
+        "steps": [
+          "Prepare valid and invalid fixtures for GET /internal/reporting-store/statements/{id}.",
+          "Exercise GET /internal/reporting-store/statements/{id} with both fixture sets.",
+          "Check responses and persisted state against acceptance criteria."
+        ],
+        "expected": "Valid data is persisted, and rejected writes leave existing data intact.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-2",
+        "title": "Verify GET /reports/monthly-statements/{id} preserves the required banking behavior",
+        "type": "regression",
+        "priority": "P2",
+        "covers": [
+          "reporting-service"
+        ],
+        "steps": [
+          "Prepare valid and invalid fixtures for GET /reports/monthly-statements/{id}.",
+          "Exercise GET /reports/monthly-statements/{id} with both fixture sets.",
+          "Check responses and persisted state against acceptance criteria."
+        ],
+        "expected": "The changed behavior meets acceptance criteria without breaking existing behavior.",
+        "source": "generated",
+        "automation_candidate": true
+      }
+    ],
+    "coverage_estimate": 1.0,
+    "effort_hours": 5.183333333333334,
+    "automation_candidates": 15,
+    "summary": "Selected 15 catalog tests and 2 new tests, covering 11 of 11 impacted nodes (100%); estimated effort is 5.2 hours."
+  },
+  "compliance": {
+    "frameworks": [
+      {
+        "framework": "GDPR",
+        "applicable": true,
+        "reason": "PII-bearing components are impacted.",
+        "risk_level": "low",
+        "score": 90,
+        "findings": [
+          {
+            "text": "GDPR review applies because PII-bearing components are impacted.",
+            "node_ids": [
+              "api-gateway",
+              "authentication-service"
+            ]
+          },
+          {
+            "text": "Deterministic control exposure: PII impacted through dependencies (-10).",
+            "node_ids": [
+              "api-gateway",
+              "authentication-service"
+            ]
+          }
+        ],
+        "recommendations": [
+          "Review data minimization, purpose and retention for customer data for api-gateway, authentication-service.",
+          "Verify access controls and privacy regression tests for api-gateway, authentication-service."
+        ]
+      },
+      {
+        "framework": "PCI DSS",
+        "applicable": false,
+        "reason": "No impacted card-data component and no card-data touch.",
+        "risk_level": null,
+        "score": null,
+        "findings": [],
+        "recommendations": []
+      },
+      {
+        "framework": "SOX",
+        "applicable": true,
+        "reason": "financial-data components are impacted; audit-data components are impacted.",
+        "risk_level": "low",
+        "score": 85,
+        "findings": [
+          {
+            "text": "SOX review applies because financial-data components are impacted; audit-data components are impacted.",
+            "node_ids": [
+              "api-gateway",
+              "audit-db",
+              "reporting-db"
+            ]
+          },
+          {
+            "text": "Deterministic control exposure: financial data impacted through dependencies (-5); audit database impacted (-10).",
+            "node_ids": [
+              "api-gateway",
+              "audit-db",
+              "reporting-db"
+            ]
+          }
+        ],
+        "recommendations": [
+          "Reconcile financial results and verify complete, immutable audit records for api-gateway, audit-db, reporting-db.",
+          "Document control-owner approval and test financial and schema changes for api-gateway, audit-db, reporting-db."
+        ]
+      },
+      {
+        "framework": "Internal Governance",
+        "applicable": false,
+        "reason": "No directly changed component with criticality >= 8 and no authentication-flow change.",
+        "risk_level": null,
+        "score": null,
+        "findings": [],
+        "recommendations": []
+      }
+    ],
+    "overall_score": 85,
+    "summary": "2 of 4 frameworks apply; the minimum compliance score is 85/100. 0 applicable framework(s) have high risk."
+  },
+  "release": {
+    "confidence": 78,
+    "decision": "GO",
+    "triggered_rules": [
+      "GO: no blocking or conditional release rules fired"
+    ],
+    "conditions": [],
+    "complexity": "high",
+    "rollback_plan": [
+      "Declare rollback, notify service owners and release communications, and pause the rollout.",
+      "channels-mobile: disable the change's feature flags where configured and drain in-flight requests.",
+      "channels-mobile: restore the previous known-good service versions and configuration.",
+      "channels-mobile: verify health checks, error rates and data integrity before proceeding to the next group.",
+      "channels-access: disable the change's feature flags where configured and drain in-flight requests.",
+      "channels-access: restore the previous known-good service versions and configuration.",
+      "channels-access: verify health checks, error rates and data integrity before proceeding to the next group.",
+      "identity: disable the change's feature flags where configured and drain in-flight requests.",
+      "identity: restore the previous known-good service versions and configuration.",
+      "identity: verify health checks, error rates and data integrity before proceeding to the next group.",
+      "documents: disable the change's feature flags where configured and drain in-flight requests.",
+      "documents: restore the previous known-good service versions and configuration.",
+      "documents: verify health checks, error rates and data integrity before proceeding to the next group.",
+      "data-platform: disable the change's feature flags where configured and drain in-flight requests.",
+      "data-platform: restore the previous known-good service versions and configuration.",
+      "data-platform: verify health checks, error rates and data integrity before proceeding to the next group.",
+      "customer-platform: disable the change's feature flags where configured and drain in-flight requests.",
+      "customer-platform: restore the previous known-good service versions and configuration.",
+      "customer-platform: verify health checks, error rates and data integrity before proceeding to the next group.",
+      "Confirm service recovery with owners, notify stakeholders, and retain incident and rollback evidence."
+    ],
+    "deployment_notes": [
+      "Notify service owners, operations and support of the release window and rollback contacts.",
+      "Deploy customer-platform in sequence (step 1); keep feature flags disabled where configured, validate health, then enable gradually.",
+      "Deploy data-platform in sequence (step 2); keep feature flags disabled where configured, validate health, then enable gradually.",
+      "Deploy documents in sequence (step 3); keep feature flags disabled where configured, validate health, then enable gradually.",
+      "Deploy identity in sequence (step 4); keep feature flags disabled where configured, validate health, then enable gradually.",
+      "Deploy channels-access in sequence (step 5); keep feature flags disabled where configured, validate health, then enable gradually.",
+      "Deploy channels-mobile in sequence (step 6); keep feature flags disabled where configured, validate health, then enable gradually.",
+      "Coordinate groups in dependency cycles in one compatible release window; monitor error rates, latency, availability and data integrity after each step.",
+      "Publish rollout status to stakeholders and hand monitoring and rollback ownership to operations."
+    ]
+  },
+  "providers_used": {
+    "requirement": "keyword-fallback",
+    "dependency": "deterministic",
+    "scoring": "deterministic",
+    "testing": "template-fallback",
+    "compliance": "template-fallback",
+    "release": "template-fallback"
+  },
+  "duration_ms": 386,
+  "created_at": "2026-10-06T18:00:53.056794Z"
+}

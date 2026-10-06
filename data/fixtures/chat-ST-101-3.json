@@ -1,0 +1,41 @@
+{
+  "answer": "- **ST-101**: overall risk 75/100; release decision GO_WITH_CONDITIONS.\n- compliance: 81/100 (high). Top factors: card data (+30; `fraud-engine`); pii data (+20; `account-service`); financial data (+20; `account-service`, `fraud-engine`, `payment-service`, `transaction-db`).\n- security: 73/100 (high). Top factors: card data (+25; `card-service`, `fraud-engine`); customer data (+20; `account-service`, `api-gateway`, `authentication-service`, `card-service`, `customer-db`, `loan-service`, `notification-service`); critical identity path (+10; `api-gateway`, `authentication-service`).\n- operational: 71/100 (high). Top factors: service criticality (+40; `payment-service`); downstream systems (+20; `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `loan-service`, `mobile-banking`, `notification-service`, `reporting-db`, `risk-engine`, `web-banking`); deployment groups (+6; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-db`, `risk-engine`, `transaction-db`, `web-banking`).\n- delivery: 58/100 (medium). Top factors: owner coordination (+28; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-db`, `risk-engine`, `transaction-db`, `web-banking`); direct services (+15; `account-service`, `fraud-engine`, `payment-service`); low ambiguity (+10; `account-service`, `fraud-engine`, `payment-service`, `transaction-db`).\n- performance: 55/100 (medium). Top factors: transaction path (+20; `payment-service`, `transaction-db`); channel path (+15; `api-gateway`, `mobile-banking`, `web-banking`); payment business rule (+15; `payment-service`, `transaction-db`).\n- technical: 33/100 (low). Top factors: direct services (+18; `account-service`, `fraud-engine`, `payment-service`); dependency depth (+10; `atm`, `branch-portal`, `mobile-banking`, `web-banking`); baseline (+5; none recorded).\n- This context contains only this story. Open the sprint view to compare risky stories.",
+  "cited_nodes": [
+    "mobile-banking",
+    "web-banking",
+    "atm",
+    "branch-portal",
+    "account-service",
+    "payment-service",
+    "loan-service",
+    "card-service",
+    "authentication-service",
+    "notification-service",
+    "api-gateway",
+    "customer-db",
+    "transaction-db",
+    "audit-db",
+    "reporting-db",
+    "fraud-engine",
+    "risk-engine"
+  ],
+  "cited_factors": [
+    "baseline",
+    "customer data",
+    "card data",
+    "critical identity path",
+    "pii data",
+    "financial data",
+    "direct services",
+    "dependency depth",
+    "service criticality",
+    "downstream systems",
+    "deployment groups",
+    "transaction path",
+    "channel path",
+    "payment business rule",
+    "low ambiguity",
+    "owner coordination"
+  ],
+  "provider": "template"
+}

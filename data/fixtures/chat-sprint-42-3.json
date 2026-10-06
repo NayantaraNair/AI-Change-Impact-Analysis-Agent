@@ -1,0 +1,6 @@
+{
+  "answer": "- **ST-101**: Increase daily payment limits for premium customers; overall risk 75/100; decision GO_WITH_CONDITIONS.\n- **ST-107**: Card freeze/unfreeze in mobile app with step-up authentication; overall risk 84/100; decision NO_GO.\n- **ST-110**: Fraud rule update: velocity check for card-not-present payments; overall risk 75/100; decision GO_WITH_CONDITIONS.\n- **ST-112**: Biometric login for mobile banking; overall risk 74/100; decision NO_GO.",
+  "cited_nodes": [],
+  "cited_factors": [],
+  "provider": "template"
+}

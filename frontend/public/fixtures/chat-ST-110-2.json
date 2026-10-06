@@ -1,0 +1,28 @@
+{
+  "answer": "- **ST-110**: coverage estimate 100%; effort 5.7 hours.\n- P1: Account limits endpoint rejects unauthorized limit overrides (TC-012); covers `account-service`.\n- P1: Payment creation returns the same instruction for a repeated idempotency key (TC-014); covers `payment-service`.\n- P1: Card status update rejects an expired step-up proof (TC-018); covers `card-service`.\n- P1: Token introspection rejects expired and revoked sessions (TC-022); covers `authentication-service`.\n- P1: Gateway card status route enforces the required authorization scope (TC-026); covers `api-gateway`.\n- P1: Customer store adapter rejects stale profile versions (TC-030); covers `customer-db`.\n- P1: Ledger adapter rejects a posting with unbalanced debit and credit totals (TC-032); covers `transaction-db`.\n- P1: Fraud screening endpoint returns rule version and decision trace (TC-038); covers `fraud-engine`.\n- P1: Risk policy publication rejects invalid threshold ordering (TC-040); covers `risk-engine`.\n- P1: Account daily limits distinguish premium and standard eligibility (TC-011); covers `account-service`.\n- P1: Payments reject amounts exceeding the remaining daily account limit (TC-013); covers `payment-service`.\n- P1: Card freeze and unfreeze preserve the original cardholder linkage (TC-017); covers `card-service`.\n- P1: Biometric login verifies a device-bound challenge before issuing a token (TC-021); covers `authentication-service`.\n- P1: Gateway routes payment requests with the original correlation identifier (TC-025); covers `api-gateway`.\n- P1: Customer profile persistence preserves optional preferred name fields (TC-029); covers `customer-db`.\n- P1: Verify compliance: POST /internal/audit/events, GET /cards/{id}, POST /fraud/screenings, POST /payments, POST /risk/assessments preserves required audit evidence (GEN-1); covers `audit-db`, `card-service`, `fraud-engine`, `payment-service`, `risk-engine`.\n- P1: Verify security: GET /accounts/{id}/limits, POST /payments, POST /atm/withdrawals, POST /internal/audit/events, POST /auth/token, GET /branch/customers, GET /cards/{id}, GET /internal/customer-store/profiles/{id}, POST /fraud/screenings, POST /loans/applications, POST /mobile/login, POST /notifications, POST /payments, GET /internal/reporting-store/statements/{id}, POST /risk/assessments, POST /internal/ledger/entries, POST /web/login rejects unauthorised access (GEN-2); covers `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-db`, `risk-engine`, `transaction-db`, `web-banking`.\n- P1: Verify operational: GET /accounts/{id}/limits, POST /payments, POST /atm/withdrawals, POST /internal/audit/events, POST /auth/token, GET /branch/customers, GET /cards/{id}, GET /internal/customer-store/profiles/{id}, POST /fraud/screenings, POST /loans/applications, POST /mobile/login, POST /notifications, POST /payments, GET /internal/reporting-store/statements/{id}, POST /risk/assessments, POST /internal/ledger/entries, POST /web/login recovers after a dependency failure (GEN-3); covers `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-db`, `risk-engine`, `transaction-db`, `web-banking`.\n- GDPR: GDPR review applies because PII-bearing components are impacted; the change touches customer data. (`account-service`, `api-gateway`, `authentication-service`, `card-service`, `customer-db`, `loan-service`, `notification-service`).\n- GDPR: Deterministic control exposure: PII impacted directly (-20); customer data touched (-15). (`account-service`, `api-gateway`, `authentication-service`, `card-service`, `customer-db`, `loan-service`, `notification-service`).\n- PCI DSS: PCI DSS review applies because card-data components are impacted; the change touches card data. (`card-service`, `fraud-engine`).\n- PCI DSS: Deterministic control exposure: card data touched (-25); card-data components impacted directly (-10). (`card-service`, `fraud-engine`).\n- SOX: SOX review applies because financial-data components are impacted; audit-data components are impacted; the change touches financial data. (`account-service`, `api-gateway`, `audit-db`, `fraud-engine`, `loan-service`, `payment-service`, `risk-engine`, `transaction-db`).\n- SOX: Deterministic control exposure: financial data touched (-15); audit database impacted (-10); business rule changes on the payment path (-10). (`audit-db`, `fraud-engine`, `payment-service`, `risk-engine`).\n- Internal Governance: Internal Governance review applies because directly changed components have criticality >= 8. (`card-service`, `fraud-engine`, `payment-service`, `risk-engine`).\n- Internal Governance: Deterministic control exposure: direct components have criticality >= 9 (-30). (`card-service`, `fraud-engine`, `payment-service`).",
+  "cited_nodes": [
+    "mobile-banking",
+    "web-banking",
+    "atm",
+    "branch-portal",
+    "account-service",
+    "payment-service",
+    "loan-service",
+    "card-service",
+    "authentication-service",
+    "notification-service",
+    "api-gateway",
+    "customer-db",
+    "transaction-db",
+    "audit-db",
+    "reporting-db",
+    "fraud-engine",
+    "risk-engine"
+  ],
+  "cited_factors": [
+    "customer data",
+    "card data",
+    "financial data"
+  ],
+  "provider": "template"
+}
