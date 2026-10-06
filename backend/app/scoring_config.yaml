@@ -1,0 +1,52 @@
+# Every scoring weight lives here. Scores clamp at 0-100; levels use 40/70.
+security:
+  base: 8
+  customer_data: 20
+  card_data: 25
+  auth_flow_change: 25
+  external_api_contract: 15
+  critical_identity_path: 10
+  identity_nodes: [authentication-service, api-gateway]
+  nearby_node: 2
+  nearby_node_cap: 10
+compliance:
+  base: 5
+  pii: 20
+  card: 30
+  financial: 20
+  # Routine reporting plus an audit trail remains below medium risk.
+  audit: 12
+  db_schema_change: 10
+technical:
+  base: 5
+  db_schema_change: 20
+  direct_service: 6
+  direct_service_cap: 30
+  hop_depth: 5
+  change_types:
+    new_feature: 10
+    integration_change: 10
+    refactor: 15
+operational:
+  base: 5
+  criticality: 4
+  downstream_system: 2
+  downstream_system_cap: 20
+  # Lower deployment weight keeps the ST-115 reporting enhancement low risk.
+  deployment_group: 2
+  deployment_group_cap: 6
+performance:
+  base: 5
+  transaction_path: 20
+  transaction_nodes: [transaction-db, payment-service]
+  channel_path: 15
+  channel_nodes: [api-gateway, mobile-banking, web-banking]
+  payment_business_rule: 15
+delivery:
+  base: 5
+  ambiguity:
+    low: 10
+    medium: 30
+    high: 55
+  direct_service: 5
+  additional_owner_team: 4
