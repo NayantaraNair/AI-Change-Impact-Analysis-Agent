@@ -77,12 +77,26 @@ def test_different_roots_same_group_choose_most_critical_root(arch):
     ]
 
 
-def test_representative_ties_are_stable_and_exact_collisions_are_retained(arch):
-    arch.components[1].criticality = 8
-    stories = [analysis("A", ["a", "b"], arch), analysis("B", ["a", "b"], arch)]
-    assert [(c.kind, c.shared_component) for c in detect_conflicts(stories, arch)] == [
-        ("deployment_collision", "a"), ("deployment_collision", "b"),
+@pytest.mark.parametrize("direct_a,direct_b,b_criticality,expected,score", [
+    (["a", "b"], ["a", "b"], 8, "a", 72),
+    (["a", "b"], ["a", "b"], 9, "b", 76),
+    (["a", "b", "auth"], ["a"], 9, "a", 72),
+])
+def test_representative_ranking_is_stable_and_shared_direct_collision_wins(
+    arch, direct_a, direct_b, b_criticality, expected, score,
+):
+    arch.components[1].criticality = b_criticality
+    arch.components[2].deployment_group = "core"
+    stories = [analysis("A", direct_a, arch), analysis("B", direct_b, arch)]
+    conflicts = detect_conflicts(stories, arch)
+    assert [(c.story_a, c.story_b, c.kind, c.shared_component, c.risk_score) for c in conflicts] == [
+        ("A", "B", "deployment_collision", expected, score),
     ]
+    assert conflicts[0].id == f"C-A-B-{expected}"
+    arch.components.reverse()
+    for story in stories:
+        story.graph.nodes.reverse()
+    assert detect_conflicts(list(reversed(stories)), arch) == conflicts
 
 
 def test_indirect_overlap_and_separate_groups_do_not_conflict(arch):
