@@ -1,7 +1,8 @@
-"""Chat route contract stand-in; T13 supplies the copilot implementation."""
+"""Chat endpoint for the context-grounded analysis copilot."""
 
 from fastapi import APIRouter
 
+from app.agents.chat import answer
 from app.contracts import ChatRequest, ChatResponse
 
 router = APIRouter()
@@ -9,6 +10,4 @@ router = APIRouter()
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest) -> ChatResponse:
-    return ChatResponse(
-        answer="Copilot is not wired yet.", cited_nodes=[], cited_factors=[], provider="none",
-    )
+    return await answer(request)
