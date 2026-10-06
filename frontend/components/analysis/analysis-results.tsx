@@ -30,7 +30,7 @@ export function AnalysisResults({ analysis, components }: { analysis: StoryAnaly
             {highlight.length > 0 && <Button type="button" variant="outline" onClick={() => setHighlight([])}>Clear highlight ({highlight.length})</Button>}
           </div>
           <p className="sr-only" role="status" aria-live="polite">{highlight.length ? `Highlighted nodes: ${highlight.join(", ")}` : "Showing all graph nodes"}</p>
-          <BlastRadiusGraph graph={analysis.graph} highlight={highlight} selectedId={selectedId} onNodeSelect={setSelectedId} height={420} />
+          <BlastRadiusGraph graph={analysis.graph} highlight={highlight} selectedId={selectedId} onNodeSelect={setSelectedId} />
         </section>
         {selectedNode && <aside aria-label="Selected node details" className="min-w-0 border-b border-line py-4 min-[1024px]:col-start-2 min-[1024px]:row-start-1 min-[1024px]:row-span-2 min-[1024px]:border-b-0 min-[1024px]:border-l min-[1024px]:pl-4">
           <div className="sticky top-4">

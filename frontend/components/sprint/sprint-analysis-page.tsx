@@ -150,7 +150,7 @@ export function SprintAnalysisPage() {
           </div>
           <p role="status" className="sr-only">{highlight.length ? `Highlighted components: ${highlight.join(", ")}` : "Showing all graph components"}</p>
           <div className={`grid min-w-0 gap-4 ${selectedNode ? "min-[1024px]:grid-cols-[minmax(0,1fr)_360px]" : "grid-cols-1"}`}>
-            <BlastRadiusGraph graph={analysis.conflict_graph} highlight={highlight} selectedId={selectedNodeId} onNodeSelect={setSelectedNodeId} height={460} />
+            <BlastRadiusGraph graph={analysis.conflict_graph} highlight={highlight} selectedId={selectedNodeId} onNodeSelect={setSelectedNodeId} />
             {selectedNode && <NodeDetailsPanel node={selectedNode} factors={selectedFactors} onClose={() => setSelectedNodeId(null)} />}
           </div>
         </section>
