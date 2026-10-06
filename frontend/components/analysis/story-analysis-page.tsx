@@ -1,0 +1,125 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { useAppContext } from "@/components/shell/app-context";
+import { analyzeStory, ApiError, getDemoSprint, getReport } from "@/lib/api";
+import type { Component, StoryAnalysis, StoryInput } from "@/lib/types";
+import { fetchArchitecture } from "./architecture";
+import { demoExamples } from "./examples";
+import { emptyStory, formFromStory, storyFromForm } from "./model";
+import { AnalysisResults } from "./analysis-results";
+import { StageProgress } from "./stage-progress";
+import { StoryForm } from "./story-form";
+
+type RequestKind = "story" | "report";
+const connectionError = "Couldn't reach the analysis server at :8000. Start the backend or set NEXT_PUBLIC_MOCK=1.";
+
+export function StoryAnalysisPage({ reportId }: { reportId: string | null }) {
+  const { setCurrentAnalysis, setCurrentContext, setHighlight } = useAppContext();
+  const [form, setForm] = useState(emptyStory);
+  const [examples, setExamples] = useState<StoryInput[]>([]);
+  const [examplesLoading, setExamplesLoading] = useState(true);
+  const [examplesError, setExamplesError] = useState(false);
+  const [components, setComponents] = useState<Component[]>([]);
+  const [analysis, setAnalysis] = useState<StoryAnalysis | null>(null);
+  const [loading, setLoading] = useState<RequestKind | null>(reportId ? "report" : null);
+  const [error, setError] = useState<string | null>(null);
+  const [sampleMismatch, setSampleMismatch] = useState(false);
+  const active = useRef(true);
+  const sequence = useRef(0);
+  const lastRequest = useRef<{ task: () => Promise<StoryAnalysis>; kind: RequestKind; story?: StoryInput } | null>(null);
+
+  const loadExamples = useCallback(async () => {
+    setExamplesLoading(true);
+    setExamplesError(false);
+    try {
+      const demo = await getDemoSprint();
+      if (active.current) setExamples(demoExamples(demo.stories));
+    } catch {
+      if (active.current) setExamplesError(true);
+    } finally {
+      if (active.current) setExamplesLoading(false);
+    }
+  }, []);
+
+  const run = useCallback(async (task: () => Promise<StoryAnalysis>, kind: RequestKind, story?: StoryInput) => {
+    const request = ++sequence.current;
+    lastRequest.current = { task, kind, story };
+    setLoading(kind);
+    setError(null);
+    setAnalysis(null);
+    setSampleMismatch(false);
+    setHighlight([]);
+    setCurrentAnalysis(null);
+    setCurrentContext(null);
+    try {
+      const result = await task();
+      if (!active.current || request !== sequence.current) return;
+      setAnalysis(result);
+      setCurrentAnalysis(result);
+      setCurrentContext({ type: "story", id: result.story.id });
+      if (kind === "report") setForm(formFromStory(result.story));
+      setSampleMismatch(story ? JSON.stringify(result.story) !== JSON.stringify(story) : Boolean(reportId && result.story.id !== reportId));
+    } catch (cause) {
+      if (!active.current || request !== sequence.current) return;
+      setError(cause instanceof ApiError && cause.status >= 400 && cause.status < 500
+        ? `Couldn't load the analysis. ${cause.message}` : connectionError);
+    } finally {
+      if (active.current && request === sequence.current) setLoading(null);
+    }
+  }, [reportId, setCurrentAnalysis, setCurrentContext, setHighlight]);
+
+  useEffect(() => {
+    active.current = true;
+    const controller = new AbortController();
+    // Start external work after mount; obsolete responses cannot update a new route.
+    void Promise.resolve().then(() => {
+      if (!active.current || controller.signal.aborted) return;
+      setHighlight([]);
+      setCurrentAnalysis(null);
+      setCurrentContext(null);
+      void loadExamples();
+      void fetchArchitecture(controller.signal).then((items) => {
+        if (active.current && !controller.signal.aborted) setComponents(items);
+      });
+      if (reportId) void run(() => getReport(reportId), "report");
+    });
+    return () => {
+      active.current = false;
+      sequence.current += 1;
+      controller.abort();
+      setHighlight([]);
+      setCurrentAnalysis(null);
+      setCurrentContext(null);
+    };
+  }, [loadExamples, reportId, run, setCurrentAnalysis, setCurrentContext, setHighlight]);
+
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (loading || !form.title.trim() || !form.description.trim()) return;
+    const story = storyFromForm(form, `ST-${crypto.randomUUID()}`);
+    setForm(formFromStory(story));
+    void run(() => analyzeStory(story), "story", story);
+  }
+
+  function retry() {
+    const request = lastRequest.current;
+    if (request) void run(request.task, request.kind, request.story);
+  }
+
+  return (
+    <div className="min-w-0">
+      <StoryForm value={form} onChange={setForm} onSubmit={submit} examples={examples}
+        onExample={(story) => { setForm(formFromStory(story)); setError(null); }}
+        examplesLoading={examplesLoading} examplesError={examplesError} onRetryExamples={() => void loadExamples()} busy={Boolean(loading)} />
+      {error && <div role="alert" className="mb-4 flex flex-wrap items-center gap-3 rounded-md border border-impact-high/40 bg-surface p-4"><p className="flex-1 text-body">{error}</p><Button type="button" variant="outline" onClick={retry}>Try again</Button></div>}
+      {loading ? <StageProgress key={loading} report={loading === "report"} /> : analysis ? (
+        <>
+          {sampleMismatch && <p role="status" className="mb-4 border-l-2 border-azure bg-surface px-4 py-3 text-dense text-muted">Showing the available sample report for {analysis.story.id}: {analysis.story.title}. Start the backend to analyze the requested story.</p>}
+          <AnalysisResults key={`${analysis.story.id}-${analysis.created_at}`} analysis={analysis} components={components} />
+        </>
+      ) : !error && <div className="flex min-h-[380px] items-center justify-center border-y border-line bg-surface/40"><p className="text-body text-muted">Paste a story and select Analyze to see its blast radius.</p></div>}
+    </div>
+  );
+}
