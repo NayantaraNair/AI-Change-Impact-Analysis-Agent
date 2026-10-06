@@ -1,0 +1,991 @@
+{
+  "components": [
+    {
+      "id": "mobile-banking",
+      "name": "Mobile Banking",
+      "type": "channel",
+      "description": "Customer mobile app for account viewing, payments, card controls and device-bound login.",
+      "owner_team": "Digital Channels",
+      "owner_contact": "digital-channels@bank.example",
+      "criticality": 8,
+      "data_classes": [
+        "pii",
+        "financial"
+      ],
+      "deployment_group": "channels-mobile",
+      "sla_tier": "tier1",
+      "downstream": [
+        "api-gateway",
+        "authentication-service",
+        "audit-db"
+      ],
+      "upstream": [],
+      "apis": [
+        {
+          "id": "mobile-banking.login",
+          "method": "POST",
+          "path": "/mobile/login",
+          "description": "Start a mobile device login session",
+          "external": true
+        },
+        {
+          "id": "mobile-banking.payments",
+          "method": "POST",
+          "path": "/mobile/payments",
+          "description": "Submit a payment from the mobile app",
+          "external": true
+        },
+        {
+          "id": "mobile-banking.card-status",
+          "method": "PATCH",
+          "path": "/mobile/cards/{id}/status",
+          "description": "Freeze or unfreeze a card",
+          "external": true
+        }
+      ]
+    },
+    {
+      "id": "web-banking",
+      "name": "Web Banking",
+      "type": "channel",
+      "description": "Browser banking channel for account dashboards, transfers and profile maintenance.",
+      "owner_team": "Digital Channels",
+      "owner_contact": "digital-channels@bank.example",
+      "criticality": 8,
+      "data_classes": [
+        "pii",
+        "financial"
+      ],
+      "deployment_group": "channels-access",
+      "sla_tier": "tier1",
+      "downstream": [
+        "api-gateway",
+        "authentication-service",
+        "audit-db"
+      ],
+      "upstream": [],
+      "apis": [
+        {
+          "id": "web-banking.login",
+          "method": "POST",
+          "path": "/web/login",
+          "description": "Start an authenticated browser session",
+          "external": true
+        },
+        {
+          "id": "web-banking.accounts",
+          "method": "GET",
+          "path": "/web/accounts",
+          "description": "List accounts visible to the signed-in customer",
+          "external": true
+        },
+        {
+          "id": "web-banking.profile",
+          "method": "PATCH",
+          "path": "/web/profile",
+          "description": "Update customer profile details",
+          "external": true
+        }
+      ]
+    },
+    {
+      "id": "atm",
+      "name": "ATM Network",
+      "type": "channel",
+      "description": "ATM channel adapter for cash withdrawals and balance enquiries with terminal traceability.",
+      "owner_team": "Assisted Channels",
+      "owner_contact": "assisted-channels@bank.example",
+      "criticality": 7,
+      "data_classes": [
+        "card",
+        "financial"
+      ],
+      "deployment_group": "channels-access",
+      "sla_tier": "tier2",
+      "downstream": [
+        "api-gateway",
+        "authentication-service",
+        "audit-db"
+      ],
+      "upstream": [],
+      "apis": [
+        {
+          "id": "atm.withdraw",
+          "method": "POST",
+          "path": "/atm/withdrawals",
+          "description": "Request a cash withdrawal from a registered terminal",
+          "external": true
+        },
+        {
+          "id": "atm.balance",
+          "method": "GET",
+          "path": "/atm/accounts/{id}/balance",
+          "description": "Read an account balance for a terminal session",
+          "external": true
+        }
+      ]
+    },
+    {
+      "id": "branch-portal",
+      "name": "Branch Portal",
+      "type": "channel",
+      "description": "Staff portal for assisted customer servicing and branch account operations.",
+      "owner_team": "Assisted Channels",
+      "owner_contact": "assisted-channels@bank.example",
+      "criticality": 6,
+      "data_classes": [
+        "pii",
+        "financial"
+      ],
+      "deployment_group": "channels-access",
+      "sla_tier": "tier2",
+      "downstream": [
+        "api-gateway",
+        "authentication-service",
+        "audit-db"
+      ],
+      "upstream": [],
+      "apis": [
+        {
+          "id": "branch-portal.customer-search",
+          "method": "GET",
+          "path": "/branch/customers",
+          "description": "Search customers within staff access scope",
+          "external": true
+        },
+        {
+          "id": "branch-portal.service-request",
+          "method": "POST",
+          "path": "/branch/service-requests",
+          "description": "Open a branch-assisted service request",
+          "external": true
+        }
+      ]
+    },
+    {
+      "id": "customer-service",
+      "name": "Customer Service",
+      "type": "core",
+      "description": "System of record API for customer profiles, contact preferences and verified email addresses.",
+      "owner_team": "Customer Platform",
+      "owner_contact": "customer-platform@bank.example",
+      "criticality": 8,
+      "data_classes": [
+        "pii"
+      ],
+      "deployment_group": "customer-platform",
+      "sla_tier": "tier1",
+      "downstream": [
+        "crm",
+        "notification-service",
+        "customer-db",
+        "authentication-service",
+        "audit-db"
+      ],
+      "upstream": [
+        "api-gateway"
+      ],
+      "apis": [
+        {
+          "id": "customer-service.profile-read",
+          "method": "GET",
+          "path": "/customers/{id}",
+          "description": "Read an authorized customer profile",
+          "external": false
+        },
+        {
+          "id": "customer-service.profile-update",
+          "method": "PATCH",
+          "path": "/customers/{id}/profile",
+          "description": "Update profile and contact preferences",
+          "external": false
+        },
+        {
+          "id": "customer-service.email-verify",
+          "method": "POST",
+          "path": "/customers/{id}/emails/verification",
+          "description": "Verify a newly supplied email address",
+          "external": false
+        }
+      ]
+    },
+    {
+      "id": "account-service",
+      "name": "Account Service",
+      "type": "core",
+      "description": "Manages account balances, account status, premium eligibility and per-account payment limits.",
+      "owner_team": "Core Banking",
+      "owner_contact": "core-banking@bank.example",
+      "criticality": 9,
+      "data_classes": [
+        "financial",
+        "pii"
+      ],
+      "deployment_group": "core-banking",
+      "sla_tier": "tier1",
+      "downstream": [
+        "customer-db",
+        "transaction-db",
+        "authentication-service",
+        "audit-db"
+      ],
+      "upstream": [
+        "api-gateway",
+        "card-service",
+        "loan-service",
+        "payment-service"
+      ],
+      "apis": [
+        {
+          "id": "account-service.limits-read",
+          "method": "GET",
+          "path": "/accounts/{id}/limits",
+          "description": "Read daily and per-payment account limits",
+          "external": false
+        },
+        {
+          "id": "account-service.limits-update",
+          "method": "PUT",
+          "path": "/accounts/{id}/limits",
+          "description": "Apply an approved account payment limit",
+          "external": false
+        },
+        {
+          "id": "account-service.balance-read",
+          "method": "GET",
+          "path": "/accounts/{id}/balance",
+          "description": "Read the posted and available balance",
+          "external": false
+        }
+      ]
+    },
+    {
+      "id": "payment-service",
+      "name": "Payment Service",
+      "type": "core",
+      "description": "Executes domestic payments, enforces account limits, screens fraud and posts transaction ledger entries.",
+      "owner_team": "Payments Platform",
+      "owner_contact": "payments-platform@bank.example",
+      "criticality": 10,
+      "data_classes": [
+        "financial"
+      ],
+      "deployment_group": "core-payments",
+      "sla_tier": "tier1",
+      "downstream": [
+        "account-service",
+        "fraud-engine",
+        "notification-service",
+        "transaction-db",
+        "authentication-service",
+        "audit-db"
+      ],
+      "upstream": [
+        "api-gateway"
+      ],
+      "apis": [
+        {
+          "id": "payment-service.create",
+          "method": "POST",
+          "path": "/payments",
+          "description": "Create an idempotent payment instruction",
+          "external": false
+        },
+        {
+          "id": "payment-service.status",
+          "method": "GET",
+          "path": "/payments/{id}",
+          "description": "Read payment processing status",
+          "external": false
+        },
+        {
+          "id": "payment-service.cancel",
+          "method": "POST",
+          "path": "/payments/{id}/cancellation",
+          "description": "Cancel a payment before settlement",
+          "external": false
+        },
+        {
+          "id": "payment-service.limits",
+          "method": "GET",
+          "path": "/payments/limits",
+          "description": "Read effective daily payment limits",
+          "external": false
+        }
+      ]
+    },
+    {
+      "id": "loan-service",
+      "name": "Loan Service",
+      "type": "core",
+      "description": "Processes loan applications, affordability decisions and disbursement postings.",
+      "owner_team": "Core Banking",
+      "owner_contact": "core-banking@bank.example",
+      "criticality": 8,
+      "data_classes": [
+        "financial",
+        "pii"
+      ],
+      "deployment_group": "core-banking",
+      "sla_tier": "tier2",
+      "downstream": [
+        "account-service",
+        "risk-engine",
+        "customer-db",
+        "transaction-db",
+        "authentication-service",
+        "audit-db"
+      ],
+      "upstream": [
+        "api-gateway"
+      ],
+      "apis": [
+        {
+          "id": "loan-service.application",
+          "method": "POST",
+          "path": "/loans/applications",
+          "description": "Submit a loan application for assessment",
+          "external": false
+        },
+        {
+          "id": "loan-service.status",
+          "method": "GET",
+          "path": "/loans/{id}",
+          "description": "Read loan status and repayment schedule",
+          "external": false
+        },
+        {
+          "id": "loan-service.disbursement",
+          "method": "POST",
+          "path": "/loans/{id}/disbursements",
+          "description": "Post an approved loan disbursement",
+          "external": false
+        }
+      ]
+    },
+    {
+      "id": "card-service",
+      "name": "Card Service",
+      "type": "core",
+      "description": "Manages tokenized card records, cardholder linkage and freeze/unfreeze controls requiring step-up authentication.",
+      "owner_team": "Cards Platform",
+      "owner_contact": "cards-platform@bank.example",
+      "criticality": 9,
+      "data_classes": [
+        "card",
+        "pii"
+      ],
+      "deployment_group": "core-banking",
+      "sla_tier": "tier1",
+      "downstream": [
+        "account-service",
+        "fraud-engine",
+        "customer-db",
+        "transaction-db",
+        "authentication-service",
+        "audit-db"
+      ],
+      "upstream": [
+        "api-gateway"
+      ],
+      "apis": [
+        {
+          "id": "card-service.read",
+          "method": "GET",
+          "path": "/cards/{id}",
+          "description": "Read masked card details and current lifecycle status",
+          "external": false
+        },
+        {
+          "id": "card-service.status-update",
+          "method": "PATCH",
+          "path": "/cards/{id}/status",
+          "description": "Freeze or unfreeze a card with step-up proof",
+          "external": false
+        },
+        {
+          "id": "card-service.replacement",
+          "method": "POST",
+          "path": "/cards/{id}/replacement",
+          "description": "Request replacement of an eligible card",
+          "external": false
+        }
+      ]
+    },
+    {
+      "id": "crm",
+      "name": "Customer Relationship Management",
+      "type": "core",
+      "description": "Maintains relationship preferences and customer contact projections for servicing teams.",
+      "owner_team": "Customer Platform",
+      "owner_contact": "customer-platform@bank.example",
+      "criticality": 6,
+      "data_classes": [
+        "pii"
+      ],
+      "deployment_group": "customer-platform",
+      "sla_tier": "tier2",
+      "downstream": [
+        "notification-service",
+        "customer-db",
+        "authentication-service",
+        "audit-db"
+      ],
+      "upstream": [
+        "api-gateway",
+        "customer-service"
+      ],
+      "apis": [
+        {
+          "id": "crm.contact-read",
+          "method": "GET",
+          "path": "/crm/customers/{id}/contacts",
+          "description": "Read synchronized customer contact preferences",
+          "external": false
+        },
+        {
+          "id": "crm.contact-update",
+          "method": "PUT",
+          "path": "/crm/customers/{id}/contacts",
+          "description": "Synchronize customer contact preferences",
+          "external": false
+        }
+      ]
+    },
+    {
+      "id": "authentication-service",
+      "name": "Authentication Service",
+      "type": "platform",
+      "description": "Identity provider for login, biometric device challenges, token validation and step-up authentication.",
+      "owner_team": "Identity & Access",
+      "owner_contact": "identity-access@bank.example",
+      "criticality": 10,
+      "data_classes": [
+        "pii"
+      ],
+      "deployment_group": "identity",
+      "sla_tier": "tier1",
+      "downstream": [
+        "customer-db",
+        "audit-db"
+      ],
+      "upstream": [
+        "account-service",
+        "api-gateway",
+        "atm",
+        "branch-portal",
+        "card-service",
+        "crm",
+        "customer-service",
+        "document-service",
+        "fraud-engine",
+        "loan-service",
+        "mobile-banking",
+        "notification-service",
+        "payment-service",
+        "reporting-service",
+        "risk-engine",
+        "web-banking"
+      ],
+      "apis": [
+        {
+          "id": "authentication-service.token",
+          "method": "POST",
+          "path": "/auth/token",
+          "description": "Issue an access token after credential validation",
+          "external": false
+        },
+        {
+          "id": "authentication-service.introspect",
+          "method": "POST",
+          "path": "/auth/introspect",
+          "description": "Validate token scopes and session expiry",
+          "external": false
+        },
+        {
+          "id": "authentication-service.step-up",
+          "method": "POST",
+          "path": "/auth/step-up",
+          "description": "Verify a step-up challenge for a privileged action",
+          "external": false
+        },
+        {
+          "id": "authentication-service.biometric",
+          "method": "POST",
+          "path": "/auth/biometric/challenges",
+          "description": "Issue a device-bound biometric login challenge",
+          "external": false
+        }
+      ]
+    },
+    {
+      "id": "notification-service",
+      "name": "Notification Service",
+      "type": "platform",
+      "description": "Delivers consent-aware email, SMS and push notifications using verified customer destinations.",
+      "owner_team": "Customer Platform",
+      "owner_contact": "customer-platform@bank.example",
+      "criticality": 6,
+      "data_classes": [
+        "pii"
+      ],
+      "deployment_group": "customer-platform",
+      "sla_tier": "tier2",
+      "downstream": [
+        "customer-db",
+        "authentication-service",
+        "audit-db"
+      ],
+      "upstream": [
+        "crm",
+        "customer-service",
+        "payment-service"
+      ],
+      "apis": [
+        {
+          "id": "notification-service.send",
+          "method": "POST",
+          "path": "/notifications",
+          "description": "Queue a notification to a verified destination",
+          "external": false
+        },
+        {
+          "id": "notification-service.status",
+          "method": "GET",
+          "path": "/notifications/{id}",
+          "description": "Read delivery status without exposing message content",
+          "external": false
+        },
+        {
+          "id": "notification-service.preferences",
+          "method": "GET",
+          "path": "/notifications/preferences/{customerId}",
+          "description": "Read permitted notification channels",
+          "external": false
+        }
+      ]
+    },
+    {
+      "id": "api-gateway",
+      "name": "API Gateway",
+      "type": "platform",
+      "description": "External REST entry point with token validation, route policy enforcement and request tracing.",
+      "owner_team": "Identity & Access",
+      "owner_contact": "identity-access@bank.example",
+      "criticality": 10,
+      "data_classes": [
+        "pii",
+        "financial"
+      ],
+      "deployment_group": "identity",
+      "sla_tier": "tier1",
+      "downstream": [
+        "customer-service",
+        "account-service",
+        "payment-service",
+        "loan-service",
+        "card-service",
+        "crm",
+        "document-service",
+        "authentication-service",
+        "audit-db"
+      ],
+      "upstream": [
+        "atm",
+        "branch-portal",
+        "mobile-banking",
+        "web-banking"
+      ],
+      "apis": [
+        {
+          "id": "api-gateway.payments",
+          "method": "POST",
+          "path": "/payments",
+          "description": "Route an authorized payment instruction to Payment Service",
+          "external": true
+        },
+        {
+          "id": "api-gateway.account-limits",
+          "method": "GET",
+          "path": "/accounts/{id}/limits",
+          "description": "Route an account limits enquiry",
+          "external": true
+        },
+        {
+          "id": "api-gateway.card-status",
+          "method": "PATCH",
+          "path": "/cards/{id}/status",
+          "description": "Route a card freeze/unfreeze request with step-up proof",
+          "external": true
+        },
+        {
+          "id": "api-gateway.customer-profile",
+          "method": "PATCH",
+          "path": "/customers/{id}/profile",
+          "description": "Route a customer profile update",
+          "external": true
+        },
+        {
+          "id": "api-gateway.loan-application",
+          "method": "POST",
+          "path": "/loans/applications",
+          "description": "Route a loan application",
+          "external": true
+        }
+      ]
+    },
+    {
+      "id": "document-service",
+      "name": "Document Service",
+      "type": "platform",
+      "description": "Renders versioned monthly statement PDF templates and manages layout assets and footer text.",
+      "owner_team": "Document Operations",
+      "owner_contact": "document-operations@bank.example",
+      "criticality": 4,
+      "data_classes": [],
+      "deployment_group": "documents",
+      "sla_tier": "tier3",
+      "downstream": [
+        "reporting-service",
+        "authentication-service",
+        "audit-db"
+      ],
+      "upstream": [
+        "api-gateway"
+      ],
+      "apis": [
+        {
+          "id": "document-service.render",
+          "method": "POST",
+          "path": "/documents/statements/render",
+          "description": "Render a monthly statement from an existing reporting payload",
+          "external": false
+        },
+        {
+          "id": "document-service.template",
+          "method": "GET",
+          "path": "/documents/templates/{id}",
+          "description": "Read the published statement layout template",
+          "external": false
+        },
+        {
+          "id": "document-service.template-update",
+          "method": "PUT",
+          "path": "/documents/templates/{id}",
+          "description": "Publish an approved layout template version",
+          "external": false
+        }
+      ]
+    },
+    {
+      "id": "customer-db",
+      "name": "Customer Database",
+      "type": "database",
+      "description": "Encrypted customer profile and identity store; REST paths represent its internal data-access adapter.",
+      "owner_team": "Customer Platform",
+      "owner_contact": "customer-platform@bank.example",
+      "criticality": 9,
+      "data_classes": [
+        "pii"
+      ],
+      "deployment_group": "customer-platform",
+      "sla_tier": "tier1",
+      "downstream": [],
+      "upstream": [
+        "account-service",
+        "authentication-service",
+        "card-service",
+        "crm",
+        "customer-service",
+        "loan-service",
+        "notification-service"
+      ],
+      "apis": [
+        {
+          "id": "customer-db.profile-read",
+          "method": "GET",
+          "path": "/internal/customer-store/profiles/{id}",
+          "description": "Read a customer profile through the private adapter",
+          "external": false
+        },
+        {
+          "id": "customer-db.profile-write",
+          "method": "PUT",
+          "path": "/internal/customer-store/profiles/{id}",
+          "description": "Persist a versioned customer profile",
+          "external": false
+        }
+      ]
+    },
+    {
+      "id": "transaction-db",
+      "name": "Transaction Ledger Database",
+      "type": "database",
+      "description": "Financial ledger with idempotent posting and change-data replication to the reporting store; APIs belong to its private adapter.",
+      "owner_team": "Core Banking",
+      "owner_contact": "core-banking@bank.example",
+      "criticality": 10,
+      "data_classes": [
+        "financial"
+      ],
+      "deployment_group": "core-banking",
+      "sla_tier": "tier1",
+      "downstream": [
+        "reporting-db"
+      ],
+      "upstream": [
+        "account-service",
+        "card-service",
+        "fraud-engine",
+        "loan-service",
+        "payment-service",
+        "risk-engine"
+      ],
+      "apis": [
+        {
+          "id": "transaction-db.entry-write",
+          "method": "POST",
+          "path": "/internal/ledger/entries",
+          "description": "Append a balanced transaction posting",
+          "external": false
+        },
+        {
+          "id": "transaction-db.entry-read",
+          "method": "GET",
+          "path": "/internal/ledger/entries/{id}",
+          "description": "Read a committed transaction ledger entry",
+          "external": false
+        },
+        {
+          "id": "transaction-db.daily-total",
+          "method": "GET",
+          "path": "/internal/ledger/accounts/{id}/daily-total",
+          "description": "Read the aggregate daily payment amount",
+          "external": false
+        }
+      ]
+    },
+    {
+      "id": "audit-db",
+      "name": "Audit Database",
+      "type": "database",
+      "description": "Append-only operational audit store with integrity checks and retention controls; APIs belong to its private adapter.",
+      "owner_team": "Data & Analytics",
+      "owner_contact": "data-analytics@bank.example",
+      "criticality": 8,
+      "data_classes": [
+        "audit"
+      ],
+      "deployment_group": "data-platform",
+      "sla_tier": "tier1",
+      "downstream": [],
+      "upstream": [
+        "account-service",
+        "api-gateway",
+        "atm",
+        "authentication-service",
+        "branch-portal",
+        "card-service",
+        "crm",
+        "customer-service",
+        "document-service",
+        "fraud-engine",
+        "loan-service",
+        "mobile-banking",
+        "notification-service",
+        "payment-service",
+        "reporting-service",
+        "risk-engine",
+        "web-banking"
+      ],
+      "apis": [
+        {
+          "id": "audit-db.append",
+          "method": "POST",
+          "path": "/internal/audit/events",
+          "description": "Append a traceable immutable audit event",
+          "external": false
+        },
+        {
+          "id": "audit-db.query",
+          "method": "GET",
+          "path": "/internal/audit/events",
+          "description": "Query audit events within an approved access scope",
+          "external": false
+        }
+      ]
+    },
+    {
+      "id": "reporting-db",
+      "name": "Reporting Database",
+      "type": "database",
+      "description": "Read-optimized transaction projections fed by ledger replication; REST paths represent its private data-access adapter.",
+      "owner_team": "Data & Analytics",
+      "owner_contact": "data-analytics@bank.example",
+      "criticality": 6,
+      "data_classes": [
+        "financial"
+      ],
+      "deployment_group": "data-platform",
+      "sla_tier": "tier2",
+      "downstream": [],
+      "upstream": [
+        "reporting-service",
+        "transaction-db"
+      ],
+      "apis": [
+        {
+          "id": "reporting-db.statement-read",
+          "method": "GET",
+          "path": "/internal/reporting-store/statements/{id}",
+          "description": "Read a monthly statement projection",
+          "external": false
+        },
+        {
+          "id": "reporting-db.projection-write",
+          "method": "POST",
+          "path": "/internal/reporting-store/projections",
+          "description": "Apply a ledger change-data projection",
+          "external": false
+        }
+      ]
+    },
+    {
+      "id": "fraud-engine",
+      "name": "Fraud Engine",
+      "type": "analytics",
+      "description": "Screens payments and card activity using fraud rules, card-not-present velocity checks and risk engine signals.",
+      "owner_team": "Payments Platform",
+      "owner_contact": "payments-platform@bank.example",
+      "criticality": 9,
+      "data_classes": [
+        "financial",
+        "card"
+      ],
+      "deployment_group": "core-payments",
+      "sla_tier": "tier1",
+      "downstream": [
+        "risk-engine",
+        "transaction-db",
+        "authentication-service",
+        "audit-db"
+      ],
+      "upstream": [
+        "card-service",
+        "payment-service"
+      ],
+      "apis": [
+        {
+          "id": "fraud-engine.screen",
+          "method": "POST",
+          "path": "/fraud/screenings",
+          "description": "Screen a payment against active fraud rules",
+          "external": false
+        },
+        {
+          "id": "fraud-engine.rule-update",
+          "method": "PUT",
+          "path": "/fraud/rules/{id}",
+          "description": "Publish an approved version of a fraud rule",
+          "external": false
+        },
+        {
+          "id": "fraud-engine.velocity",
+          "method": "POST",
+          "path": "/fraud/velocity-checks",
+          "description": "Evaluate card-not-present event velocity",
+          "external": false
+        }
+      ]
+    },
+    {
+      "id": "risk-engine",
+      "name": "Risk Engine",
+      "type": "analytics",
+      "description": "Computes operational credit and transaction risk signals from versioned policy and ledger aggregates.",
+      "owner_team": "Data & Analytics",
+      "owner_contact": "data-analytics@bank.example",
+      "criticality": 8,
+      "data_classes": [
+        "financial"
+      ],
+      "deployment_group": "data-platform",
+      "sla_tier": "tier2",
+      "downstream": [
+        "transaction-db",
+        "authentication-service",
+        "audit-db"
+      ],
+      "upstream": [
+        "fraud-engine",
+        "loan-service"
+      ],
+      "apis": [
+        {
+          "id": "risk-engine.assessment",
+          "method": "POST",
+          "path": "/risk/assessments",
+          "description": "Compute a risk signal for a transaction or application",
+          "external": false
+        },
+        {
+          "id": "risk-engine.policy",
+          "method": "GET",
+          "path": "/risk/policies/{id}",
+          "description": "Read the active risk policy version",
+          "external": false
+        },
+        {
+          "id": "risk-engine.policy-update",
+          "method": "PUT",
+          "path": "/risk/policies/{id}",
+          "description": "Publish an approved risk policy",
+          "external": false
+        }
+      ]
+    },
+    {
+      "id": "reporting-service",
+      "name": "Reporting Service",
+      "type": "analytics",
+      "description": "Reads reporting projections and supplies stable monthly statement payloads and template selection to Document Service.",
+      "owner_team": "Data & Analytics",
+      "owner_contact": "data-analytics@bank.example",
+      "criticality": 5,
+      "data_classes": [],
+      "deployment_group": "data-platform",
+      "sla_tier": "tier2",
+      "downstream": [
+        "reporting-db",
+        "authentication-service",
+        "audit-db"
+      ],
+      "upstream": [
+        "document-service"
+      ],
+      "apis": [
+        {
+          "id": "reporting-service.statement",
+          "method": "GET",
+          "path": "/reports/monthly-statements/{id}",
+          "description": "Read an existing statement render payload",
+          "external": false
+        },
+        {
+          "id": "reporting-service.statement-job",
+          "method": "POST",
+          "path": "/reports/monthly-statements/jobs",
+          "description": "Schedule the monthly statement rendering batch",
+          "external": false
+        },
+        {
+          "id": "reporting-service.template-selection",
+          "method": "GET",
+          "path": "/reports/statement-template",
+          "description": "Read the statement template version for rendering",
+          "external": false
+        }
+      ]
+    }
+  ]
+}
