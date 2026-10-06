@@ -35,6 +35,10 @@ def demo_sprint() -> DemoSprint:
 def _latest(story_id: str) -> StoryAnalysis:
     analysis = db.latest_story_analysis(story_id)
     if analysis is None:
+        # A fresh database still has saved results for the demo stories.
+        demo = next((s for s in load_demo_sprint().stories if s.id == story_id), None)
+        analysis = story_fixture(demo) if demo else None
+    if analysis is None:
         raise HTTPException(status_code=404, detail="Story analysis not found")
     return analysis
 
