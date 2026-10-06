@@ -1,0 +1,78 @@
+{
+  "sprint_id": "sprint-42",
+  "name": "Sprint 42: Q4 payments & cards",
+  "stories": [
+    {
+      "id": "ST-101",
+      "title": "Increase daily payment limits for premium customers",
+      "type": "story",
+      "description": "Increase daily payment limits for premium customers from AED 25,000 to AED 50,000 for domestic transfers. The payment-service must obtain premium eligibility and the effective account limit from account-service before accepting each payment. Keep fraud screening active through fraud-engine and use the transaction ledger in transaction-db to calculate the remaining daily allowance, including concurrent requests. Roll out the business rule behind an approved feature flag during the payments release window. Operations must confirm threshold monitoring and rollback readiness before enabling the higher limit; standard customer limits remain unchanged.",
+      "acceptance_criteria": [
+        "A premium account can submit domestic payments totaling AED 50,000 per bank-local calendar day; the next payment is declined.",
+        "A standard account retains its AED 25,000 daily limit and existing per-payment checks.",
+        "Concurrent payment submissions cannot exceed the account daily limit, and retries create one transaction ledger posting.",
+        "Every accepted payment passes fraud screening; operations approves monitoring and can restore the previous limit with the feature flag."
+      ]
+    },
+    {
+      "id": "ST-104",
+      "title": "Customer profile: add preferred name and secondary email",
+      "type": "story",
+      "description": "Extend the customer profile with an optional preferred name and secondary email for service notifications. The customer-service stores this personal data in customer-db through a backward-compatible schema change and synchronizes the contact projection with CRM. The notification-service may use the secondary email only after verification and explicit customer consent. Keep the legal name and primary email behavior unchanged, including customers who leave the new fields blank. Apply existing retention, access, correction and erasure controls to both fields, and record the consent evidence needed for GDPR review.",
+      "acceptance_criteria": [
+        "Preferred name accepts 1-80 characters and is optional; the legal name remains unchanged.",
+        "Secondary email must have valid email syntax and complete verification before notification delivery is enabled.",
+        "Customer profile updates persist in customer-db and synchronize with CRM without overwriting the primary email.",
+        "Withdrawal of consent stops secondary email notifications, and access or erasure requests include both new personal data fields."
+      ]
+    },
+    {
+      "id": "ST-107",
+      "title": "Card freeze/unfreeze in mobile app with step-up authentication",
+      "type": "story",
+      "description": "Add card freeze/unfreeze controls to the mobile app through a new API gateway endpoint backed by card-service. Each card status change requires step-up authentication from authentication-service, binds the proof to the device and requested action, and exposes only masked card details. Update mobile-banking and api-gateway authorization policies together with the card control flow. PCI DSS review and security sign-off are outstanding: the prototype permits cross-device proof replay and lacks fail-closed verification evidence. These unresolved authentication defects and the missing rollback rehearsal are release blockers until the acceptance criteria have demonstrated evidence.",
+      "acceptance_criteria": [
+        "A cardholder can freeze or unfreeze their own card in mobile-banking through the API gateway endpoint, and the refreshed view shows the confirmed status.",
+        "Each action requires a fresh step-up proof bound to the card, device and requested action; replay and cross-customer requests are rejected.",
+        "If authentication-service is unavailable or proof validation fails, card-service leaves the card status unchanged and denies the action.",
+        "Card control traces contain masked identifiers only; PCI DSS review, security sign-off and a rehearsed rollback are mandatory before release."
+      ]
+    },
+    {
+      "id": "ST-110",
+      "title": "Fraud rule update: velocity check for card-not-present payments",
+      "type": "story",
+      "description": "Update the fraud rule in fraud-engine to add a rolling velocity check for card-not-present payments. The payment-service must supply the existing payment event attributes and apply the returned screening decision before posting. The risk engine provides the current policy signal used when the threshold is exceeded. Block the sixth attempt for the same card token within a rolling sixty-second window, including declined attempts. This change shares the payment screening path and core-payments deployment with ST-101, so both stories must agree on rule ordering, combined regression coverage and rollout timing.",
+      "acceptance_criteria": [
+        "The first five card-not-present attempts for one card token inside sixty seconds are evaluated normally; the sixth is blocked by the velocity rule.",
+        "Declined attempts count toward the velocity window, while distinct card tokens maintain independent counters.",
+        "fraud-engine includes the active risk-engine policy signal and rule version in its screening decision.",
+        "Combined ST-101 and ST-110 regression evidence confirms premium payment limits cannot bypass fraud screening; their core-payments release order is agreed."
+      ]
+    },
+    {
+      "id": "ST-112",
+      "title": "Biometric login for mobile banking",
+      "type": "story",
+      "description": "Enable biometric login for mobile banking on supported devices using a device-bound challenge verified by the authentication service. The mobile-banking client invokes the platform biometric prompt and sends its signed result to authentication-service before receiving the existing scoped access token. Customers may opt in after a successful credential login and revoke the device registration from their session settings. Preserve the credential fallback for unsupported devices and failed prompts. Schedule the identity deployment jointly with ST-107 because both stories modify authentication-service challenge validation and cannot deploy incompatible authentication policies independently.",
+      "acceptance_criteria": [
+        "An opted-in device completes a fresh signed biometric challenge before authentication-service issues the normal scoped access token.",
+        "A failed, expired or replayed biometric challenge creates no authenticated mobile banking session.",
+        "Unsupported devices retain credential login, and device revocation prevents further biometric login from that device.",
+        "ST-112 and ST-107 coordinate the authentication-service identity deployment, shared challenge contract and rollback policy to avoid a deployment collision."
+      ]
+    },
+    {
+      "id": "ST-115",
+      "title": "Update the footer text on monthly statement PDFs",
+      "type": "story",
+      "description": "Update the monthly statement PDF footer text rendered by the document service to read: Thank you for banking with us. Apply the approved sentence to the English statement template and retain the existing font, alignment and page margins. The reporting service continues selecting the same template family and supplying the existing render payload. This is a presentation-only template update with fixed wording and a versioned layout asset. The existing rendering workflow remains unchanged. Publish a versioned template after preview approval; rollback consists of selecting the previous template version for subsequent statement rendering.",
+      "acceptance_criteria": [
+        "Every page of newly rendered English monthly statement PDFs shows exactly: Thank you for banking with us.",
+        "Footer font, alignment, margins, page numbering and all other template content remain unchanged, including multi-page statements.",
+        "document-service and reporting-service use the existing render payload and template selection interfaces without modification.",
+        "An approved PDF preview confirms the footer fits the existing layout, and selecting the previous template version restores the prior footer."
+      ]
+    }
+  ]
+}

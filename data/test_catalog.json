@@ -1,0 +1,842 @@
+[
+  {
+    "id": "TC-001",
+    "title": "Mobile payment confirmation shows a single successful submission",
+    "type": "functional",
+    "services": [
+      "mobile-banking"
+    ],
+    "apis": [
+      "mobile-banking.payments"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-002",
+    "title": "Mobile card status route requires a valid device session",
+    "type": "api",
+    "services": [
+      "mobile-banking"
+    ],
+    "apis": [
+      "mobile-banking.card-status"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-003",
+    "title": "Web dashboard displays only accounts authorized for the current customer",
+    "type": "functional",
+    "services": [
+      "web-banking"
+    ],
+    "apis": [
+      "web-banking.accounts"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-004",
+    "title": "Web profile update rejects unsupported fields",
+    "type": "api",
+    "services": [
+      "web-banking"
+    ],
+    "apis": [
+      "web-banking.profile"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-005",
+    "title": "ATM withdrawal declines when available balance is insufficient",
+    "type": "functional",
+    "services": [
+      "atm"
+    ],
+    "apis": [
+      "atm.withdraw"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-006",
+    "title": "ATM balance enquiry rejects an unregistered terminal",
+    "type": "api",
+    "services": [
+      "atm"
+    ],
+    "apis": [
+      "atm.balance"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-007",
+    "title": "Branch customer search respects staff branch entitlements",
+    "type": "functional",
+    "services": [
+      "branch-portal"
+    ],
+    "apis": [
+      "branch-portal.customer-search"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-008",
+    "title": "Branch service request validates the required request category",
+    "type": "api",
+    "services": [
+      "branch-portal"
+    ],
+    "apis": [
+      "branch-portal.service-request"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-009",
+    "title": "Customer preferred name round-trips without changing the legal name",
+    "type": "functional",
+    "services": [
+      "customer-service"
+    ],
+    "apis": [
+      "customer-service.profile-update"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-010",
+    "title": "Customer profile patch rejects malformed secondary email addresses",
+    "type": "api",
+    "services": [
+      "customer-service"
+    ],
+    "apis": [
+      "customer-service.profile-update"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-011",
+    "title": "Account daily limits distinguish premium and standard eligibility",
+    "type": "functional",
+    "services": [
+      "account-service"
+    ],
+    "apis": [
+      "account-service.limits-read"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-012",
+    "title": "Account limits endpoint rejects unauthorized limit overrides",
+    "type": "api",
+    "services": [
+      "account-service"
+    ],
+    "apis": [
+      "account-service.limits-update"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-013",
+    "title": "Payments reject amounts exceeding the remaining daily account limit",
+    "type": "functional",
+    "services": [
+      "payment-service"
+    ],
+    "apis": [
+      "payment-service.create"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-014",
+    "title": "Payment creation returns the same instruction for a repeated idempotency key",
+    "type": "api",
+    "services": [
+      "payment-service"
+    ],
+    "apis": [
+      "payment-service.create"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-015",
+    "title": "Loan disbursement is blocked before application approval",
+    "type": "functional",
+    "services": [
+      "loan-service"
+    ],
+    "apis": [
+      "loan-service.disbursement"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-016",
+    "title": "Loan application endpoint validates amount and repayment term",
+    "type": "api",
+    "services": [
+      "loan-service"
+    ],
+    "apis": [
+      "loan-service.application"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-017",
+    "title": "Card freeze and unfreeze preserve the original cardholder linkage",
+    "type": "functional",
+    "services": [
+      "card-service"
+    ],
+    "apis": [
+      "card-service.status-update"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-018",
+    "title": "Card status update rejects an expired step-up proof",
+    "type": "api",
+    "services": [
+      "card-service"
+    ],
+    "apis": [
+      "card-service.status-update"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-019",
+    "title": "CRM contact synchronization retains verified address preferences",
+    "type": "functional",
+    "services": [
+      "crm"
+    ],
+    "apis": [
+      "crm.contact-update"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-020",
+    "title": "CRM contact update enforces optimistic version checks",
+    "type": "api",
+    "services": [
+      "crm"
+    ],
+    "apis": [
+      "crm.contact-update"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-021",
+    "title": "Biometric login verifies a device-bound challenge before issuing a token",
+    "type": "functional",
+    "services": [
+      "authentication-service"
+    ],
+    "apis": [
+      "authentication-service.biometric"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-022",
+    "title": "Token introspection rejects expired and revoked sessions",
+    "type": "api",
+    "services": [
+      "authentication-service"
+    ],
+    "apis": [
+      "authentication-service.introspect"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-023",
+    "title": "Notification delivery uses only verified and permitted destinations",
+    "type": "functional",
+    "services": [
+      "notification-service"
+    ],
+    "apis": [
+      "notification-service.send"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-024",
+    "title": "Notification submission rejects an unsupported delivery channel",
+    "type": "api",
+    "services": [
+      "notification-service"
+    ],
+    "apis": [
+      "notification-service.send"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-025",
+    "title": "Gateway routes payment requests with the original correlation identifier",
+    "type": "functional",
+    "services": [
+      "api-gateway"
+    ],
+    "apis": [
+      "api-gateway.payments"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-026",
+    "title": "Gateway card status route enforces the required authorization scope",
+    "type": "api",
+    "services": [
+      "api-gateway"
+    ],
+    "apis": [
+      "api-gateway.card-status"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-027",
+    "title": "Statement PDF footer renders within page margins on every template",
+    "type": "functional",
+    "services": [
+      "document-service"
+    ],
+    "apis": [
+      "document-service.render"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-028",
+    "title": "Statement render endpoint rejects an unknown template version",
+    "type": "api",
+    "services": [
+      "document-service"
+    ],
+    "apis": [
+      "document-service.render"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-029",
+    "title": "Customer profile persistence preserves optional preferred name fields",
+    "type": "functional",
+    "services": [
+      "customer-db"
+    ],
+    "apis": [
+      "customer-db.profile-write"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-030",
+    "title": "Customer store adapter rejects stale profile versions",
+    "type": "api",
+    "services": [
+      "customer-db"
+    ],
+    "apis": [
+      "customer-db.profile-write"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-031",
+    "title": "Ledger duplicate posting preserves balanced entries and daily totals",
+    "type": "functional",
+    "services": [
+      "transaction-db"
+    ],
+    "apis": [
+      "transaction-db.entry-write"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-032",
+    "title": "Ledger adapter rejects a posting with unbalanced debit and credit totals",
+    "type": "api",
+    "services": [
+      "transaction-db"
+    ],
+    "apis": [
+      "transaction-db.entry-write"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-033",
+    "title": "Audit events retain correlation identifiers and ordered timestamps",
+    "type": "functional",
+    "services": [
+      "audit-db"
+    ],
+    "apis": [
+      "audit-db.append"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-034",
+    "title": "Audit adapter denies attempts to overwrite an existing event",
+    "type": "api",
+    "services": [
+      "audit-db"
+    ],
+    "apis": [
+      "audit-db.append"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-035",
+    "title": "Reporting projection applies each ledger change exactly once",
+    "type": "functional",
+    "services": [
+      "reporting-db"
+    ],
+    "apis": [
+      "reporting-db.projection-write"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-036",
+    "title": "Reporting store returns a stable monthly statement snapshot",
+    "type": "api",
+    "services": [
+      "reporting-db"
+    ],
+    "apis": [
+      "reporting-db.statement-read"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-037",
+    "title": "Card-not-present velocity threshold blocks the sixth attempt inside one minute",
+    "type": "functional",
+    "services": [
+      "fraud-engine"
+    ],
+    "apis": [
+      "fraud-engine.velocity"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-038",
+    "title": "Fraud screening endpoint returns rule version and decision trace",
+    "type": "api",
+    "services": [
+      "fraud-engine"
+    ],
+    "apis": [
+      "fraud-engine.screen"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-039",
+    "title": "Risk assessment evaluates the published policy version consistently",
+    "type": "functional",
+    "services": [
+      "risk-engine"
+    ],
+    "apis": [
+      "risk-engine.assessment"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-040",
+    "title": "Risk policy publication rejects invalid threshold ordering",
+    "type": "api",
+    "services": [
+      "risk-engine"
+    ],
+    "apis": [
+      "risk-engine.policy-update"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-041",
+    "title": "Monthly statement jobs select the published document template version",
+    "type": "functional",
+    "services": [
+      "reporting-service"
+    ],
+    "apis": [
+      "reporting-service.statement-job"
+    ],
+    "automated": true,
+    "duration_min": 6
+  },
+  {
+    "id": "TC-042",
+    "title": "Monthly statement payload endpoint preserves pagination metadata",
+    "type": "api",
+    "services": [
+      "reporting-service"
+    ],
+    "apis": [
+      "reporting-service.statement-job"
+    ],
+    "automated": true,
+    "duration_min": 4
+  },
+  {
+    "id": "TC-043",
+    "title": "Premium payment limit enforcement agrees with posted daily ledger totals",
+    "type": "integration",
+    "services": [
+      "payment-service",
+      "account-service",
+      "transaction-db"
+    ],
+    "apis": [
+      "payment-service.create",
+      "account-service.limits-read",
+      "transaction-db.daily-total"
+    ],
+    "automated": true,
+    "duration_min": 12
+  },
+  {
+    "id": "TC-044",
+    "title": "Fraud decline leaves the payment ledger unchanged and records its decision",
+    "type": "integration",
+    "services": [
+      "payment-service",
+      "fraud-engine",
+      "transaction-db",
+      "audit-db"
+    ],
+    "apis": [
+      "payment-service.create",
+      "fraud-engine.screen",
+      "audit-db.append"
+    ],
+    "automated": true,
+    "duration_min": 10
+  },
+  {
+    "id": "TC-045",
+    "title": "Preferred name and verified secondary email propagate to CRM and notifications",
+    "type": "integration",
+    "services": [
+      "customer-service",
+      "crm",
+      "customer-db",
+      "notification-service"
+    ],
+    "apis": [
+      "customer-service.profile-update",
+      "crm.contact-update",
+      "notification-service.send"
+    ],
+    "automated": true,
+    "duration_min": 12
+  },
+  {
+    "id": "TC-046",
+    "title": "Mobile card freeze propagates through gateway to card lifecycle state",
+    "type": "integration",
+    "services": [
+      "mobile-banking",
+      "api-gateway",
+      "card-service",
+      "authentication-service"
+    ],
+    "apis": [
+      "mobile-banking.card-status",
+      "api-gateway.card-status",
+      "card-service.status-update"
+    ],
+    "automated": true,
+    "duration_min": 15
+  },
+  {
+    "id": "TC-047",
+    "title": "Velocity screening consumes the risk signal for card-not-present payments",
+    "type": "integration",
+    "services": [
+      "fraud-engine",
+      "risk-engine",
+      "payment-service"
+    ],
+    "apis": [
+      "fraud-engine.velocity",
+      "risk-engine.assessment",
+      "payment-service.create"
+    ],
+    "automated": true,
+    "duration_min": 10
+  },
+  {
+    "id": "TC-048",
+    "title": "Biometric challenge completion creates an authorized mobile session",
+    "type": "integration",
+    "services": [
+      "authentication-service",
+      "mobile-banking",
+      "api-gateway"
+    ],
+    "apis": [
+      "authentication-service.biometric",
+      "mobile-banking.login"
+    ],
+    "automated": true,
+    "duration_min": 10
+  },
+  {
+    "id": "TC-049",
+    "title": "Ledger replication feeds a consistent reporting statement projection",
+    "type": "integration",
+    "services": [
+      "transaction-db",
+      "reporting-db",
+      "reporting-service"
+    ],
+    "apis": [
+      "transaction-db.entry-write",
+      "reporting-db.projection-write",
+      "reporting-service.statement"
+    ],
+    "automated": true,
+    "duration_min": 14
+  },
+  {
+    "id": "TC-050",
+    "title": "Reporting template selection renders the approved footer in Document Service",
+    "type": "integration",
+    "services": [
+      "document-service",
+      "reporting-service"
+    ],
+    "apis": [
+      "document-service.render",
+      "reporting-service.template-selection"
+    ],
+    "automated": true,
+    "duration_min": 8
+  },
+  {
+    "id": "TC-051",
+    "title": "Step-up proof cannot be replayed across devices or different card actions",
+    "type": "security",
+    "services": [
+      "authentication-service",
+      "card-service",
+      "mobile-banking"
+    ],
+    "apis": [
+      "authentication-service.step-up",
+      "card-service.status-update"
+    ],
+    "automated": true,
+    "duration_min": 15
+  },
+  {
+    "id": "TC-052",
+    "title": "Gateway denies card controls when token introspection is unavailable",
+    "type": "security",
+    "services": [
+      "api-gateway",
+      "authentication-service",
+      "card-service"
+    ],
+    "apis": [
+      "api-gateway.card-status",
+      "authentication-service.introspect"
+    ],
+    "automated": true,
+    "duration_min": 10
+  },
+  {
+    "id": "TC-053",
+    "title": "Customer profile and CRM contact access prevent cross-customer disclosure",
+    "type": "security",
+    "services": [
+      "customer-service",
+      "crm",
+      "customer-db"
+    ],
+    "apis": [
+      "customer-service.profile-read",
+      "crm.contact-read"
+    ],
+    "automated": true,
+    "duration_min": 12
+  },
+  {
+    "id": "TC-054",
+    "title": "Privileged limit changes require authorized staff scope and an audit event",
+    "type": "security",
+    "services": [
+      "account-service",
+      "authentication-service",
+      "audit-db"
+    ],
+    "apis": [
+      "account-service.limits-update",
+      "audit-db.query"
+    ],
+    "automated": true,
+    "duration_min": 10
+  },
+  {
+    "id": "TC-055",
+    "title": "Biometric enrollment rejects mismatched device keys and revoked challenges",
+    "type": "security",
+    "services": [
+      "authentication-service",
+      "mobile-banking"
+    ],
+    "apis": [
+      "authentication-service.biometric",
+      "mobile-banking.login"
+    ],
+    "automated": true,
+    "duration_min": 15
+  },
+  {
+    "id": "TC-056",
+    "title": "Audit retention administrator cannot modify existing financial event records",
+    "type": "security",
+    "services": [
+      "audit-db",
+      "transaction-db"
+    ],
+    "apis": [
+      "audit-db.append",
+      "transaction-db.entry-read"
+    ],
+    "automated": false,
+    "duration_min": 25
+  },
+  {
+    "id": "TC-057",
+    "title": "Standard customer payment limits remain unchanged after premium rollout",
+    "type": "regression",
+    "services": [
+      "payment-service",
+      "account-service",
+      "web-banking"
+    ],
+    "apis": [
+      "payment-service.limits",
+      "account-service.limits-read"
+    ],
+    "automated": true,
+    "duration_min": 9
+  },
+  {
+    "id": "TC-058",
+    "title": "Loan repayment and card replacement workflows retain existing account checks",
+    "type": "regression",
+    "services": [
+      "loan-service",
+      "card-service",
+      "account-service"
+    ],
+    "apis": [
+      "loan-service.status",
+      "card-service.replacement"
+    ],
+    "automated": true,
+    "duration_min": 12
+  },
+  {
+    "id": "TC-059",
+    "title": "ATM and branch servicing keep existing terminal and staff session behavior",
+    "type": "regression",
+    "services": [
+      "atm",
+      "branch-portal",
+      "api-gateway",
+      "authentication-service"
+    ],
+    "apis": [
+      "atm.balance",
+      "branch-portal.customer-search"
+    ],
+    "automated": false,
+    "duration_min": 20
+  },
+  {
+    "id": "TC-060",
+    "title": "Statement footer typography passes visual review across supported PDF layouts",
+    "type": "regression",
+    "services": [
+      "document-service",
+      "reporting-service"
+    ],
+    "apis": [
+      "document-service.render",
+      "reporting-service.statement"
+    ],
+    "automated": false,
+    "duration_min": 18
+  }
+]
