@@ -47,6 +47,12 @@ def _level(score: int) -> Severity:
     return "low"
 
 
+def _name_list(node_ids: list[str], limit: int = 3) -> str:
+    if len(node_ids) <= limit:
+        return ", ".join(node_ids)
+    return f"{', '.join(node_ids[:limit])} and {len(node_ids) - limit} more"
+
+
 def _dimension(name: RiskDimensionName, factors: list[RiskFactor]) -> RiskDimension:
     score = max(0, min(100, sum(factor.points for factor in factors)))
     level = _level(score)
@@ -56,10 +62,10 @@ def _dimension(name: RiskDimensionName, factors: list[RiskFactor]) -> RiskDimens
     top = sorted(contributors, key=lambda factor: -factor.points)[:3] or factors[:1]
     reasons = []
     for factor in top:
-        location = f" on {', '.join(factor.node_ids)}" if factor.node_ids else ""
+        location = f" on {_name_list(factor.node_ids)}" if factor.node_ids else ""
         reasons.append(f"{factor.label} ({factor.points:+d}){location}")
     explanation = f"{name.capitalize()} risk is {level} ({score}) because "
-    explanation += " and ".join(reasons) + "."
+    explanation += "; ".join(reasons) + "."
     return RiskDimension(
         name=name,
         score=score,

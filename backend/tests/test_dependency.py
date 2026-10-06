@@ -1,11 +1,11 @@
 """Dependency engine tests use inline catalogs and never call an LLM."""
 
-from math import hypot
+from math import atan2, hypot, pi
 
 import pytest
 
 from app.contracts import ApiEndpoint, Architecture, Component, ComponentType
-from app.engine.dependency import build_impact_graph
+from app.engine.dependency import NODE_SPACING, RING_GAP, build_impact_graph
 
 
 def component(
@@ -158,10 +158,25 @@ def test_positions_are_deterministic_and_grouped_by_type():
     assert result == build_impact_graph(["root", "root"], reordered)
     nodes = node_map(result)
     assert (nodes["root"].x, nodes["root"].y) == (0.0, 0.0)
-    assert [(nodes[key].x, nodes[key].y) for key in ["channel", "core-a", "core-b", "db"]] == [
-        (310.0, 0.0), (0.0, 310.0), (-310.0, 0.0), (0.0, -310.0),
-    ]
-    assert (nodes["outside"].x, nodes["outside"].y) == (820.0, 0.0)
+    hop1 = [nodes[key] for key in ["channel", "core-a", "core-b", "db"]]
+    radii = {round(hypot(node.x, node.y), 1) for node in hop1}
+    assert len(radii) == 1 and radii.pop() >= RING_GAP
+    # Sorted by type then id, so the channel leads the ring.
+    angles = [atan2(node.y, node.x) % (2 * pi) for node in hop1]
+    assert angles == sorted(angles)
+    assert hypot(nodes["outside"].x, nodes["outside"].y) > hypot(hop1[0].x, hop1[0].y)
+
+
+def test_crowded_rings_grow_so_nodes_do_not_overlap():
+    leaves = [component(f"leaf-{index:02d}") for index in range(16)]
+    hub = component("hub", downstream=[leaf.id for leaf in leaves])
+    result = build_impact_graph(["hub"], Architecture(components=[hub, *leaves]))
+    points = [(node.x, node.y) for node in result.nodes]
+    closest = min(
+        hypot(ax - bx, ay - by)
+        for i, (ax, ay) in enumerate(points) for bx, by in points[i + 1:]
+    )
+    assert closest >= NODE_SPACING * 0.95
 
 
 def test_multiple_changed_nodes_use_a_small_ring():
@@ -169,7 +184,7 @@ def test_multiple_changed_nodes_use_a_small_ring():
     result = build_impact_graph(["b", "a", "c"], arch)
     assert result == build_impact_graph(["c", "a", "b"], arch)
     for node in result.nodes:
-        assert hypot(node.x, node.y) == pytest.approx(70, abs=0.1)
+        assert hypot(node.x, node.y) == pytest.approx(110, abs=0.1)
         assert node.x == round(node.x, 1)
         assert node.y == round(node.y, 1)
     assert len({(node.x, node.y) for node in result.nodes}) == 3

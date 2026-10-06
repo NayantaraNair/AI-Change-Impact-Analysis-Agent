@@ -30,6 +30,10 @@ def _severity(criticality: int, hop: int) -> Severity:
     return "low"
 
 
+NODE_SPACING = 190.0  # arc length per node on a ring
+RING_GAP = 170.0
+
+
 def _positions(
     components: list[Component], hops: dict[ServiceId, int]
 ) -> dict[ServiceId, tuple[float, float]]:
@@ -37,15 +41,20 @@ def _positions(
     for component in components:
         rings[hops.get(component.id)].append(component)
 
+    # Rings grow with their population so ~170 px-wide nodes never overlap, and
+    # each ring sits at least RING_GAP outside the previous one.
     positions = {}
-    for hop, ring in rings.items():
-        ring.sort(key=lambda component: (component.type, component.id))
+    radius = 0.0
+    for hop in sorted(rings, key=lambda h: 99 if h is None else h):
+        ring = sorted(rings[hop], key=lambda component: (component.type, component.id))
         if hop == 0 and len(ring) == 1:
             positions[ring[0].id] = (0.0, 0.0)
             continue
-        radius = 70 if hop == 0 else 140 + (4 if hop is None else hop) * 170
+        floor = 110.0 if hop == 0 else radius + RING_GAP
+        radius = max(floor, len(ring) * NODE_SPACING / (2 * pi))
+        offset = pi / len(ring) if hop and hop % 2 else 0.0
         for index, component in enumerate(ring):
-            angle = 2 * pi * index / len(ring)
+            angle = 2 * pi * index / len(ring) + offset
             positions[component.id] = (
                 round(radius * cos(angle), 1),
                 round(radius * sin(angle), 1),
