@@ -1,0 +1,20 @@
+{
+  "answer": "- **ST-104**: release confidence 53/100; decision GO_WITH_CONDITIONS.\n- Triggered rule: GO_WITH_CONDITIONS: highest risk is 63 (>= 60)\n- Triggered rule: GO_WITH_CONDITIONS: GDPR risk is high\n- Triggered rule: GO_WITH_CONDITIONS: PCI DSS risk is medium\n- Triggered rule: GO_WITH_CONDITIONS: SOX risk is medium\n- Condition: Run the P1 api tests on customer-service before release (TC-010: Customer profile patch rejects malformed secondary email addresses)\n- Condition: Run the P1 api tests on account-service before release (TC-012: Account limits endpoint rejects unauthorized limit overrides)\n- Condition: Run the P1 api tests on payment-service before release (TC-014: Payment creation returns the same instruction for a repeated idempotency key)\n- Condition: Run the P1 api tests on card-service before release (TC-018: Card status update rejects an expired step-up proof)\n- Condition: Run the P1 api tests on crm before release (TC-020: CRM contact update enforces optimistic version checks)\n- Condition: Run the P1 api tests on authentication-service before release (TC-022: Token introspection rejects expired and revoked sessions)\n- Condition: Run the P1 api tests on notification-service before release (TC-024: Notification submission rejects an unsupported delivery channel)\n- Condition: Run the P1 api tests on api-gateway before release (TC-026: Gateway card status route enforces the required authorization scope)\n- Condition: Run the P1 api tests on customer-db before release (TC-030: Customer store adapter rejects stale profile versions)\n- Condition: Run the P1 functional tests on customer-service before release (TC-009: Customer preferred name round-trips without changing the legal name)\n- Condition: Run the P1 functional tests on account-service before release (TC-011: Account daily limits distinguish premium and standard eligibility)\n- Condition: Run the P1 functional tests on payment-service before release (TC-013: Payments reject amounts exceeding the remaining daily account limit)\n- Condition: Run the P1 functional tests on card-service before release (TC-017: Card freeze and unfreeze preserve the original cardholder linkage)\n- Condition: Run the P1 functional tests on crm before release (TC-019: CRM contact synchronization retains verified address preferences)\n- Condition: Run the P1 functional tests on authentication-service before release (TC-021: Biometric login verifies a device-bound challenge before issuing a token)\n- Condition: Review data minimization, purpose and retention for customer data for account-service, api-gateway, audit-db, authentication-service, card-service, crm, customer-db, customer-service, loan-service, notification-service.\n- Condition: Verify access controls and privacy regression tests for account-service, api-gateway, audit-db, authentication-service, card-service, crm, customer-db, customer-service, loan-service, notification-service.\n- Condition: Verify card-data encryption, masking and access restrictions for card-service.\n- Condition: Run card-data security tests and review authentication and API controls for card-service.\n- Condition: Reconcile financial results and verify complete, immutable audit records for account-service, api-gateway, audit-db, customer-db, loan-service, payment-service.\n- Condition: Document control-owner approval and test financial and schema changes for account-service, api-gateway, audit-db, customer-db, loan-service, payment-service.",
+  "cited_nodes": [
+    "customer-service",
+    "account-service",
+    "payment-service",
+    "loan-service",
+    "card-service",
+    "crm",
+    "authentication-service",
+    "notification-service",
+    "api-gateway",
+    "customer-db",
+    "audit-db"
+  ],
+  "cited_factors": [
+    "customer data"
+  ],
+  "provider": "template"
+}

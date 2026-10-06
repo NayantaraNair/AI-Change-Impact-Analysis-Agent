@@ -1,0 +1,33 @@
+{
+  "answer": "- **ST-115**: overall risk 41/100; release decision GO.\n- operational: 49/100 (medium). Top factors: service criticality (+20; `reporting-service`); downstream systems (+18; `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `customer-db`, `mobile-banking`, `reporting-db`, `web-banking`); deployment groups (+6; `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `customer-db`, `document-service`, `mobile-banking`, `reporting-db`, `reporting-service`, `web-banking`).\n- delivery: 45/100 (medium). Top factors: owner coordination (+20; `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `customer-db`, `document-service`, `mobile-banking`, `reporting-db`, `reporting-service`, `web-banking`); low ambiguity (+10; `document-service`, `reporting-service`); direct services (+10; `document-service`, `reporting-service`).\n- security: 28/100 (low). Top factors: critical identity path (+10; `api-gateway`, `authentication-service`); blast radius size (+10; `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `customer-db`, `document-service`, `mobile-banking`, `reporting-db`, `reporting-service`, `web-banking`); baseline (+8; none recorded).\n- compliance: 27/100 (low). Top factors: nearby pii data (+8; `api-gateway`, `authentication-service`); nearby financial data (+8; `api-gateway`, `reporting-db`); nearby audit data (+6; `audit-db`).\n- technical: 27/100 (low). Top factors: direct services (+12; `document-service`, `reporting-service`); dependency depth (+10; `atm`, `branch-portal`, `customer-db`, `mobile-banking`, `web-banking`); baseline (+5; none recorded).\n- performance: 20/100 (low). Top factors: channel path (+15; `api-gateway`, `mobile-banking`, `web-banking`); baseline (+5; none recorded).\n- This context contains only this story. Open the sprint view to compare risky stories.",
+  "cited_nodes": [
+    "mobile-banking",
+    "web-banking",
+    "atm",
+    "branch-portal",
+    "authentication-service",
+    "api-gateway",
+    "document-service",
+    "customer-db",
+    "audit-db",
+    "reporting-db",
+    "reporting-service"
+  ],
+  "cited_factors": [
+    "baseline",
+    "critical identity path",
+    "blast radius size",
+    "nearby pii data",
+    "nearby financial data",
+    "nearby audit data",
+    "direct services",
+    "dependency depth",
+    "service criticality",
+    "downstream systems",
+    "deployment groups",
+    "channel path",
+    "low ambiguity",
+    "owner coordination"
+  ],
+  "provider": "template"
+}

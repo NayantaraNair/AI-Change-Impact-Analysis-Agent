@@ -1,0 +1,20 @@
+{
+  "answer": "- **ST-115** directly changes: `document-service`, `reporting-service`.\n- Impacted services: `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `customer-db`, `document-service`, `mobile-banking`, `reporting-db`, `reporting-service`, `web-banking`.\n- Impacted databases: `audit-db`, `customer-db`, `reporting-db`.\n- Impacted APIs: `GET /accounts/{id}/limits`, `GET /documents/templates/{id}`, `GET /internal/audit/events`, `GET /internal/reporting-store/statements/{id}`, `GET /reports/monthly-statements/{id}`, `GET /reports/statement-template`, `PATCH /cards/{id}/status`, `PATCH /customers/{id}/profile`, `POST /auth/biometric/challenges`, `POST /auth/introspect`, `POST /auth/step-up`, `POST /auth/token`, `POST /documents/statements/render`, `POST /internal/audit/events`, `POST /internal/reporting-store/projections`, `POST /loans/applications`, `POST /payments`, `POST /reports/monthly-statements/jobs`, `PUT /documents/templates/{id}`.\n- Downstream systems: `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `customer-db`, `mobile-banking`, `reporting-db`, `web-banking`.",
+  "cited_nodes": [
+    "mobile-banking",
+    "web-banking",
+    "atm",
+    "branch-portal",
+    "authentication-service",
+    "api-gateway",
+    "document-service",
+    "customer-db",
+    "audit-db",
+    "reporting-db",
+    "reporting-service"
+  ],
+  "cited_factors": [
+    "downstream systems"
+  ],
+  "provider": "template"
+}

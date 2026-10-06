@@ -1,0 +1,14 @@
+{
+  "answer": "- **ST-115**: coverage estimate 100%; effort 5.18333 hours.\n- P1: Token introspection rejects expired and revoked sessions (TC-022); covers `authentication-service`.\n- P1: Gateway card status route enforces the required authorization scope (TC-026); covers `api-gateway`.\n- P1: Biometric login verifies a device-bound challenge before issuing a token (TC-021); covers `authentication-service`.\n- P1: Gateway routes payment requests with the original correlation identifier (TC-025); covers `api-gateway`.\n- P1: Mobile card freeze propagates through gateway to card lifecycle state (TC-046); covers `api-gateway`, `authentication-service`, `mobile-banking`.\n- P1: Biometric challenge completion creates an authorized mobile session (TC-048); covers `api-gateway`, `authentication-service`, `mobile-banking`.\n- P1: ATM and branch servicing keep existing terminal and staff session behavior (TC-059); covers `api-gateway`, `atm`, `authentication-service`, `branch-portal`.\n- P1: Step-up proof cannot be replayed across devices or different card actions (TC-051); covers `authentication-service`, `mobile-banking`.\n- P1: Gateway denies card controls when token introspection is unavailable (TC-052); covers `api-gateway`, `authentication-service`.\n- P1: Privileged limit changes require authorized staff scope and an audit event (TC-054); covers `audit-db`, `authentication-service`.\n- P1: Biometric enrollment rejects mismatched device keys and revoked challenges (TC-055); covers `authentication-service`, `mobile-banking`.\n- GDPR: GDPR review applies because PII-bearing components are impacted. (`api-gateway`, `authentication-service`).\n- GDPR: Deterministic control exposure: PII impacted through dependencies (-10). (`api-gateway`, `authentication-service`).\n- SOX: SOX review applies because financial-data components are impacted; audit-data components are impacted. (`api-gateway`, `audit-db`, `reporting-db`).\n- SOX: Deterministic control exposure: financial data impacted through dependencies (-5); audit database impacted (-10). (`api-gateway`, `audit-db`, `reporting-db`).",
+  "cited_nodes": [
+    "mobile-banking",
+    "atm",
+    "branch-portal",
+    "authentication-service",
+    "api-gateway",
+    "audit-db",
+    "reporting-db"
+  ],
+  "cited_factors": [],
+  "provider": "template"
+}
