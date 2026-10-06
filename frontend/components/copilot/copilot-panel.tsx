@@ -101,12 +101,13 @@ function Conversation({ context }: { context: AnalysisContext }) {
                   </div>
                   {message.citedNodes.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Cited components">
-                      {message.citedNodes.map((id) => (
+                      {message.citedNodes.slice(0, 8).map((id) => (
                         <Button key={id} variant="outline" size="xs" className="border-line bg-surface text-meta text-azure"
                           aria-label={`Highlight ${id} in the graph`} onClick={() => setHighlight([id])}>
                           {id}
                         </Button>
                       ))}
+                      {message.citedNodes.length > 8 && <span className="self-center text-meta text-muted">+{message.citedNodes.length - 8} more</span>}
                     </div>
                   )}
                 </>

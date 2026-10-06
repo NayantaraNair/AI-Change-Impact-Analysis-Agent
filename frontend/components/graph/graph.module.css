@@ -71,14 +71,15 @@
 .ringLegend { margin-left: 4px; }
 .legend .legendHint { margin-left: auto; }
 
-.nodeFrame { position: relative; width: 150px; }
+.nodeFrame { position: relative; width: 170px; }
 .node {
   --node-color: var(--line);
   position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
   align-items: center;
-  gap: 9px;
-  width: 150px;
+  gap: 3px 9px;
+  width: 170px;
   min-height: 66px;
   padding: 10px;
   border: 1px solid var(--node-color);
@@ -101,13 +102,13 @@
 .node[data-type="database"] { padding-top: 17px; padding-bottom: 12px; border-radius: 50% / 12%; }
 .node[data-type="database"]::before { content: ""; position: absolute; inset: 1px 1px auto; height: 10px; border-bottom: 1px solid var(--node-color); border-radius: 50%; pointer-events: none; }
 .node[data-type="analytics"] { border-radius: 12px 4px 12px 4px; }
-.nodeIcon { flex-shrink: 0; color: var(--node-color); }
-.nodeText { min-width: 0; }
-.nodeLabel { display: block; overflow-wrap: anywhere; font-weight: 500; }
-.nodeMeta { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }
+.nodeIcon { grid-column: 1; grid-row: 2; color: var(--node-color); }
+.nodeText { display: contents; }
+.nodeLabel { grid-column: 1 / -1; grid-row: 1; display: block; overflow-wrap: anywhere; font-size: 13px; font-weight: 500; }
+.nodeMeta { grid-column: 2; grid-row: 2; display: block; color: var(--muted); font-size: 12px; }
 .nodeFrame .handle { width: 1px; height: 1px; min-width: 1px; min-height: 1px; opacity: 0; pointer-events: none; border: 0; }
 
-.rings { position: absolute; left: -850px; top: -850px; z-index: -1; overflow: visible; pointer-events: none; }
+.rings { position: absolute; z-index: -1; overflow: visible; pointer-events: none; }
 .rings circle { fill: none; stroke: var(--line); stroke-width: 1px; stroke-opacity: 0.55; }
 .rings text { fill: var(--muted); font-family: inherit; font-size: 12px; }
 .animatedEdge { animation: impactPath 1.2s linear 1; }

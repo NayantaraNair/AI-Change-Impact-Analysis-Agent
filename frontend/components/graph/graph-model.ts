@@ -16,6 +16,24 @@ export type ImpactFlowEdge = Edge<ImpactEdgeData, "impact">;
 export const severityColor = (severity: Severity | null) =>
   severity === "medium" ? "var(--impact-med)" : severity ? `var(--impact-${severity})` : "var(--line)";
 
+export function hopRings(nodes: GraphNode[]): { hop: number | null; radius: number }[] {
+  const distances = new Map<number | null, number[]>();
+  for (const node of nodes) {
+    const ring = distances.get(node.hop) ?? [];
+    ring.push(Math.hypot(node.x, node.y));
+    distances.set(node.hop, ring);
+  }
+  return [...distances]
+    .filter(([hop, ring]) => hop !== 0 || ring.length > 1)
+    .sort(([a], [b]) => (a ?? Infinity) - (b ?? Infinity))
+    .map(([hop, ring]) => {
+      ring.sort((a, b) => a - b);
+      const middle = Math.floor(ring.length / 2);
+      const radius = ring.length % 2 ? ring[middle] : (ring[middle - 1] + ring[middle]) / 2;
+      return { hop, radius };
+    });
+}
+
 export function searchNodes(nodes: GraphNode[], query: string): GraphNode[] {
   const term = query.trim().toLocaleLowerCase();
   if (!term) return [];

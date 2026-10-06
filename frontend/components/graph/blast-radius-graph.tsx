@@ -29,7 +29,7 @@ function subscribeMotion(callback: () => void) {
 }
 const getMotion = () => window.matchMedia(motionQuery).matches;
 const getServerMotion = () => true;
-const fitOptions = { padding: 0.2, minZoom: 0.25, maxZoom: 1.15 };
+const defaultFitOptions = { padding: 0.08, minZoom: 0.2, maxZoom: 1.15 };
 
 function GraphCanvas({ graph, highlight, selectedId, onNodeSelect, conflictEdges }: BlastRadiusGraphProps) {
   const [showUnimpacted, setShowUnimpacted] = useState(true);
@@ -53,6 +53,10 @@ function GraphCanvas({ graph, highlight, selectedId, onNodeSelect, conflictEdges
   }), [graph, highlight, selection, showUnimpacted, animate, reducedMotion, select, conflictEdges]);
   const matches = useMemo(() => searchNodes(graph.nodes, query), [graph.nodes, query]);
   const activeIndex = Math.min(searchIndex, Math.max(matches.length - 1, 0));
+  const fitOptions = useMemo(() => ({
+    ...defaultFitOptions,
+    nodes: graph.nodes.filter((node) => showUnimpacted || node.hop !== null).map(({ id }) => ({ id })),
+  }), [graph.nodes, showUnimpacted]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setAnimate(false), 1200);
@@ -71,7 +75,7 @@ function GraphCanvas({ graph, highlight, selectedId, onNodeSelect, conflictEdges
       }
     });
     return () => cancelAnimationFrame(frame);
-  }, [initialized, showUnimpacted, fitView, setCenter, reducedMotion]);
+  }, [initialized, fitOptions, fitView, setCenter, reducedMotion]);
 
   function focusNode(node: GraphNode) {
     if (node.hop === null && !showUnimpacted) {
@@ -162,13 +166,13 @@ function GraphCanvas({ graph, highlight, selectedId, onNodeSelect, conflictEdges
             onPaneClick={() => select(null)}
             fitView
             fitViewOptions={fitOptions}
-            minZoom={0.15}
+            minZoom={0.2}
             maxZoom={2}
             colorMode="dark"
             proOptions={{ hideAttribution: true }}
             aria-label="Blast radius dependency graph"
           >
-            <HopRings showUnimpacted={showUnimpacted} />
+            <HopRings nodes={graph.nodes} showUnimpacted={showUnimpacted} />
             <Controls showInteractive={false} position="bottom-left" fitViewOptions={fitOptions} />
           </ReactFlow>
         ) : <p className={styles.emptyState}>Paste a story and select Analyze to see its blast radius.</p>}
@@ -190,7 +194,7 @@ export function BlastRadiusGraph(props: BlastRadiusGraphProps) {
   // Selection, search, highlights and visibility do not remount the graph.
   const graphKey = JSON.stringify([props.graph.nodes, props.graph.edges, props.conflictEdges]);
   return (
-    <section className={styles.graph} style={{ height: props.height ?? 640 }} aria-label="Blast radius">
+    <section className={styles.graph} style={{ height: props.height ?? "clamp(560px, 68vh, 760px)" }} aria-label="Blast radius">
       <ReactFlowProvider key={graphKey}><GraphCanvas {...props} /></ReactFlowProvider>
     </section>
   );
