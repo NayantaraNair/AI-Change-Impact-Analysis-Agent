@@ -1,6 +1,7 @@
 """FastAPI contracts, demo fixtures, and persisted reports in no-key mode."""
 
 import asyncio
+from itertools import combinations
 
 import pytest
 from fastapi.testclient import TestClient
@@ -116,23 +117,51 @@ def test_fixtures_ignored_when_enabled_or_invalid(client, story, stages, monkeyp
     assert len(runs()) == 3
 
 
-def test_sprint_stub_persistence_kpis_and_union(client, stages):
+def test_sprint_persistence_kpis_and_union(client, stages):
     response = client.post("/analyze-sprint", json={})
     assert response.status_code == 200, response.text
     result = SprintAnalysis.model_validate(response.json())
     demo = load_demo_sprint()
     assert result.sprint_id == demo.sprint_id
     assert [a.story for a in result.stories] == demo.stories
-    assert result.conflicts == []
-    assert result.kpis.stories == len(demo.stories)
-    assert result.kpis.testing_effort_hours == 3.5 * len(demo.stories)
-    assert result.kpis.release_confidence == 20
+    # The mocked stages give every story the same three directly changed services.
+    assert [
+        (c.story_a, c.story_b, c.kind, c.shared_component, c.risk_score, c.risk)
+        for c in result.conflicts
+    ] == [
+        (a, b, kind, component, 100, "high")
+        for a, b in combinations(sorted(s.id for s in demo.stories), 2)
+        for kind, component in [
+            ("deployment_collision", "authentication-service"),
+            ("shared_api_change", "mobile-banking"),
+        ]
+    ]
+    assert result.kpis.model_dump() == {
+        "stories": 6, "applications_impacted": 17, "dependencies_impacted": 18,
+        "conflicts": 30, "compliance_issues": 0, "testing_effort_hours": 21.0,
+        "health_score": 0, "release_confidence": 0,
+        "high_risk_stories": [s.id for s in demo.stories],
+    }
     assert len(result.conflict_graph.nodes) == len({n.id for n in result.conflict_graph.nodes})
+    assert {n.id for n in result.conflict_graph.nodes} == {
+        n.id for a in result.stories for n in a.graph.nodes
+    }
+    assert {e.id for e in result.conflict_graph.edges} == {
+        e.id for a in result.stories for e in a.graph.edges
+    }
+    # Shared roots produce conflicts without self-loop graph edges.
     assert all(not edge.conflict for edge in result.conflict_graph.edges)
     assert SprintAnalysis.model_validate(client.get(f"/sprint/{demo.sprint_id}").json()) == result
-    assert len(runs()) == len(demo.stories)
-    assert all(run.sprint_id == demo.sprint_id for run in runs())
+    saved_runs = runs()
+    assert len(saved_runs) == 2 * len(demo.stories)
+    # Reassessment changes the release payload, so save_sprint adds a final run.
     for analysis in result.stories:
+        story_runs = [run for run in saved_runs if run.story_id == analysis.story.id]
+        assert {run.sprint_id for run in story_runs} == {None, demo.sprint_id}
+        original, = [run for run in story_runs if run.sprint_id is None]
+        final, = [run for run in story_runs if run.sprint_id == demo.sprint_id]
+        assert original.payload["release"]["confidence"] == 20
+        assert final.payload == analysis.model_dump(mode="json")
         assert db.latest_story_analysis(analysis.story.id) == analysis
 
 

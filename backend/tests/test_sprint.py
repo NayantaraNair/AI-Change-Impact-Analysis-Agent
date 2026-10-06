@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+from collections import Counter
 
 import httpx
 import pytest
@@ -13,6 +14,7 @@ from app.architecture import get_architecture, load_demo_sprint
 from app.contracts import Conflict, FrameworkAssessment, SprintAnalysis
 from app.engine import sprint
 from tests.test_conflicts import analysis, arch  # noqa: F401
+from tests.test_pipeline import runs
 
 
 @pytest.fixture(autouse=True)
@@ -65,12 +67,20 @@ async def test_real_demo_sprint_conflicts_decisions_and_persistence(demo_result)
     assert all(e.source != e.target and not e.on_impact_path for e in graph.edges if e.conflict)
 
 
-@pytest.mark.xfail(strict=True, reason=(
-    "Demo architecture groups ST-115 reporting-service and ST-110 risk-engine in data-platform; "
-    "the required same-group collision makes the demo's only initial GO conditional."
-))
 async def test_real_demo_sprint_includes_go(demo_result):
-    assert any(item.release.decision == "GO" for item in demo_result.stories)
+    assert [item.story.id for item in demo_result.stories if item.release.decision == "GO"] == ["ST-115"]
+
+
+async def test_real_demo_sprint_has_one_conflict_per_pair_and_kind(demo_result):
+    counts = Counter((c.story_a, c.story_b, c.kind) for c in demo_result.conflicts)
+    assert counts
+    assert set(counts.values()) == {1}
+    assert all(c.story_a < c.story_b for c in demo_result.conflicts)
+    authentication = [
+        c for c in demo_result.conflicts
+        if (c.story_a, c.story_b, c.kind) == ("ST-107", "ST-112", "deployment_collision")
+    ]
+    assert [c.shared_component for c in authentication] == ["authentication-service"]
 
 
 async def test_story_concurrency_release_only_reassessment_and_persistence(arch, monkeypatch):
@@ -79,6 +89,11 @@ async def test_story_concurrency_release_only_reassessment_and_persistence(arch,
     started = set()
     all_started = asyncio.Event()
     calls, events = [], []
+    save_sprint = db.save_sprint
+
+    def persist(result):
+        events.append(("sprint", result))
+        save_sprint(result)
 
     async def analyze(story, refresh=False):
         assert refresh is True
@@ -112,7 +127,7 @@ async def test_story_concurrency_release_only_reassessment_and_persistence(arch,
     monkeypatch.setattr(sprint.release, "assess_release", reassess)
     monkeypatch.setattr(llm, "complete_structured", structured)
     monkeypatch.setattr(llm, "complete_text", prose)
-    monkeypatch.setattr(db, "save_sprint", lambda result: events.append(("sprint", result)))
+    monkeypatch.setattr(db, "save_sprint", persist)
     monkeypatch.setattr(db, "save_analysis", lambda result, sprint_id: events.append((sprint_id, result)))
     result = await asyncio.wait_for(sprint.analyze_sprint("S", "Sprint", [a.story for a in originals], refresh=True), 5)
     assert [a.story.id for a in result.stories] == ["A", "B", "C"]
@@ -121,8 +136,14 @@ async def test_story_concurrency_release_only_reassessment_and_persistence(arch,
     assert all(a.release.decision == "GO" for a in originals)
     assert result.stories[2] is originals[2]
     assert result.summary == "Summary paragraph. Release sequencing is required."
-    assert events[0] == ("sprint", result)
-    assert events[1:] == [("S", item) for item in result.stories]
+    assert events == [("sprint", result)]
+    assert db.latest_sprint("S") == result
+    saved_runs = runs()
+    assert len(saved_runs) == 3
+    assert {run.story_id for run in saved_runs} == {"A", "B", "C"}
+    assert all(run.sprint_id == "S" for run in saved_runs)
+    for item in result.stories:
+        assert db.latest_story_analysis(item.story.id) == item
 
 
 def test_kpi_exact_formula_and_distinct_dependency_count(arch):
@@ -141,8 +162,9 @@ def test_kpi_exact_formula_and_distinct_dependency_count(arch):
     kpis = sprint.compute_kpis([first, second], [conflict(), conflict(component="db", risk="medium")])
     assert kpis.model_dump() == {
         "stories": 2, "applications_impacted": 2, "dependencies_impacted": 1,
-        "conflicts": 2, "compliance_issues": 2, "testing_effort_hours": 5.0,
-        "health_score": 60, "release_confidence": 50, "high_risk_stories": ["A"],
+        "conflicts": 2, "compliance_issues": 1, "testing_effort_hours": 5.0,
+        # round(100 - .35*50 - 6 - 3 - 10 - 2) == 62
+        "health_score": 62, "release_confidence": 50, "high_risk_stories": ["A"],
     }
     first.risk.overall = 20
     assert sprint.compute_kpis([first], []).high_risk_stories == ["A"]
