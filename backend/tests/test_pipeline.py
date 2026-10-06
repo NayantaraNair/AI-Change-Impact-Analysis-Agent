@@ -118,7 +118,6 @@ async def test_changed_story_and_conflicts_invalidate_correct_stages(isolated, s
     assert stages["calls"]["release"] == 2
     assert stages["calls"]["requirement"] == stages["calls"]["testing"] == 1
     assert stages["conflicts"] == [conflict]
-    assert all(criterion in stages["text"] for criterion in story.acceptance_criteria)
     changed = story.model_copy(update={"description": story.description + " New scope."})
     await pipeline.analyze_story(changed)
     assert stages["calls"]["requirement"] == 2

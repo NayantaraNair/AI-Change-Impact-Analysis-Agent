@@ -74,19 +74,26 @@ def build_impact_graph(
         for target in component.downstream
     )
 
-    hops = {component_id: 0 for component_id in sorted(set(affected) & components.keys())}
-    pending = deque(hops)
-    while pending:
-        source = pending.popleft()
-        if hops[source] >= max_hops:
-            continue
-        neighbors = set(graph.successors(source)) | set(graph.predecessors(source))
-        for target in sorted(neighbors):
-            # Dangling references have no component metadata and cannot be impacted.
-            if target not in components or target in hops:
+    start = sorted(set(affected) & components.keys())
+    hops = {component_id: 0 for component_id in start}
+    # Walk each direction separately: dependents of what we change, and callers
+    # of what we change. Mixing directions would hop through shared sinks such as
+    # audit-db and mark the whole estate as impacted.
+    for neighbours in (graph.successors, graph.predecessors):
+        seen = {component_id: 0 for component_id in start}
+        pending = deque(start)
+        while pending:
+            source = pending.popleft()
+            if seen[source] >= max_hops:
                 continue
-            hops[target] = hops[source] + 1
-            pending.append(target)
+            for target in sorted(neighbours(source)):
+                # Dangling references have no component metadata and cannot be impacted.
+                if target not in components or target in seen:
+                    continue
+                seen[target] = seen[source] + 1
+                pending.append(target)
+        for component_id, hop in seen.items():
+            hops[component_id] = min(hop, hops.get(component_id, hop))
 
     positions = _positions(list(components.values()), hops)
     nodes = []

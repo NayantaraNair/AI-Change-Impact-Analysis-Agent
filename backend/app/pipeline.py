@@ -116,7 +116,6 @@ async def analyze_story(
         _cached_stage(directory, "compliance", ComplianceReport, [facts, graph, arch],
                       lambda: assess_compliance(facts, graph, arch), refresh),
     )
-    text = "\n".join([story.title, story.description, *story.acceptance_criteria])
     release, release_provider = await _cached_stage(
         directory, "release", ReleaseAssessment,
         [facts, graph, risk, tests, compliance, conflicts],

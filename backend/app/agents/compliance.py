@@ -20,6 +20,7 @@ from app.contracts import (
 )
 
 Framework = Literal["GDPR", "PCI DSS", "SOX", "Internal Governance"]
+DATA_HOP_LIMIT = 1
 FRAMEWORK_ORDER: tuple[Framework, ...] = ("GDPR", "PCI DSS", "SOX", "Internal Governance")
 
 # Each condition is charged once, regardless of node count, except governance's
@@ -32,7 +33,7 @@ GDPR_DEDUCTIONS = {
     "external_api": 10,
 }
 PCI_DEDUCTIONS = {"card_data": 25, "external_api": 15, "auth": 10, "direct_card": 10}
-SOX_DEDUCTIONS = {"financial_data": 15, "audit_db": 10, "db_schema": 10, "payment_rule": 10}
+SOX_DEDUCTIONS = {"financial_data": 15, "indirect_financial": 5, "audit_db": 10, "db_schema": 10, "payment_rule": 10}
 GOVERNANCE_DEDUCTIONS = {"critical_node": 15, "critical_cap": 30, "auth": 15, "external_api": 10}
 
 _RECOMMENDATIONS: dict[Framework, tuple[str, str]] = {
@@ -100,8 +101,13 @@ def _assess_rules(
     impacted = sorted(hops)
     direct = [node_id for node_id in impacted if hops[node_id] == 0]
     anchors = direct or impacted
+    # Regulated data counts when the change touches it directly or one step away;
+    # data further out is reached through unchanged, already-controlled interfaces.
     data_nodes = {
-        kind: [node_id for node_id in impacted if kind in components[node_id].data_classes]
+        kind: [
+            node_id for node_id in impacted
+            if hops[node_id] <= DATA_HOP_LIMIT and kind in components[node_id].data_classes
+        ]
         for kind in ("pii", "card", "financial", "audit")
     }
     databases = [node_id for node_id in impacted if components[node_id].type == "database"]
@@ -177,7 +183,7 @@ def _assess_rules(
     )
     deduct(
         "GDPR",
-        bool(indirect_pii),
+        bool(indirect_pii) and not direct_pii,
         "PII impacted through dependencies",
         GDPR_DEDUCTIONS["indirect_pii"],
         indirect_pii,
@@ -235,12 +241,20 @@ def _assess_rules(
     )
 
     audit_databases = [node_id for node_id in data_nodes["audit"] if node_id in databases]
+    direct_financial = [node_id for node_id in data_nodes["financial"] if hops[node_id] == 0]
     deduct(
         "SOX",
-        bool(data_nodes["financial"]) or facts.touches_financial_data,
+        bool(direct_financial) or facts.touches_financial_data,
         "financial data touched",
         SOX_DEDUCTIONS["financial_data"],
-        data_nodes["financial"] or anchors,
+        direct_financial or data_nodes["financial"] or anchors,
+    )
+    deduct(
+        "SOX",
+        bool(data_nodes["financial"]) and not direct_financial and not facts.touches_financial_data,
+        "financial data impacted through dependencies",
+        SOX_DEDUCTIONS["indirect_financial"],
+        data_nodes["financial"],
     )
     deduct(
         "SOX",

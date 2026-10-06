@@ -14,8 +14,13 @@ compliance:
   pii: 20
   card: 30
   financial: 20
-  # Routine reporting plus an audit trail remains below medium risk.
-  audit: 12
+  audit: 6
+  # Data one hop from the change (read or written through an unchanged interface).
+  nearby:
+    pii: 8
+    card: 12
+    financial: 8
+    audit: 6
   db_schema_change: 10
 technical:
   base: 5

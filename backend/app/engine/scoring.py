@@ -97,10 +97,11 @@ def score_risk(
     anchors = (
         direct or impacted or sorted(set(facts.affected_services) & components.keys())
     )
+    # Regulated data counts when it is changed directly or one hop away.
     data_nodes = {
         data_class: [
             node_id for node_id in impacted
-            if data_class in components[node_id].data_classes
+            if hops[node_id] <= 1 and data_class in components[node_id].data_classes
         ]
         for data_class in ("pii", "card", "financial", "audit")
     }
@@ -155,11 +156,19 @@ def score_risk(
     )
 
     compliance = cfg["compliance"]
-    for data_class in data_nodes:
-        if data_nodes[data_class]:
+    # Regulated data changed directly scores in full; data one hop away scores
+    # at the reduced "nearby" weight.
+    for data_class, nodes in data_nodes.items():
+        direct_nodes = [node_id for node_id in nodes if hops[node_id] == 0]
+        if direct_nodes:
             add(
                 "compliance", f"{data_class} data",
-                compliance[data_class], data_nodes[data_class],
+                compliance[data_class], direct_nodes,
+            )
+        elif nodes:
+            add(
+                "compliance", f"nearby {data_class} data",
+                compliance["nearby"][data_class], nodes,
             )
     if facts.changes_db_schema:
         add(
