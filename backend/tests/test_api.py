@@ -69,16 +69,16 @@ def test_missing_reports_are_json_404(client):
         assert "detail" in response.json()
 
 
-def test_demo_and_chat_stub(client):
+def test_demo_sprint_and_chat_route(client):
     assert client.get("/demo-sprint").json() == load_demo_sprint().model_dump(mode="json")
     response = client.post("/chat", json={
         "session_id": "session", "message": "Why is this high risk?",
-        "context_type": "story", "context_id": "ST-107",
+        "context_type": "story", "context_id": "ST-NONE",
     })
     assert response.status_code == 200
-    assert ChatResponse.model_validate(response.json()) == ChatResponse(
-        answer="Copilot is not wired yet.", cited_nodes=[], cited_factors=[], provider="none",
-    )
+    answer = ChatResponse.model_validate(response.json())
+    assert "ST-NONE" in answer.answer
+    assert answer.provider == "none"
 
 
 def test_story_fixture_exact_match_saved_and_refreshable(client, story, stages):
