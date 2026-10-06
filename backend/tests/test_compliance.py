@@ -110,8 +110,14 @@ async def test_st115_has_no_high_risk_framework():
         facts(affected_services=["document-service", "reporting-service"]), arch
     )
     assert all(assessment.risk_level != "high" for assessment in report.frameworks)
-    assert frameworks(report)["SOX"].score == 75
-    assert report.overall_score == 75
+    sox = frameworks(report)["SOX"]
+    assert sox.score == 85  # 100 - 5 (nearby financial) - 10 (audit database)
+    assert sox.risk_level == "low"
+    assert sox.findings[1].text == (
+        "Deterministic control exposure: financial data impacted through dependencies (-5); "
+        "audit database impacted (-10)."
+    )
+    assert report.overall_score == 85
 
 
 async def test_no_applicable_framework_has_fixed_order_and_empty_details(monkeypatch):
@@ -176,10 +182,12 @@ async def test_fact_only_change_with_no_known_services_still_applies():
     assert all(finding.node_ids == [] for finding in pci.findings)
 
 
-async def test_gdpr_direct_and_indirect_conditions_are_charged_once():
+@pytest.mark.parametrize("direct_pii,score", [(True, 45), (False, 55)])
+async def test_gdpr_direct_and_indirect_conditions_are_charged_once(direct_pii, score):
     arch = Architecture(
         components=[
-            component("customer", data_classes=["pii"], downstream=["customer-db", "profile-db"]),
+            component("customer", data_classes=["pii"] if direct_pii else [],
+                      downstream=["customer-db", "profile-db"]),
             component("customer-db", data_classes=["pii"], kind="database"),
             component("profile-db", data_classes=["pii"], kind="database"),
         ]
@@ -194,9 +202,18 @@ async def test_gdpr_direct_and_indirect_conditions_are_charged_once():
         arch,
     )
     gdpr = frameworks(report)["GDPR"]
-    assert gdpr.score == 35  # 100 - 20 - 10 - 15 - 10 - 10
+    # Charge either direct PII (20) or indirect PII (10), plus 15 + 10 + 10.
+    assert gdpr.score == score
     assert gdpr.risk_level == "high"
-    assert report.overall_score == 35
+    assert report.overall_score == score
+    pii_deduction = (
+        "PII impacted directly (-20)" if direct_pii
+        else "PII impacted through dependencies (-10)"
+    )
+    assert gdpr.findings[1].text == (
+        f"Deterministic control exposure: {pii_deduction}; customer data touched (-15); "
+        "database schema changes (-10); external API contract changes (-10)."
+    )
     assert set(gdpr.findings[1].node_ids) == {"customer", "customer-db", "profile-db"}
 
 

@@ -130,7 +130,8 @@ def test_st107_security_is_high_and_factors_are_traceable(st107):
 
 def test_st115_every_dimension_stays_low(st115):
     report = score_risk(*st115)
-    assert [d.score for d in report.dimensions] == [16, 37, 22, 35, 5, 37]
+    # Compliance: baseline 5 + nearby financial 8 + nearby audit 6.
+    assert [d.score for d in report.dimensions] == [16, 19, 22, 35, 5, 37]
     assert all(d.score < 40 and d.level == "low" for d in report.dimensions)
 
 
@@ -138,8 +139,10 @@ def test_determinism_dimension_order_and_overall(st107):
     report = score_risk(*st107)
     assert report == score_risk(*st107)
     assert tuple(d.name for d in report.dimensions) == DIMENSION_ORDER
-    assert [d.score for d in report.dimensions] == [93, 87, 49, 57, 40, 59]
-    assert report.overall == 80
+    # Compliance: 5 + direct PII 20 + direct card 30 + nearby financial 8;
+    # audit data at hop 2 is excluded. Overall averages the top three scores.
+    assert [d.score for d in report.dimensions] == [93, 63, 49, 57, 40, 59]
+    assert report.overall == 72
     assert report.highest == "security"
 
 
@@ -187,8 +190,23 @@ def test_technical_change_types_and_schema(st115, change_type, points):
     requirement = requirement.model_copy(update={"change_type": change_type, "changes_db_schema": True})
     scored = dimensions(score_risk(requirement, graph, arch))
     assert scored["technical"].score == 22 + 20 + points
-    assert scored["compliance"].score == 47
+    assert scored["compliance"].score == 29  # 5 + 8 + 6 + schema change 10
     assert factor_map(scored["technical"])["database schema change"].node_ids == ["audit-db", "reporting-db"]
+
+
+def test_hop_one_only_pii_uses_nearby_compliance_weight():
+    arch = Architecture(components=[
+        component("changed"),
+        component("customer-db", data_classes=["pii"], kind="database"),
+    ])
+    graph = graph_for(arch, {"changed": 0, "customer-db": 1})
+    compliance = dimensions(score_risk(facts(affected_services=["changed"]), graph, arch))["compliance"]
+    assert compliance.score == 13  # baseline 5 + nearby PII 8
+    assert [(f.label, f.points, f.node_ids) for f in compliance.factors] == [
+        ("baseline", 5, []),
+        ("nearby pii data", 8, ["customer-db"]),
+    ]
+    assert load_scoring_config()["compliance"]["nearby"]["pii"] == 8
 
 
 def test_caps_and_distinct_counts():

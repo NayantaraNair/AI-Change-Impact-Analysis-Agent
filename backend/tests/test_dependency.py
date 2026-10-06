@@ -95,6 +95,23 @@ def test_leaf_change_propagates_upstream_without_upstream_declarations():
     assert result.edges[0].on_impact_path is True
 
 
+def test_shared_sink_does_not_impact_another_caller():
+    arch = Architecture(components=[
+        component("A", downstream=["S"]),
+        component("B", downstream=["S"]),
+        component("S", kind="database"),
+    ])
+    result = build_impact_graph(["A"], arch)
+    assert {key: node.hop for key, node in node_map(result).items()} == {
+        "A": 0, "B": None, "S": 1,
+    }
+    assert result.impacted_services == ["A", "S"]
+    assert node_map(result)["B"].severity is None
+    assert {edge.id: edge.on_impact_path for edge in result.edges} == {
+        "A->S": True, "B->S": False,
+    }
+
+
 def test_isolated_leaf_only_impacts_itself():
     arch = Architecture(components=[component("leaf"), component("unrelated")])
     result = build_impact_graph(["leaf"], arch)
