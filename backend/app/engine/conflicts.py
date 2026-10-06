@@ -34,13 +34,16 @@ def _recommendation(kind: str, a: str, b: str, component: str) -> str:
 
 
 def detect_conflicts(analyses: list[StoryAnalysis], arch: Architecture) -> list[Conflict]:
-    """Emit one conflict per canonical story pair, shared component and kind.
+    """Emit one conflict per story pair and kind, on the most telling component.
+
+    A component both stories change directly outranks one that only shares a
+    deployment group; ties go to the more critical component.
 
     Indirect database overlap matters only for two schema changes within one hop.
     Architecture metadata determines types, deployment membership and APIs.
     """
     components = {component.id: component for component in arch.components}
-    conflicts: dict[tuple[str, str, str, str], Conflict] = {}
+    conflicts: dict[tuple[str, str, str], tuple[tuple[int, int, str], Conflict]] = {}
     for first, second in combinations(sorted(analyses, key=lambda a: a.story.id), 2):
         a, b = first.story.id, second.story.id
         if a == b:
@@ -56,7 +59,11 @@ def detect_conflicts(analyses: list[StoryAnalysis], arch: Architecture) -> list[
             if first.requirement.changes_auth_flow or second.requirement.changes_auth_flow:
                 score += 10
             score = max(0, min(100, score))
-            conflicts[(a, b, component.id, kind)] = Conflict(
+            rank = (0 if component.id in shared_direct else 1, -component.criticality, component.id)
+            current = conflicts.get((a, b, kind))
+            if current is not None and current[0] <= rank:
+                return
+            conflicts[(a, b, kind)] = rank, Conflict(
                 id=f"C-{a}-{b}-{component.id}", story_a=a, story_b=b,
                 shared_component=component.id, kind=kind,
                 risk_score=score, risk="high" if score >= 70 else "medium" if score >= 40 else "low",
@@ -92,4 +99,4 @@ def detect_conflicts(analyses: list[StoryAnalysis], arch: Architecture) -> list[
         for node_id in sorted(databases):
             add("schema_contention" if both_schema else "shared_database", components[node_id])
 
-    return [conflicts[key] for key in sorted(conflicts)]
+    return [conflicts[key][1] for key in sorted(conflicts)]

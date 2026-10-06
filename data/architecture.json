@@ -909,7 +909,7 @@
       "data_classes": [
         "financial"
       ],
-      "deployment_group": "data-platform",
+      "deployment_group": "core-payments",
       "sla_tier": "tier2",
       "downstream": [
         "transaction-db",

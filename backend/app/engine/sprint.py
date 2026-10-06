@@ -22,7 +22,7 @@ def compute_kpis(analyses: list[StoryAnalysis], conflicts: list[Conflict]) -> Sp
     impacted = {n.id for a in analyses for n in a.graph.nodes if n.hop is not None and n.type != "database"}
     dependencies = {n.id for a in analyses for n in a.graph.nodes if n.hop is not None and n.hop >= 1}
     issues = sum(
-        f.applicable and f.risk_level in {"medium", "high"}
+        f.applicable and f.risk_level == "high"
         for a in analyses for f in a.compliance.frameworks
     )
     high_conflicts = sum(c.risk == "high" for c in conflicts)
@@ -184,6 +184,4 @@ async def analyze_sprint(
         summary=await _summary(kpis, conflicts, analyses),
     )
     await asyncio.to_thread(db.save_sprint, result)
-    for analysis in analyses:
-        await asyncio.to_thread(db.save_analysis, analysis, sprint_id)
     return result
