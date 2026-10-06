@@ -37,6 +37,9 @@ async def analyze_sprint(request: SprintRequest, refresh: bool = False) -> Sprin
 @router.get("/sprint/{sprint_id}", response_model=SprintAnalysis)
 def sprint(sprint_id: str) -> SprintAnalysis:
     analysis = db.latest_sprint(sprint_id)
+    if analysis is None and sprint_id == load_demo_sprint().sprint_id:
+        # A fresh database still has the saved demo sprint.
+        analysis = sprint_fixture(SprintRequest(sprint_id=sprint_id))
     if analysis is None:
         raise HTTPException(status_code=404, detail="Sprint analysis not found")
     return analysis
