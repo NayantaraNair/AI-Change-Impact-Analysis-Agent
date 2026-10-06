@@ -1,0 +1,253 @@
+[
+    {
+        "id":  "mobile-banking",
+        "name":  "Mobile Banking",
+        "type":  "channel",
+        "description":  "Customer mobile app for account viewing, payments, card controls and device-bound login.",
+        "owner_team":  "Digital Channels",
+        "owner_contact":  "digital-channels@bank.example",
+        "criticality":  8,
+        "data_classes":  [
+                             "pii",
+                             "financial"
+                         ],
+        "deployment_group":  "channels-mobile",
+        "sla_tier":  "tier1",
+        "downstream":  [
+                           "api-gateway",
+                           "authentication-service",
+                           "audit-db"
+                       ],
+        "upstream":  [
+
+                     ],
+        "apis":  [
+                     {
+                         "id":  "mobile-banking.login",
+                         "method":  "POST",
+                         "path":  "/mobile/login",
+                         "description":  "Start a mobile device login session",
+                         "external":  true
+                     },
+                     {
+                         "id":  "mobile-banking.payments",
+                         "method":  "POST",
+                         "path":  "/mobile/payments",
+                         "description":  "Submit a payment from the mobile app",
+                         "external":  true
+                     },
+                     {
+                         "id":  "mobile-banking.card-status",
+                         "method":  "PATCH",
+                         "path":  "/mobile/cards/{id}/status",
+                         "description":  "Freeze or unfreeze a card",
+                         "external":  true
+                     }
+                 ]
+    },
+    {
+        "id":  "customer-service",
+        "name":  "Customer Service",
+        "type":  "core",
+        "description":  "System of record API for customer profiles, contact preferences and verified email addresses.",
+        "owner_team":  "Customer Platform",
+        "owner_contact":  "customer-platform@bank.example",
+        "criticality":  8,
+        "data_classes":  [
+                             "pii"
+                         ],
+        "deployment_group":  "customer-platform",
+        "sla_tier":  "tier1",
+        "downstream":  [
+                           "crm",
+                           "notification-service",
+                           "customer-db",
+                           "authentication-service",
+                           "audit-db"
+                       ],
+        "upstream":  [
+                         "api-gateway"
+                     ],
+        "apis":  [
+                     {
+                         "id":  "customer-service.profile-read",
+                         "method":  "GET",
+                         "path":  "/customers/{id}",
+                         "description":  "Read an authorized customer profile",
+                         "external":  false
+                     },
+                     {
+                         "id":  "customer-service.profile-update",
+                         "method":  "PATCH",
+                         "path":  "/customers/{id}/profile",
+                         "description":  "Update profile and contact preferences",
+                         "external":  false
+                     },
+                     {
+                         "id":  "customer-service.email-verify",
+                         "method":  "POST",
+                         "path":  "/customers/{id}/emails/verification",
+                         "description":  "Verify a newly supplied email address",
+                         "external":  false
+                     }
+                 ]
+    },
+    {
+        "id":  "notification-service",
+        "name":  "Notification Service",
+        "type":  "platform",
+        "description":  "Delivers consent-aware email, SMS and push notifications using verified customer destinations.",
+        "owner_team":  "Customer Platform",
+        "owner_contact":  "customer-platform@bank.example",
+        "criticality":  6,
+        "data_classes":  [
+                             "pii"
+                         ],
+        "deployment_group":  "customer-platform",
+        "sla_tier":  "tier2",
+        "downstream":  [
+                           "customer-db",
+                           "authentication-service",
+                           "audit-db"
+                       ],
+        "upstream":  [
+                         "crm",
+                         "customer-service",
+                         "payment-service"
+                     ],
+        "apis":  [
+                     {
+                         "id":  "notification-service.send",
+                         "method":  "POST",
+                         "path":  "/notifications",
+                         "description":  "Queue a notification to a verified destination",
+                         "external":  false
+                     },
+                     {
+                         "id":  "notification-service.status",
+                         "method":  "GET",
+                         "path":  "/notifications/{id}",
+                         "description":  "Read delivery status without exposing message content",
+                         "external":  false
+                     },
+                     {
+                         "id":  "notification-service.preferences",
+                         "method":  "GET",
+                         "path":  "/notifications/preferences/{customerId}",
+                         "description":  "Read permitted notification channels",
+                         "external":  false
+                     }
+                 ]
+    },
+    {
+        "id":  "api-gateway",
+        "name":  "API Gateway",
+        "type":  "platform",
+        "description":  "External REST entry point with token validation, route policy enforcement and request tracing.",
+        "owner_team":  "Identity \u0026 Access",
+        "owner_contact":  "identity-access@bank.example",
+        "criticality":  10,
+        "data_classes":  [
+                             "pii",
+                             "financial"
+                         ],
+        "deployment_group":  "identity",
+        "sla_tier":  "tier1",
+        "downstream":  [
+                           "customer-service",
+                           "account-service",
+                           "payment-service",
+                           "loan-service",
+                           "card-service",
+                           "crm",
+                           "document-service",
+                           "authentication-service",
+                           "audit-db"
+                       ],
+        "upstream":  [
+                         "atm",
+                         "branch-portal",
+                         "mobile-banking",
+                         "web-banking"
+                     ],
+        "apis":  [
+                     {
+                         "id":  "api-gateway.payments",
+                         "method":  "POST",
+                         "path":  "/payments",
+                         "description":  "Route an authorized payment instruction to Payment Service",
+                         "external":  true
+                     },
+                     {
+                         "id":  "api-gateway.account-limits",
+                         "method":  "GET",
+                         "path":  "/accounts/{id}/limits",
+                         "description":  "Route an account limits enquiry",
+                         "external":  true
+                     },
+                     {
+                         "id":  "api-gateway.card-status",
+                         "method":  "PATCH",
+                         "path":  "/cards/{id}/status",
+                         "description":  "Route a card freeze/unfreeze request with step-up proof",
+                         "external":  true
+                     },
+                     {
+                         "id":  "api-gateway.customer-profile",
+                         "method":  "PATCH",
+                         "path":  "/customers/{id}/profile",
+                         "description":  "Route a customer profile update",
+                         "external":  true
+                     },
+                     {
+                         "id":  "api-gateway.loan-application",
+                         "method":  "POST",
+                         "path":  "/loans/applications",
+                         "description":  "Route a loan application",
+                         "external":  true
+                     }
+                 ]
+    },
+    {
+        "id":  "customer-db",
+        "name":  "Customer Database",
+        "type":  "database",
+        "description":  "Encrypted customer profile and identity store; REST paths represent its internal data-access adapter.",
+        "owner_team":  "Customer Platform",
+        "owner_contact":  "customer-platform@bank.example",
+        "criticality":  9,
+        "data_classes":  [
+                             "pii"
+                         ],
+        "deployment_group":  "customer-platform",
+        "sla_tier":  "tier1",
+        "downstream":  [
+
+                       ],
+        "upstream":  [
+                         "account-service",
+                         "authentication-service",
+                         "card-service",
+                         "crm",
+                         "customer-service",
+                         "loan-service",
+                         "notification-service"
+                     ],
+        "apis":  [
+                     {
+                         "id":  "customer-db.profile-read",
+                         "method":  "GET",
+                         "path":  "/internal/customer-store/profiles/{id}",
+                         "description":  "Read a customer profile through the private adapter",
+                         "external":  false
+                     },
+                     {
+                         "id":  "customer-db.profile-write",
+                         "method":  "PUT",
+                         "path":  "/internal/customer-store/profiles/{id}",
+                         "description":  "Persist a versioned customer profile",
+                         "external":  false
+                     }
+                 ]
+    }
+]
