@@ -1,0 +1,1060 @@
+{
+  "sprint_id": "DEMO-01",
+  "name": "Customer preferences sprint",
+  "stories": [
+    {
+      "story": {
+        "id": "ST-107",
+        "title": "Update notification preferences",
+        "description": "Let customers choose whether to receive account activity notifications.",
+        "type": "story",
+        "acceptance_criteria": [
+          "Customers can update their notification preference.",
+          "Preference changes are recorded in the audit log."
+        ]
+      },
+      "requirement": {
+        "business_summary": "Customers control account activity notifications.",
+        "technical_summary": "Update the stored customer preference and record an audit event.",
+        "business_domain": "Customer engagement",
+        "affected_capabilities": [
+          "Notification preferences"
+        ],
+        "affected_services": [
+          "notification-service"
+        ],
+        "change_type": "enhancement",
+        "touches_customer_data": true,
+        "touches_card_data": false,
+        "touches_financial_data": false,
+        "changes_auth_flow": false,
+        "changes_external_api_contract": false,
+        "changes_db_schema": false,
+        "ambiguity": "low",
+        "engineering_scope": "Preference update and audit event.",
+        "source": "sample-fixture"
+      },
+      "graph": {
+        "nodes": [
+          {
+            "id": "notification-service",
+            "label": "Notifications",
+            "type": "platform",
+            "hop": 0,
+            "severity": "low",
+            "x": 0,
+            "y": 0,
+            "criticality": 5,
+            "owner_team": "Customer engagement",
+            "data_classes": [
+              "pii"
+            ]
+          },
+          {
+            "id": "customer-service",
+            "label": "Customer service",
+            "type": "core",
+            "hop": 1,
+            "severity": "low",
+            "x": 160,
+            "y": 0,
+            "criticality": 7,
+            "owner_team": "Customer platforms",
+            "data_classes": [
+              "pii"
+            ]
+          },
+          {
+            "id": "customer-db",
+            "label": "Customer database",
+            "type": "database",
+            "hop": 2,
+            "severity": "low",
+            "x": 280,
+            "y": 0,
+            "criticality": 8,
+            "owner_team": "Data platforms",
+            "data_classes": [
+              "pii"
+            ]
+          },
+          {
+            "id": "audit-store",
+            "label": "Audit store",
+            "type": "database",
+            "hop": 1,
+            "severity": "low",
+            "x": -160,
+            "y": 0,
+            "criticality": 7,
+            "owner_team": "Governance",
+            "data_classes": [
+              "audit"
+            ]
+          },
+          {
+            "id": "api-gateway",
+            "label": "API gateway",
+            "type": "platform",
+            "hop": 2,
+            "severity": "low",
+            "x": 0,
+            "y": 280,
+            "criticality": 8,
+            "owner_team": "Integration",
+            "data_classes": []
+          },
+          {
+            "id": "online-banking",
+            "label": "Online banking",
+            "type": "channel",
+            "hop": 3,
+            "severity": "low",
+            "x": 0,
+            "y": 400,
+            "criticality": 7,
+            "owner_team": "Digital channels",
+            "data_classes": [
+              "pii"
+            ]
+          },
+          {
+            "id": "mobile-banking",
+            "label": "Mobile banking",
+            "type": "channel",
+            "hop": 3,
+            "severity": "low",
+            "x": -346,
+            "y": -200,
+            "criticality": 7,
+            "owner_team": "Digital channels",
+            "data_classes": [
+              "pii"
+            ]
+          },
+          {
+            "id": "analytics",
+            "label": "Analytics",
+            "type": "analytics",
+            "hop": null,
+            "severity": null,
+            "x": 0,
+            "y": -520,
+            "criticality": 4,
+            "owner_team": "Insights",
+            "data_classes": []
+          }
+        ],
+        "edges": [
+          {
+            "id": "edge-0",
+            "source": "online-banking",
+            "target": "api-gateway",
+            "on_impact_path": true,
+            "conflict": false
+          },
+          {
+            "id": "edge-1",
+            "source": "mobile-banking",
+            "target": "api-gateway",
+            "on_impact_path": true,
+            "conflict": false
+          },
+          {
+            "id": "edge-2",
+            "source": "api-gateway",
+            "target": "customer-service",
+            "on_impact_path": true,
+            "conflict": false
+          },
+          {
+            "id": "edge-3",
+            "source": "customer-service",
+            "target": "notification-service",
+            "on_impact_path": true,
+            "conflict": false
+          },
+          {
+            "id": "edge-4",
+            "source": "customer-service",
+            "target": "customer-db",
+            "on_impact_path": true,
+            "conflict": false
+          },
+          {
+            "id": "edge-5",
+            "source": "notification-service",
+            "target": "audit-store",
+            "on_impact_path": true,
+            "conflict": false
+          },
+          {
+            "id": "edge-6",
+            "source": "audit-store",
+            "target": "analytics",
+            "on_impact_path": false,
+            "conflict": false
+          }
+        ],
+        "impacted_services": [
+          "notification-service",
+          "customer-service",
+          "api-gateway",
+          "online-banking",
+          "mobile-banking"
+        ],
+        "impacted_databases": [
+          "customer-db",
+          "audit-store"
+        ],
+        "impacted_apis": [],
+        "downstream_systems": [
+          "customer-db",
+          "audit-store"
+        ],
+        "deployment_groups": [
+          "customer-platforms",
+          "digital-channels"
+        ]
+      },
+      "risk": {
+        "dimensions": [
+          {
+            "name": "delivery",
+            "score": 20,
+            "level": "low",
+            "factors": [
+              {
+                "label": "Two deployment groups",
+                "points": 20,
+                "node_ids": [
+                  "notification-service",
+                  "customer-service"
+                ]
+              }
+            ],
+            "explanation": "Coordinate the preference update across the customer platforms."
+          },
+          {
+            "name": "technical",
+            "score": 30,
+            "level": "low",
+            "factors": [
+              {
+                "label": "Shared preference store",
+                "points": 30,
+                "node_ids": [
+                  "customer-db"
+                ]
+              }
+            ],
+            "explanation": "Regression coverage is needed for existing preference readers."
+          },
+          {
+            "name": "security",
+            "score": 25,
+            "level": "low",
+            "factors": [
+              {
+                "label": "Customer data",
+                "points": 25,
+                "node_ids": [
+                  "customer-service",
+                  "customer-db"
+                ]
+              }
+            ],
+            "explanation": "Check authorization before changing a customer preference."
+          },
+          {
+            "name": "operational",
+            "score": 20,
+            "level": "low",
+            "factors": [
+              {
+                "label": "Notification delivery",
+                "points": 20,
+                "node_ids": [
+                  "notification-service"
+                ]
+              }
+            ],
+            "explanation": "Monitor delivery after rollout."
+          },
+          {
+            "name": "compliance",
+            "score": 25,
+            "level": "low",
+            "factors": [
+              {
+                "label": "Customer consent",
+                "points": 25,
+                "node_ids": [
+                  "customer-db",
+                  "audit-store"
+                ]
+              }
+            ],
+            "explanation": "Retain an audit trail of consent changes."
+          },
+          {
+            "name": "performance",
+            "score": 10,
+            "level": "low",
+            "factors": [
+              {
+                "label": "Preference lookup",
+                "points": 10,
+                "node_ids": [
+                  "customer-db"
+                ]
+              }
+            ],
+            "explanation": "Check preference lookup latency."
+          }
+        ],
+        "overall": 22,
+        "highest": "technical"
+      },
+      "tests": {
+        "tests": [
+          {
+            "id": "TEST-107",
+            "title": "Save and audit notification preference",
+            "type": "integration",
+            "priority": "P1",
+            "covers": [
+              "notification-service",
+              "customer-service",
+              "api-gateway",
+              "online-banking",
+              "mobile-banking",
+              "customer-db",
+              "audit-store"
+            ],
+            "steps": [
+              "Sign in as a customer.",
+              "Disable activity notifications.",
+              "Confirm the preference and audit event are saved."
+            ],
+            "expected": "The preference is respected on both channels and the audit event is retained.",
+            "source": "generated",
+            "automation_candidate": true
+          }
+        ],
+        "coverage_estimate": 1,
+        "effort_hours": 3,
+        "automation_candidates": 1,
+        "summary": "Sample test plan covering preference storage and audit behavior."
+      },
+      "compliance": {
+        "frameworks": [
+          {
+            "framework": "GDPR",
+            "applicable": true,
+            "reason": "Customer notification consent is stored.",
+            "risk_level": "low",
+            "score": 85,
+            "findings": [
+              {
+                "text": "Verify consent changes are recorded.",
+                "node_ids": [
+                  "customer-db",
+                  "audit-store"
+                ]
+              }
+            ],
+            "recommendations": [
+              "Review consent retention with the privacy owner."
+            ]
+          },
+          {
+            "framework": "PCI DSS",
+            "applicable": false,
+            "reason": "No card data is involved.",
+            "risk_level": null,
+            "score": null,
+            "findings": [],
+            "recommendations": []
+          },
+          {
+            "framework": "SOX",
+            "applicable": false,
+            "reason": "No financial reporting controls change.",
+            "risk_level": null,
+            "score": null,
+            "findings": [],
+            "recommendations": []
+          },
+          {
+            "framework": "Internal Governance",
+            "applicable": true,
+            "reason": "Shared customer services require owner review.",
+            "risk_level": "low",
+            "score": 90,
+            "findings": [],
+            "recommendations": [
+              "Record the service owner approval."
+            ]
+          }
+        ],
+        "overall_score": 85,
+        "summary": "Confirm consent handling and owner review before release."
+      },
+      "release": {
+        "confidence": 85,
+        "decision": "GO_WITH_CONDITIONS",
+        "triggered_rules": [
+          "Owner approval required"
+        ],
+        "conditions": [
+          "Confirm consent retention with the privacy owner."
+        ],
+        "complexity": "low",
+        "rollback_plan": [
+          "Disable the new preference control.",
+          "Restore the previous notification preference behavior."
+        ],
+        "deployment_notes": [
+          "Deploy customer services before enabling the channel control.",
+          "Monitor preference update failures."
+        ]
+      },
+      "providers_used": {
+        "requirement": "sample-fixture",
+        "dependency": "deterministic",
+        "scoring": "deterministic",
+        "testing": "sample-fixture",
+        "compliance": "sample-fixture",
+        "release": "deterministic"
+      },
+      "duration_ms": 0,
+      "created_at": "2026-10-06T08:00:00Z"
+    },
+    {
+      "story": {
+        "id": "ST-108",
+        "title": "Expose notification preferences on mobile",
+        "description": "Let customers choose whether to receive account activity notifications.",
+        "type": "story",
+        "acceptance_criteria": [
+          "Customers can update their notification preference.",
+          "Preference changes are recorded in the audit log."
+        ]
+      },
+      "requirement": {
+        "business_summary": "Customers control account activity notifications.",
+        "technical_summary": "Update the stored customer preference and record an audit event.",
+        "business_domain": "Customer engagement",
+        "affected_capabilities": [
+          "Notification preferences"
+        ],
+        "affected_services": [
+          "notification-service"
+        ],
+        "change_type": "enhancement",
+        "touches_customer_data": true,
+        "touches_card_data": false,
+        "touches_financial_data": false,
+        "changes_auth_flow": false,
+        "changes_external_api_contract": false,
+        "changes_db_schema": false,
+        "ambiguity": "low",
+        "engineering_scope": "Preference update and audit event.",
+        "source": "sample-fixture"
+      },
+      "graph": {
+        "nodes": [
+          {
+            "id": "notification-service",
+            "label": "Notifications",
+            "type": "platform",
+            "hop": 0,
+            "severity": "low",
+            "x": 0,
+            "y": 0,
+            "criticality": 5,
+            "owner_team": "Customer engagement",
+            "data_classes": [
+              "pii"
+            ]
+          },
+          {
+            "id": "customer-service",
+            "label": "Customer service",
+            "type": "core",
+            "hop": 1,
+            "severity": "low",
+            "x": 160,
+            "y": 0,
+            "criticality": 7,
+            "owner_team": "Customer platforms",
+            "data_classes": [
+              "pii"
+            ]
+          },
+          {
+            "id": "customer-db",
+            "label": "Customer database",
+            "type": "database",
+            "hop": 2,
+            "severity": "low",
+            "x": 280,
+            "y": 0,
+            "criticality": 8,
+            "owner_team": "Data platforms",
+            "data_classes": [
+              "pii"
+            ]
+          },
+          {
+            "id": "audit-store",
+            "label": "Audit store",
+            "type": "database",
+            "hop": 1,
+            "severity": "low",
+            "x": -160,
+            "y": 0,
+            "criticality": 7,
+            "owner_team": "Governance",
+            "data_classes": [
+              "audit"
+            ]
+          },
+          {
+            "id": "api-gateway",
+            "label": "API gateway",
+            "type": "platform",
+            "hop": 2,
+            "severity": "low",
+            "x": 0,
+            "y": 280,
+            "criticality": 8,
+            "owner_team": "Integration",
+            "data_classes": []
+          },
+          {
+            "id": "online-banking",
+            "label": "Online banking",
+            "type": "channel",
+            "hop": 3,
+            "severity": "low",
+            "x": 0,
+            "y": 400,
+            "criticality": 7,
+            "owner_team": "Digital channels",
+            "data_classes": [
+              "pii"
+            ]
+          },
+          {
+            "id": "mobile-banking",
+            "label": "Mobile banking",
+            "type": "channel",
+            "hop": 3,
+            "severity": "low",
+            "x": -346,
+            "y": -200,
+            "criticality": 7,
+            "owner_team": "Digital channels",
+            "data_classes": [
+              "pii"
+            ]
+          },
+          {
+            "id": "analytics",
+            "label": "Analytics",
+            "type": "analytics",
+            "hop": null,
+            "severity": null,
+            "x": 0,
+            "y": -520,
+            "criticality": 4,
+            "owner_team": "Insights",
+            "data_classes": []
+          }
+        ],
+        "edges": [
+          {
+            "id": "edge-0",
+            "source": "online-banking",
+            "target": "api-gateway",
+            "on_impact_path": true,
+            "conflict": false
+          },
+          {
+            "id": "edge-1",
+            "source": "mobile-banking",
+            "target": "api-gateway",
+            "on_impact_path": true,
+            "conflict": false
+          },
+          {
+            "id": "edge-2",
+            "source": "api-gateway",
+            "target": "customer-service",
+            "on_impact_path": true,
+            "conflict": false
+          },
+          {
+            "id": "edge-3",
+            "source": "customer-service",
+            "target": "notification-service",
+            "on_impact_path": true,
+            "conflict": false
+          },
+          {
+            "id": "edge-4",
+            "source": "customer-service",
+            "target": "customer-db",
+            "on_impact_path": true,
+            "conflict": false
+          },
+          {
+            "id": "edge-5",
+            "source": "notification-service",
+            "target": "audit-store",
+            "on_impact_path": true,
+            "conflict": false
+          },
+          {
+            "id": "edge-6",
+            "source": "audit-store",
+            "target": "analytics",
+            "on_impact_path": false,
+            "conflict": false
+          }
+        ],
+        "impacted_services": [
+          "notification-service",
+          "customer-service",
+          "api-gateway",
+          "online-banking",
+          "mobile-banking"
+        ],
+        "impacted_databases": [
+          "customer-db",
+          "audit-store"
+        ],
+        "impacted_apis": [],
+        "downstream_systems": [
+          "customer-db",
+          "audit-store"
+        ],
+        "deployment_groups": [
+          "customer-platforms",
+          "digital-channels"
+        ]
+      },
+      "risk": {
+        "dimensions": [
+          {
+            "name": "delivery",
+            "score": 20,
+            "level": "low",
+            "factors": [
+              {
+                "label": "Two deployment groups",
+                "points": 20,
+                "node_ids": [
+                  "notification-service",
+                  "customer-service"
+                ]
+              }
+            ],
+            "explanation": "Coordinate the preference update across the customer platforms."
+          },
+          {
+            "name": "technical",
+            "score": 30,
+            "level": "low",
+            "factors": [
+              {
+                "label": "Shared preference store",
+                "points": 30,
+                "node_ids": [
+                  "customer-db"
+                ]
+              }
+            ],
+            "explanation": "Regression coverage is needed for existing preference readers."
+          },
+          {
+            "name": "security",
+            "score": 25,
+            "level": "low",
+            "factors": [
+              {
+                "label": "Customer data",
+                "points": 25,
+                "node_ids": [
+                  "customer-service",
+                  "customer-db"
+                ]
+              }
+            ],
+            "explanation": "Check authorization before changing a customer preference."
+          },
+          {
+            "name": "operational",
+            "score": 20,
+            "level": "low",
+            "factors": [
+              {
+                "label": "Notification delivery",
+                "points": 20,
+                "node_ids": [
+                  "notification-service"
+                ]
+              }
+            ],
+            "explanation": "Monitor delivery after rollout."
+          },
+          {
+            "name": "compliance",
+            "score": 25,
+            "level": "low",
+            "factors": [
+              {
+                "label": "Customer consent",
+                "points": 25,
+                "node_ids": [
+                  "customer-db",
+                  "audit-store"
+                ]
+              }
+            ],
+            "explanation": "Retain an audit trail of consent changes."
+          },
+          {
+            "name": "performance",
+            "score": 10,
+            "level": "low",
+            "factors": [
+              {
+                "label": "Preference lookup",
+                "points": 10,
+                "node_ids": [
+                  "customer-db"
+                ]
+              }
+            ],
+            "explanation": "Check preference lookup latency."
+          }
+        ],
+        "overall": 22,
+        "highest": "technical"
+      },
+      "tests": {
+        "tests": [
+          {
+            "id": "TEST-107",
+            "title": "Save and audit notification preference",
+            "type": "integration",
+            "priority": "P1",
+            "covers": [
+              "notification-service",
+              "customer-service",
+              "api-gateway",
+              "online-banking",
+              "mobile-banking",
+              "customer-db",
+              "audit-store"
+            ],
+            "steps": [
+              "Sign in as a customer.",
+              "Disable activity notifications.",
+              "Confirm the preference and audit event are saved."
+            ],
+            "expected": "The preference is respected on both channels and the audit event is retained.",
+            "source": "generated",
+            "automation_candidate": true
+          }
+        ],
+        "coverage_estimate": 1,
+        "effort_hours": 3,
+        "automation_candidates": 1,
+        "summary": "Sample test plan covering preference storage and audit behavior."
+      },
+      "compliance": {
+        "frameworks": [
+          {
+            "framework": "GDPR",
+            "applicable": true,
+            "reason": "Customer notification consent is stored.",
+            "risk_level": "low",
+            "score": 85,
+            "findings": [
+              {
+                "text": "Verify consent changes are recorded.",
+                "node_ids": [
+                  "customer-db",
+                  "audit-store"
+                ]
+              }
+            ],
+            "recommendations": [
+              "Review consent retention with the privacy owner."
+            ]
+          },
+          {
+            "framework": "PCI DSS",
+            "applicable": false,
+            "reason": "No card data is involved.",
+            "risk_level": null,
+            "score": null,
+            "findings": [],
+            "recommendations": []
+          },
+          {
+            "framework": "SOX",
+            "applicable": false,
+            "reason": "No financial reporting controls change.",
+            "risk_level": null,
+            "score": null,
+            "findings": [],
+            "recommendations": []
+          },
+          {
+            "framework": "Internal Governance",
+            "applicable": true,
+            "reason": "Shared customer services require owner review.",
+            "risk_level": "low",
+            "score": 90,
+            "findings": [],
+            "recommendations": [
+              "Record the service owner approval."
+            ]
+          }
+        ],
+        "overall_score": 85,
+        "summary": "Confirm consent handling and owner review before release."
+      },
+      "release": {
+        "confidence": 85,
+        "decision": "GO_WITH_CONDITIONS",
+        "triggered_rules": [
+          "Owner approval required"
+        ],
+        "conditions": [
+          "Confirm consent retention with the privacy owner."
+        ],
+        "complexity": "low",
+        "rollback_plan": [
+          "Disable the new preference control.",
+          "Restore the previous notification preference behavior."
+        ],
+        "deployment_notes": [
+          "Deploy customer services before enabling the channel control.",
+          "Monitor preference update failures."
+        ]
+      },
+      "providers_used": {
+        "requirement": "sample-fixture",
+        "dependency": "deterministic",
+        "scoring": "deterministic",
+        "testing": "sample-fixture",
+        "compliance": "sample-fixture",
+        "release": "deterministic"
+      },
+      "duration_ms": 0,
+      "created_at": "2026-10-06T08:00:00Z"
+    }
+  ],
+  "conflicts": [],
+  "kpis": {
+    "stories": 2,
+    "applications_impacted": 5,
+    "dependencies_impacted": 7,
+    "conflicts": 0,
+    "compliance_issues": 0,
+    "testing_effort_hours": 6,
+    "health_score": 78,
+    "release_confidence": 85,
+    "high_risk_stories": []
+  },
+  "conflict_graph": {
+    "nodes": [
+      {
+        "id": "notification-service",
+        "label": "Notifications",
+        "type": "platform",
+        "hop": 0,
+        "severity": "low",
+        "x": 0,
+        "y": 0,
+        "criticality": 5,
+        "owner_team": "Customer engagement",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "customer-service",
+        "label": "Customer service",
+        "type": "core",
+        "hop": 1,
+        "severity": "low",
+        "x": 160,
+        "y": 0,
+        "criticality": 7,
+        "owner_team": "Customer platforms",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "customer-db",
+        "label": "Customer database",
+        "type": "database",
+        "hop": 2,
+        "severity": "low",
+        "x": 280,
+        "y": 0,
+        "criticality": 8,
+        "owner_team": "Data platforms",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "audit-store",
+        "label": "Audit store",
+        "type": "database",
+        "hop": 1,
+        "severity": "low",
+        "x": -160,
+        "y": 0,
+        "criticality": 7,
+        "owner_team": "Governance",
+        "data_classes": [
+          "audit"
+        ]
+      },
+      {
+        "id": "api-gateway",
+        "label": "API gateway",
+        "type": "platform",
+        "hop": 2,
+        "severity": "low",
+        "x": 0,
+        "y": 280,
+        "criticality": 8,
+        "owner_team": "Integration",
+        "data_classes": []
+      },
+      {
+        "id": "online-banking",
+        "label": "Online banking",
+        "type": "channel",
+        "hop": 3,
+        "severity": "low",
+        "x": 0,
+        "y": 400,
+        "criticality": 7,
+        "owner_team": "Digital channels",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "mobile-banking",
+        "label": "Mobile banking",
+        "type": "channel",
+        "hop": 3,
+        "severity": "low",
+        "x": -346,
+        "y": -200,
+        "criticality": 7,
+        "owner_team": "Digital channels",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "analytics",
+        "label": "Analytics",
+        "type": "analytics",
+        "hop": null,
+        "severity": null,
+        "x": 0,
+        "y": -520,
+        "criticality": 4,
+        "owner_team": "Insights",
+        "data_classes": []
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-0",
+        "source": "online-banking",
+        "target": "api-gateway",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "edge-1",
+        "source": "mobile-banking",
+        "target": "api-gateway",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "edge-2",
+        "source": "api-gateway",
+        "target": "customer-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "edge-3",
+        "source": "customer-service",
+        "target": "notification-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "edge-4",
+        "source": "customer-service",
+        "target": "customer-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "edge-5",
+        "source": "notification-service",
+        "target": "audit-store",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "edge-6",
+        "source": "audit-store",
+        "target": "analytics",
+        "on_impact_path": false,
+        "conflict": false
+      }
+    ],
+    "impacted_services": [
+      "notification-service",
+      "customer-service",
+      "api-gateway",
+      "online-banking",
+      "mobile-banking"
+    ],
+    "impacted_databases": [
+      "customer-db",
+      "audit-store"
+    ],
+    "impacted_apis": [],
+    "downstream_systems": [
+      "customer-db",
+      "audit-store"
+    ],
+    "deployment_groups": [
+      "customer-platforms",
+      "digital-channels"
+    ]
+  },
+  "summary": "Sample sprint: two customer preference changes with coordinated owner review."
+}

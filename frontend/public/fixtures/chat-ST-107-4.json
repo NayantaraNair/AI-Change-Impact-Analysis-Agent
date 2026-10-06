@@ -1,0 +1,10 @@
+{
+  "answer": "The sample decision is **Go with conditions** at 85% confidence. Confirm consent retention with the privacy owner before releasing.",
+  "cited_nodes": [
+    "customer-db"
+  ],
+  "cited_factors": [
+    "Customer consent"
+  ],
+  "provider": "sample-fixture"
+}
