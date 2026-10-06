@@ -1,3 +1,10 @@
+import { Suspense } from "react";
+import { StoryRoute } from "@/components/analysis/story-route";
+
 export default function StoryPage() {
-  return <p className="text-muted">Paste a story and select Analyze to see its blast radius.</p>;
+  return (
+    <Suspense fallback={<p role="status" className="text-muted">Loading story analysis…</p>}>
+      <StoryRoute />
+    </Suspense>
+  );
 }
