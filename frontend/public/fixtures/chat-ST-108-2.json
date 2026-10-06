@@ -1,0 +1,10 @@
+{
+  "answer": "Start with the P1 integration test: save the preference, verify both channels respect it, and confirm the audit event.",
+  "cited_nodes": [
+    "customer-service",
+    "customer-db",
+    "audit-store"
+  ],
+  "cited_factors": [],
+  "provider": "sample-fixture"
+}

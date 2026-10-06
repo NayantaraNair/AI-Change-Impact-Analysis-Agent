@@ -1,0 +1,26 @@
+{
+  "sprint_id": "DEMO-01",
+  "name": "Customer preferences sprint",
+  "stories": [
+    {
+      "id": "ST-107",
+      "title": "Update notification preferences",
+      "description": "Let customers choose whether to receive account activity notifications.",
+      "type": "story",
+      "acceptance_criteria": [
+        "Customers can update their notification preference.",
+        "Preference changes are recorded in the audit log."
+      ]
+    },
+    {
+      "id": "ST-108",
+      "title": "Expose notification preferences on mobile",
+      "description": "Let customers choose whether to receive account activity notifications.",
+      "type": "story",
+      "acceptance_criteria": [
+        "Customers can update their notification preference.",
+        "Preference changes are recorded in the audit log."
+      ]
+    }
+  ]
+}

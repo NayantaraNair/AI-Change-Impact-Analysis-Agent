@@ -1,0 +1,11 @@
+{
+  "answer": "GDPR and Internal Governance apply to this sample. Confirm consent retention and record service owner approval.",
+  "cited_nodes": [
+    "customer-db",
+    "audit-store"
+  ],
+  "cited_factors": [
+    "Customer consent"
+  ],
+  "provider": "sample-fixture"
+}
