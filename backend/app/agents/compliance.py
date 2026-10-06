@@ -411,7 +411,7 @@ async def assess_compliance(
                 user,
                 schema,
                 tier="fast",
-                max_tokens=2400,
+                max_tokens=5000,
             )
             prose = schema.model_validate(response.model_dump(by_alias=True)).model_dump(
                 by_alias=True

@@ -1,4 +1,8 @@
-"""Serve validated, exact-input demo fixtures only in disabled-LLM mode."""
+"""Serve saved demo results for unchanged demo input.
+
+Fixtures are built with the live LLM chain (scripts/build_fixtures.py), so the
+demo stories answer instantly in every mode. `?refresh=true` runs the pipeline.
+"""
 
 from __future__ import annotations
 
@@ -20,8 +24,6 @@ def _load(path: Path, schema: type[BaseModel]):
 
 
 def story_fixture(story: StoryInput) -> StoryAnalysis | None:
-    if not config.llm_disabled():
-        return None
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", story.id) or len(story.id) > 100:
         return None
     analysis = _load(Path(config.FIXTURES_DIR) / f"story-{story.id}.json", StoryAnalysis)
@@ -29,8 +31,6 @@ def story_fixture(story: StoryInput) -> StoryAnalysis | None:
 
 
 def sprint_fixture(request: SprintRequest) -> SprintAnalysis | None:
-    if not config.llm_disabled():
-        return None
     demo = load_demo_sprint()
     stories = request.stories or demo.stories
     if stories != demo.stories:

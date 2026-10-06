@@ -222,7 +222,7 @@ async def write_plans(
         "dependency_edges": [edge.model_dump() for edge in graph.edges if edge.on_impact_path],
     })
     try:
-        plans, provider = await llm.complete_structured(system, user, _ReleasePlans, tier="strong")
+        plans, provider = await llm.complete_structured(system, user, _ReleasePlans, tier="strong", max_tokens=4000)
     except llm.NoLLM:
         rollback, notes = _template_plans(facts, groups, database_groups, decision)
         return rollback, notes, "template-fallback"

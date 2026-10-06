@@ -41,7 +41,10 @@ class Provider:
 
 # The ":free" Token Harbor routes need no account balance; override with a paid model if you have credit.
 TOKENHARBOR_FAST_MODEL = os.getenv("TOKENHARBOR_FAST_MODEL", "deepseek-v4.1-flash:free")
-TOKENHARBOR_STRONG_MODEL = os.getenv("TOKENHARBOR_STRONG_MODEL", "deepseek-v4-flash:free")
+TOKENHARBOR_STRONG_MODEL = os.getenv("TOKENHARBOR_STRONG_MODEL", "deepseek-v4.1-flash:free")
+
+# Free-tier models can take 30-60 s for long structured answers.
+LLM_TIMEOUT_S = float(os.getenv("LLM_TIMEOUT_S", "60"))
 
 PROVIDERS = (
     Provider("tokenharbor", "https://tokenharbor.ai/v1", TOKENHARBOR_FAST_MODEL),
@@ -158,7 +161,7 @@ async def _complete_provider(
         retried_transient = False
         retried_tool = False
         async with AsyncOpenAI(
-            api_key=key, base_url=provider.base_url, timeout=30.0,
+            api_key=key, base_url=provider.base_url, timeout=LLM_TIMEOUT_S,
             max_retries=0, default_headers=headers,
         ) as client:
             while True:
@@ -185,7 +188,7 @@ async def _complete_provider(
                 response = None
                 error_class = None
                 try:
-                    async with asyncio.timeout(30):
+                    async with asyncio.timeout(LLM_TIMEOUT_S):
                         response = await client.chat.completions.create(**request)
                     return _parse_response(response, schema, tool_mode)
                 except _FALLBACK_ERRORS as exc:

@@ -164,7 +164,7 @@ async def test_transient_retries_same_provider_once(mock_chain, error_kind, retr
     assert [call["model"] for call in mock_chain.calls][:2] == [first.model, first.model]
     assert len(mock_chain.calls) == (2 if retry_succeeds else 3)
     assert mock_chain.clients[0]["max_retries"] == 0
-    assert mock_chain.clients[0]["timeout"] == 30
+    assert mock_chain.clients[0]["timeout"] == llm.LLM_TIMEOUT_S
 
 
 async def test_connection_error_does_not_retry(mock_chain):
@@ -256,9 +256,9 @@ async def test_code_fences_and_safe_logging(mock_chain, caplog):
         assert secret not in caplog.text
 
 
-async def test_strong_tier_uses_pro(mock_chain):
-    mock_chain.outcomes["deepseek-v4-flash:free"].append(response())
-    assert (await llm.complete_structured("system", "user", Facts, tier="strong"))[1] == "tokenharbor:deepseek-v4-flash:free"
+async def test_strong_tier_uses_strong_model(mock_chain):
+    mock_chain.outcomes["deepseek-v4.1-flash:free"].append(response())
+    assert (await llm.complete_structured("system", "user", Facts, tier="strong"))[1] == "tokenharbor:deepseek-v4.1-flash:free"
 
 
 async def test_text_temperature_and_history(mock_chain):

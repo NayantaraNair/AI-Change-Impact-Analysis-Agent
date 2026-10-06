@@ -1,5 +1,6 @@
 """FastAPI application and startup data loading."""
 
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -8,6 +9,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import config, db
 from app.api import routes_analysis, routes_chat, routes_sprint
 from app.architecture import get_architecture, get_test_catalog
+
+# Provider, model and latency per LLM call (app.llm never logs keys or prompts).
+logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 
 @asynccontextmanager
