@@ -12,30 +12,32 @@
     ]
   },
   "requirement": {
-    "business_summary": "Requested banking change: Increase daily payment limits for premium customers.",
-    "technical_summary": "Apply the business rule change to account-service, payment-service, transaction-db, fraud-engine according to the supplied criteria.",
-    "business_domain": "Fraud prevention",
+    "business_summary": "Increase daily payment limit for premium customers from AED 25,000 to AED 50,000 for domestic transfers while keeping standard customer limits unchanged.",
+    "technical_summary": "Payment-service will obtain premium eligibility and effective daily limit from account-service before accepting each payment, apply fraud screening via fraud-engine, and compute remaining daily allowance using transaction ledger in transaction-db (including concurrent requests). The change is gated by a feature flag; operations will monitor and can rollback via the flag.",
+    "business_domain": "Domestic Payments",
     "affected_capabilities": [
-      "Account Service",
-      "Payment Service",
-      "Fraud Engine"
+      "Payment Limit Enforcement",
+      "Premium Eligibility Check",
+      "Fraud Screening",
+      "Concurrency Control",
+      "Feature Flag Governance"
     ],
     "affected_services": [
-      "account-service",
       "payment-service",
-      "transaction-db",
-      "fraud-engine"
+      "account-service",
+      "fraud-engine",
+      "transaction-db"
     ],
     "change_type": "business_rule_change",
     "touches_customer_data": true,
-    "touches_card_data": true,
+    "touches_card_data": false,
     "touches_financial_data": true,
     "changes_auth_flow": false,
     "changes_external_api_contract": false,
     "changes_db_schema": false,
     "ambiguity": "low",
-    "engineering_scope": "Implement Increase daily payment limits for premium customers across account-service, payment-service, transaction-db, fraud-engine; verify 4 acceptance criteria.",
-    "source": "keyword-fallback"
+    "engineering_scope": "Update payment-service to query account-service for premium eligibility and dynamic daily limit, integrate with fraud-engine, use transaction-db for daily allowance calculation with concurrency handling, introduce feature flag for rollout, and adjust monitoring/rollback procedures.",
+    "source": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
   },
   "graph": {
     "nodes": [
@@ -46,7 +48,7 @@
         "hop": 0,
         "severity": "high",
         "x": 0.0,
-        "y": 70.0,
+        "y": 121.0,
         "criticality": 9,
         "owner_team": "Core Banking",
         "data_classes": [
@@ -60,8 +62,8 @@
         "type": "platform",
         "hop": 1,
         "severity": "high",
-        "x": -155.0,
-        "y": -268.5,
+        "x": -50.5,
+        "y": -286.5,
         "criticality": 10,
         "owner_team": "Identity & Access",
         "data_classes": [
@@ -75,7 +77,7 @@
         "type": "channel",
         "hop": 2,
         "severity": "low",
-        "x": 480.0,
+        "x": 461.0,
         "y": 0.0,
         "criticality": 7,
         "owner_team": "Assisted Channels",
@@ -90,8 +92,8 @@
         "type": "database",
         "hop": 1,
         "severity": "medium",
-        "x": -155.0,
-        "y": 268.5,
+        "x": -222.9,
+        "y": 187.0,
         "criticality": 8,
         "owner_team": "Data & Analytics",
         "data_classes": [
@@ -104,8 +106,8 @@
         "type": "platform",
         "hop": 1,
         "severity": "high",
-        "x": 53.8,
-        "y": -305.3,
+        "x": 145.5,
+        "y": -252.0,
         "criticality": 10,
         "owner_team": "Identity & Access",
         "data_classes": [
@@ -119,7 +121,7 @@
         "hop": 2,
         "severity": "low",
         "x": 0.0,
-        "y": 480.0,
+        "y": 461.0,
         "criticality": 6,
         "owner_team": "Assisted Channels",
         "data_classes": [
@@ -133,8 +135,8 @@
         "type": "core",
         "hop": 1,
         "severity": "high",
-        "x": 237.5,
-        "y": 199.3,
+        "x": 145.5,
+        "y": 252.0,
         "criticality": 9,
         "owner_team": "Cards Platform",
         "data_classes": [
@@ -149,7 +151,7 @@
         "hop": null,
         "severity": null,
         "x": 0.0,
-        "y": 820.0,
+        "y": 631.0,
         "criticality": 6,
         "owner_team": "Customer Platform",
         "data_classes": [
@@ -162,8 +164,8 @@
         "type": "database",
         "hop": 1,
         "severity": "high",
-        "x": -291.3,
-        "y": 106.0,
+        "x": -291.0,
+        "y": 0.0,
         "criticality": 9,
         "owner_team": "Customer Platform",
         "data_classes": [
@@ -176,7 +178,7 @@
         "type": "core",
         "hop": null,
         "severity": null,
-        "x": -820.0,
+        "x": -631.0,
         "y": 0.0,
         "criticality": 8,
         "owner_team": "Customer Platform",
@@ -191,7 +193,7 @@
         "hop": null,
         "severity": null,
         "x": -0.0,
-        "y": -820.0,
+        "y": -631.0,
         "criticality": 4,
         "owner_team": "Document Operations",
         "data_classes": []
@@ -202,7 +204,7 @@
         "type": "analytics",
         "hop": 0,
         "severity": "high",
-        "x": 70.0,
+        "x": 121.0,
         "y": 0.0,
         "criticality": 9,
         "owner_team": "Payments Platform",
@@ -217,8 +219,8 @@
         "type": "core",
         "hop": 1,
         "severity": "medium",
-        "x": 53.8,
-        "y": 305.3,
+        "x": -50.5,
+        "y": 286.5,
         "criticality": 8,
         "owner_team": "Core Banking",
         "data_classes": [
@@ -232,7 +234,7 @@
         "type": "channel",
         "hop": 2,
         "severity": "medium",
-        "x": -480.0,
+        "x": -461.0,
         "y": 0.0,
         "criticality": 8,
         "owner_team": "Digital Channels",
@@ -247,8 +249,8 @@
         "type": "platform",
         "hop": 1,
         "severity": "medium",
-        "x": 237.5,
-        "y": -199.3,
+        "x": 273.4,
+        "y": -99.5,
         "criticality": 6,
         "owner_team": "Customer Platform",
         "data_classes": [
@@ -261,7 +263,7 @@
         "type": "core",
         "hop": 0,
         "severity": "high",
-        "x": -70.0,
+        "x": -121.0,
         "y": 0.0,
         "criticality": 10,
         "owner_team": "Payments Platform",
@@ -275,8 +277,8 @@
         "type": "database",
         "hop": 1,
         "severity": "medium",
-        "x": -291.3,
-        "y": -106.0,
+        "x": -222.9,
+        "y": -187.0,
         "criticality": 6,
         "owner_team": "Data & Analytics",
         "data_classes": [
@@ -289,7 +291,7 @@
         "type": "analytics",
         "hop": null,
         "severity": null,
-        "x": 820.0,
+        "x": 631.0,
         "y": 0.0,
         "criticality": 5,
         "owner_team": "Data & Analytics",
@@ -301,8 +303,8 @@
         "type": "analytics",
         "hop": 1,
         "severity": "medium",
-        "x": 310.0,
-        "y": 0.0,
+        "x": 273.4,
+        "y": 99.5,
         "criticality": 8,
         "owner_team": "Data & Analytics",
         "data_classes": [
@@ -316,7 +318,7 @@
         "hop": 0,
         "severity": "high",
         "x": -0.0,
-        "y": -70.0,
+        "y": -121.0,
         "criticality": 10,
         "owner_team": "Core Banking",
         "data_classes": [
@@ -330,7 +332,7 @@
         "hop": 2,
         "severity": "medium",
         "x": -0.0,
-        "y": -480.0,
+        "y": -461.0,
         "criticality": 8,
         "owner_team": "Digital Channels",
         "data_classes": [
@@ -930,8 +932,8 @@
     "dimensions": [
       {
         "name": "security",
-        "score": 73,
-        "level": "high",
+        "score": 48,
+        "level": "medium",
         "factors": [
           {
             "label": "baseline",
@@ -949,14 +951,6 @@
               "customer-db",
               "loan-service",
               "notification-service"
-            ]
-          },
-          {
-            "label": "card data",
-            "points": 25,
-            "node_ids": [
-              "card-service",
-              "fraud-engine"
             ]
           },
           {
@@ -991,7 +985,7 @@
             ]
           }
         ],
-        "explanation": "Security risk is high (73) because card data (+25) on card-service, fraud-engine and customer data (+20) on account-service, api-gateway, authentication-service, card-service, customer-db, loan-service, notification-service and critical identity path (+10) on api-gateway, authentication-service."
+        "explanation": "Security risk is medium (48) because customer data (+20) on account-service, api-gateway, authentication-service and 4 more; critical identity path (+10) on api-gateway, authentication-service; blast radius size (+10) on account-service, api-gateway, atm and 14 more."
       },
       {
         "name": "compliance",
@@ -1035,7 +1029,7 @@
             ]
           }
         ],
-        "explanation": "Compliance risk is high (81) because card data (+30) on fraud-engine and pii data (+20) on account-service and financial data (+20) on account-service, fraud-engine, payment-service, transaction-db."
+        "explanation": "Compliance risk is high (81) because card data (+30) on fraud-engine; pii data (+20) on account-service; financial data (+20) on account-service, fraud-engine, payment-service and 1 more."
       },
       {
         "name": "technical",
@@ -1067,7 +1061,7 @@
             ]
           }
         ],
-        "explanation": "Technical risk is low (33) because direct services (+18) on account-service, fraud-engine, payment-service and dependency depth (+10) on atm, branch-portal, mobile-banking, web-banking."
+        "explanation": "Technical risk is low (33) because direct services (+18) on account-service, fraud-engine, payment-service; dependency depth (+10) on atm, branch-portal, mobile-banking and 1 more."
       },
       {
         "name": "operational",
@@ -1129,7 +1123,7 @@
             ]
           }
         ],
-        "explanation": "Operational risk is high (71) because service criticality (+40) on payment-service and downstream systems (+20) on api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, customer-db, loan-service, mobile-banking, notification-service, reporting-db, risk-engine, web-banking and deployment groups (+6) on account-service, api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, customer-db, fraud-engine, loan-service, mobile-banking, notification-service, payment-service, reporting-db, risk-engine, transaction-db, web-banking."
+        "explanation": "Operational risk is high (71) because service criticality (+40) on payment-service; downstream systems (+20) on api-gateway, atm, audit-db and 10 more; deployment groups (+6) on account-service, api-gateway, atm and 14 more."
       },
       {
         "name": "performance",
@@ -1167,7 +1161,7 @@
             ]
           }
         ],
-        "explanation": "Performance risk is medium (55) because transaction path (+20) on payment-service, transaction-db and channel path (+15) on api-gateway, mobile-banking, web-banking and payment business rule (+15) on payment-service, transaction-db."
+        "explanation": "Performance risk is medium (55) because transaction path (+20) on payment-service, transaction-db; channel path (+15) on api-gateway, mobile-banking, web-banking; payment business rule (+15) on payment-service, transaction-db."
       },
       {
         "name": "delivery",
@@ -1222,10 +1216,10 @@
             ]
           }
         ],
-        "explanation": "Delivery risk is medium (58) because owner coordination (+28) on account-service, api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, customer-db, fraud-engine, loan-service, mobile-banking, notification-service, payment-service, reporting-db, risk-engine, transaction-db, web-banking and direct services (+15) on account-service, fraud-engine, payment-service and low ambiguity (+10) on account-service, fraud-engine, payment-service, transaction-db."
+        "explanation": "Delivery risk is medium (58) because owner coordination (+28) on account-service, api-gateway, atm and 14 more; direct services (+15) on account-service, fraud-engine, payment-service; low ambiguity (+10) on account-service, fraud-engine, payment-service and 1 more."
       }
     ],
-    "overall": 75,
+    "overall": 70,
     "highest": "compliance"
   },
   "tests": {
@@ -1487,96 +1481,171 @@
       },
       {
         "id": "GEN-1",
-        "title": "Verify compliance: GET /accounts/{id}/limits, POST /internal/audit/events, POST /fraud/screenings, POST /payments, POST /internal/ledger/entries preserves required audit evidence",
-        "type": "functional",
+        "title": "Compliance: Premium limit increase audit events capture effective limit and premium eligibility",
+        "type": "integration",
         "priority": "P1",
         "covers": [
           "account-service",
           "audit-db",
-          "fraud-engine",
           "payment-service",
           "transaction-db"
         ],
         "steps": [
-          "Prepare compliance fixtures for GET /accounts/{id}/limits, POST /internal/audit/events, POST /fraud/screenings, POST /payments, POST /internal/ledger/entries.",
-          "Exercise the change and verify it preserves required audit evidence.",
-          "Compare the observed result with the documented requirements."
+          "Submit a domestic payment of 40,000 AED for a premium customer with the feature flag enabled.",
+          "Verify payment is accepted and settled.",
+          "Query audit-db for audit events related to the payment and limit check."
         ],
-        "expected": "Required audit evidence is complete and traceable.",
+        "expected": "Audit events record the premium eligibility check, the effective daily limit of 50,000 AED, the transaction amount, correlation ID, and timestamp in ordered sequence.",
         "source": "generated",
         "automation_candidate": false
       },
       {
         "id": "GEN-2",
-        "title": "Verify security: GET /accounts/{id}/limits, POST /payments, POST /atm/withdrawals, POST /internal/audit/events, POST /auth/token, GET /branch/customers, GET /cards/{id}, GET /internal/customer-store/profiles/{id}, POST /fraud/screenings, POST /loans/applications, POST /mobile/login, POST /notifications, POST /payments, GET /internal/reporting-store/statements/{id}, POST /risk/assessments, POST /internal/ledger/entries, POST /web/login rejects unauthorised access",
-        "type": "security",
-        "priority": "P1",
-        "covers": [
-          "account-service",
-          "api-gateway",
-          "atm",
-          "audit-db",
-          "authentication-service",
-          "branch-portal",
-          "card-service",
-          "customer-db",
-          "fraud-engine",
-          "loan-service",
-          "mobile-banking",
-          "notification-service",
-          "payment-service",
-          "reporting-db",
-          "risk-engine",
-          "transaction-db",
-          "web-banking"
-        ],
-        "steps": [
-          "Prepare security fixtures for GET /accounts/{id}/limits, POST /payments, POST /atm/withdrawals, POST /internal/audit/events, POST /auth/token, GET /branch/customers, GET /cards/{id}, GET /internal/customer-store/profiles/{id}, POST /fraud/screenings, POST /loans/applications, POST /mobile/login, POST /notifications, POST /payments, GET /internal/reporting-store/statements/{id}, POST /risk/assessments, POST /internal/ledger/entries, POST /web/login.",
-          "Exercise the change and verify it rejects unauthorised access.",
-          "Compare the observed result with the documented requirements."
-        ],
-        "expected": "Access is denied without exposing protected data.",
-        "source": "generated",
-        "automation_candidate": false
-      },
-      {
-        "id": "GEN-3",
-        "title": "Verify operational: GET /accounts/{id}/limits, POST /payments, POST /atm/withdrawals, POST /internal/audit/events, POST /auth/token, GET /branch/customers, GET /cards/{id}, GET /internal/customer-store/profiles/{id}, POST /fraud/screenings, POST /loans/applications, POST /mobile/login, POST /notifications, POST /payments, GET /internal/reporting-store/statements/{id}, POST /risk/assessments, POST /internal/ledger/entries, POST /web/login recovers after a dependency failure",
+        "title": "Operational: Feature flag rollback reverts premium limit to 25,000 AED within one minute",
         "type": "integration",
         "priority": "P1",
         "covers": [
           "account-service",
           "api-gateway",
-          "atm",
-          "audit-db",
-          "authentication-service",
-          "branch-portal",
-          "card-service",
-          "customer-db",
           "fraud-engine",
-          "loan-service",
-          "mobile-banking",
-          "notification-service",
           "payment-service",
+          "transaction-db"
+        ],
+        "steps": [
+          "Ensure feature flag for premium limit increase is enabled.",
+          "Process a 40,000 AED payment for a premium customer and verify success.",
+          "Disable the feature flag via operations console.",
+          "Attempt another 40,000 AED payment for the same customer."
+        ],
+        "expected": "After disabling the flag, the payment is declined with a daily limit exceeded error, and the rollback is logged without service restart.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-3",
+        "title": "Compliance: Reporting projections correctly aggregate premium limit payments for regulatory reporting",
+        "type": "integration",
+        "priority": "P1",
+        "covers": [
+          "audit-db",
           "reporting-db",
-          "risk-engine",
+          "transaction-db"
+        ],
+        "steps": [
+          "Post three premium payments of 30,000 AED, 15,000 AED, and 5,000 AED on the same day.",
+          "Trigger the reporting projection job.",
+          "Query reporting-db for the daily aggregate for that customer."
+        ],
+        "expected": "The daily aggregate equals 50,000 AED, and audit events link each payment to the reporting entry with matching timestamps.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-4",
+        "title": "Operational: Mobile and web banking channels handle premium limit increase without latency degradation",
+        "type": "integration",
+        "priority": "P1",
+        "covers": [
+          "api-gateway",
+          "mobile-banking",
+          "payment-service",
           "transaction-db",
           "web-banking"
         ],
         "steps": [
-          "Prepare operational fixtures for GET /accounts/{id}/limits, POST /payments, POST /atm/withdrawals, POST /internal/audit/events, POST /auth/token, GET /branch/customers, GET /cards/{id}, GET /internal/customer-store/profiles/{id}, POST /fraud/screenings, POST /loans/applications, POST /mobile/login, POST /notifications, POST /payments, GET /internal/reporting-store/statements/{id}, POST /risk/assessments, POST /internal/ledger/entries, POST /web/login.",
-          "Exercise the change and verify it recovers after a dependency failure.",
-          "Compare the observed result with the documented requirements."
+          "Simulate 100 concurrent premium payment requests from mobile and web channels, each 45,000 AED.",
+          "Measure response times and error rates.",
+          "Verify that all requests are processed within two seconds."
         ],
-        "expected": "Recovery preserves data and restores the documented service behavior.",
+        "expected": "All requests complete within acceptable latency (<2s), no timeouts occur, and daily limits are enforced correctly with concurrency handling.",
         "source": "generated",
         "automation_candidate": false
+      },
+      {
+        "id": "GEN-5",
+        "title": "Compliance: Fraud screening and risk assessment align with new premium limit thresholds",
+        "type": "integration",
+        "priority": "P1",
+        "covers": [
+          "account-service",
+          "fraud-engine",
+          "payment-service",
+          "risk-engine"
+        ],
+        "steps": [
+          "Submit a premium payment of 45,000 AED that matches a high-velocity fraud rule.",
+          "Monitor fraud-engine and risk-engine responses.",
+          "Check that the payment is held or declined based on policy."
+        ],
+        "expected": "Fraud engine flags the transaction with the correct rule version, risk engine evaluates against updated policies for premium limits, and the payment is held/declined as per compliance.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-6",
+        "title": "Operational: Premium limit change notifications are delivered reliably to affected customers",
+        "type": "integration",
+        "priority": "P1",
+        "covers": [
+          "account-service",
+          "mobile-banking",
+          "notification-service",
+          "web-banking"
+        ],
+        "steps": [
+          "Update a customer to premium eligibility and daily limit to 50,000 AED.",
+          "Trigger a notification via account-service to the customer.",
+          "Verify notification-service delivers to mobile and web channels."
+        ],
+        "expected": "Notifications are sent once per channel with the correct limit information, and no duplicates or delivery failures occur.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-7",
+        "title": "Security: Unauthorized attempts to override premium limit are blocked and audited",
+        "type": "security",
+        "priority": "P1",
+        "covers": [
+          "account-service",
+          "api-gateway",
+          "audit-db",
+          "authentication-service"
+        ],
+        "steps": [
+          "Attempt to call PUT /accounts/{id}/limits with a standard customer token trying to set limit to 50,000 AED.",
+          "Verify the request is rejected by api-gateway or account-service.",
+          "Query audit-db for a security event."
+        ],
+        "expected": "Request returns 403 Forbidden, and an audit event logs the unauthorized attempt with user ID, timestamp, and correlation ID.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-8",
+        "title": "Regression: Loan disbursement and card replacement workflows remain unaffected by premium limit change",
+        "type": "regression",
+        "priority": "P1",
+        "covers": [
+          "account-service",
+          "card-service",
+          "loan-service",
+          "transaction-db"
+        ],
+        "steps": [
+          "Process a loan disbursement of 100,000 AED for a premium customer.",
+          "Process a card replacement request for the same customer.",
+          "Verify both workflows complete successfully."
+        ],
+        "expected": "Loan disbursement and card replacement succeed without premium limit enforcement interfering, and daily payment limits are not applied to these transactions.",
+        "source": "generated",
+        "automation_candidate": true
       }
     ],
-    "coverage_estimate": 1.0,
-    "effort_hours": 5.733333333333333,
-    "automation_candidates": 15,
-    "summary": "Selected 15 catalog tests and 3 new tests, covering 17 of 17 impacted nodes (100%); estimated effort is 5.7 hours."
+    "coverage_estimate": 0.8823529411764706,
+    "effort_hours": 13.233333333333334,
+    "automation_candidates": 16,
+    "summary": "Selected 15 catalog tests and 8 new tests, covering 15 of 17 impacted nodes (88%); estimated effort is 13.2 hours."
   },
   "compliance": {
     "frameworks": [
@@ -1588,60 +1657,61 @@
         "score": 65,
         "findings": [
           {
-            "text": "GDPR review applies because PII-bearing components are impacted; the change touches customer data.",
+            "text": "The change makes payment-service request premium status and an effective daily limit from account-service before accepting a payment, so customer attributes are newly used inside the payment authorization decision. The purpose limitation, minimization and retention basis for that eligibility lookup, and for the profile attributes read from customer-db, should be confirmed before rollout.",
             "node_ids": [
+              "payment-service",
               "account-service",
-              "api-gateway",
-              "authentication-service",
-              "card-service",
-              "customer-db",
-              "loan-service",
-              "notification-service"
+              "customer-db"
             ]
           },
           {
-            "text": "Deterministic control exposure: PII impacted directly (-20); customer data touched (-15).",
+            "text": "Personal data traverses api-gateway and authentication-service on the same path as the new limit check, including token scope and session context. Exposure of eligibility or limit attributes in gateway logs, traces and error responses, and the scope checks enforced at authentication-service, should be reviewed.",
             "node_ids": [
-              "account-service",
               "api-gateway",
-              "authentication-service",
-              "card-service",
-              "customer-db",
-              "loan-service",
-              "notification-service"
+              "authentication-service"
+            ]
+          },
+          {
+            "text": "Limit-change communications routed through notification-service rely on consent-aware delivery to verified destinations. The content of those messages, the preference lookup against customer-db, and any change in notification volume triggered by the new limit should be checked for data minimization and consent coverage.",
+            "node_ids": [
+              "notification-service",
+              "customer-db"
             ]
           }
         ],
         "recommendations": [
-          "Review data minimization, purpose and retention for customer data for account-service, api-gateway, authentication-service, card-service, customer-db, loan-service, notification-service.",
-          "Verify access controls and privacy regression tests for account-service, api-gateway, authentication-service, card-service, customer-db, loan-service, notification-service."
+          "Confirm lawful basis, purpose limitation, minimization and retention for the premium-eligibility and effective-limit data exchanged between payment-service and account-service, including attributes sourced from customer-db.",
+          "Verify that access controls, token scopes and logging on api-gateway and authentication-service cover the new limit-check path and do not surface personal data in logs or error payloads.",
+          "Review consent and channel preferences in notification-service before any limit-change messaging, and confirm privacy regression tests exist for the affected flow."
         ]
       },
       {
         "framework": "PCI DSS",
         "applicable": true,
-        "reason": "card-data components are impacted; the change touches card data.",
+        "reason": "card-data components are impacted.",
         "risk_level": "medium",
         "score": 65,
         "findings": [
           {
-            "text": "PCI DSS review applies because card-data components are impacted; the change touches card data.",
+            "text": "The change does not introduce card data into the payment limit flow, but fraud-engine is a shared screening component also used for card-not-present velocity checks. Any rule, configuration or data-flow change on that component should be assessed for its effect on the cardholder data environment, segmentation and logging.",
             "node_ids": [
-              "card-service",
-              "fraud-engine"
+              "fraud-engine",
+              "payment-service"
             ]
           },
           {
-            "text": "Deterministic control exposure: card data touched (-25); card-data components impacted directly (-10).",
+            "text": "card-service and api-gateway handle card lifecycle and card status routing adjacent to the modified payment path. Payloads, routing rules and step-up calls should be checked to confirm no cardholder data is added to the new limit-enforcement request or response chain, including calls through authentication-service.",
             "node_ids": [
               "card-service",
-              "fraud-engine"
+              "api-gateway",
+              "authentication-service"
             ]
           }
         ],
         "recommendations": [
-          "Verify card-data encryption, masking and access restrictions for card-service, fraud-engine.",
-          "Run card-data security tests and review authentication and API controls for card-service, fraud-engine."
+          "Confirm that no cardholder data elements are introduced into the new premium-eligibility or daily-limit payloads exchanged between payment-service, account-service and transaction-db.",
+          "Review fraud-engine rule and configuration changes for impact on card-not-present velocity screening and confirm card-data security tests still exercise the affected screening path.",
+          "Re-verify masking, encryption and access restrictions on card-service and its routing through api-gateway and authentication-service after the limit change is deployed."
         ]
       },
       {
@@ -1652,33 +1722,33 @@
         "score": 65,
         "findings": [
           {
-            "text": "SOX review applies because financial-data components are impacted; audit-data components are impacted; the change touches financial data.",
+            "text": "The change alters payment authorization logic in payment-service using a premium eligibility result from account-service, which affects how financial transactions are accepted and against what limit. This is a business-rule change on a financially significant path and requires change-management evidence, control-owner approval and testing before release.",
             "node_ids": [
-              "account-service",
-              "api-gateway",
-              "audit-db",
-              "fraud-engine",
-              "loan-service",
               "payment-service",
-              "reporting-db",
-              "risk-engine",
-              "transaction-db"
+              "account-service"
             ]
           },
           {
-            "text": "Deterministic control exposure: financial data touched (-15); audit database impacted (-10); business rule changes on the payment path (-10).",
+            "text": "Daily allowance is computed from transaction-db with concurrency handling, so posting accuracy, idempotency and daily-total consistency are exposed. Reconciliation of ledger entries and daily totals should be performed to confirm the new calculation does not create duplicate, missing or misstated postings.",
             "node_ids": [
-              "account-service",
+              "transaction-db",
+              "payment-service"
+            ]
+          },
+          {
+            "text": "Limit decisions and eligibility outcomes should remain traceable through audit-db, with downstream effect on reporting-db projections and risk-engine and fraud-engine signals. Completeness, immutability and retention of the audit records supporting the changed rule should be verified.",
+            "node_ids": [
               "audit-db",
-              "fraud-engine",
-              "payment-service",
-              "transaction-db"
+              "reporting-db",
+              "risk-engine",
+              "fraud-engine"
             ]
           }
         ],
         "recommendations": [
-          "Reconcile financial results and verify complete, immutable audit records for account-service, audit-db, fraud-engine, payment-service, transaction-db.",
-          "Document control-owner approval and test financial and schema changes for account-service, audit-db, fraud-engine, payment-service, transaction-db."
+          "Reconcile transaction-db ledger entries and daily totals after the change, and verify idempotent posting behaviour under concurrent payment requests.",
+          "Document control-owner approval, test evidence and rollback criteria for the payment limit business-rule change in payment-service and account-service.",
+          "Verify that audit-db events for limit and eligibility decisions are complete and append-only, and confirm reporting-db projections reflect the revised limit behaviour."
         ]
       },
       {
@@ -1689,27 +1759,35 @@
         "score": 70,
         "findings": [
           {
-            "text": "Internal Governance review applies because directly changed components have criticality >= 8.",
+            "text": "Directly changed components include payment-service, account-service, fraud-engine and transaction-db, which are high-criticality services on tier1 paths with wide downstream dependency. Service-owner approval, documented rollback criteria and release evidence should be in place before the change is promoted.",
             "node_ids": [
+              "payment-service",
               "account-service",
               "fraud-engine",
-              "payment-service",
               "transaction-db"
             ]
           },
           {
-            "text": "Deterministic control exposure: direct components have criticality >= 9 (-30).",
+            "text": "The rollout depends on a feature flag as the primary control gate. Flag ownership, default state, evaluation scope and a defined sunset should be recorded so the flag cannot be used to bypass limit enforcement or persist untracked after rollout.",
             "node_ids": [
-              "account-service",
-              "fraud-engine",
               "payment-service",
-              "transaction-db"
+              "account-service"
+            ]
+          },
+          {
+            "text": "Concurrency handling for daily allowance and monitoring/rollback procedures are part of the engineering scope, but observability coverage across the affected services and their downstream ledger writes should be checked. Authorization tests and operational monitoring evidence will be needed to demonstrate the change behaves as intended.",
+            "node_ids": [
+              "payment-service",
+              "transaction-db",
+              "api-gateway",
+              "authentication-service"
             ]
           }
         ],
         "recommendations": [
-          "Obtain service-owner change approval and record the rollback plan for account-service, fraud-engine, payment-service, transaction-db.",
-          "Verify authorization tests, operational monitoring and release evidence for account-service, fraud-engine, payment-service, transaction-db."
+          "Obtain service-owner approval and record the rollback plan for payment-service, account-service, fraud-engine and transaction-db before promotion.",
+          "Define feature-flag ownership, safe default, evaluation scope and sunset date, and confirm the flag cannot bypass limit enforcement once disabled.",
+          "Verify authorization tests, concurrency handling and operational monitoring for the affected path, and retain release evidence covering api-gateway and authentication-service interactions."
         ]
       }
     ],
@@ -1717,7 +1795,7 @@
     "summary": "4 of 4 frameworks apply; the minimum compliance score is 65/100. 0 applicable framework(s) have high risk."
   },
   "release": {
-    "confidence": 28,
+    "confidence": 24,
     "decision": "GO_WITH_CONDITIONS",
     "triggered_rules": [
       "GO_WITH_CONDITIONS: highest risk is 81 (>= 60)",
@@ -1744,17 +1822,26 @@
       "Run the P1 functional tests on api-gateway before release (TC-025: Gateway routes payment requests with the original correlation identifier)",
       "Run the P1 functional tests on customer-db before release (TC-029: Customer profile persistence preserves optional preferred name fields)",
       "Run the P1 functional tests on transaction-db before release (TC-031: Ledger duplicate posting preserves balanced entries and daily totals)",
-      "Run the P1 functional tests on account-service, audit-db, fraud-engine, payment-service, transaction-db before release (GEN-1: Verify compliance: GET /accounts/{id}/limits, POST /internal/audit/events, POST /fraud/screenings, POST /payments, POST /internal/ledger/entries preserves required audit evidence)",
-      "Run the P1 security tests on account-service, api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, customer-db, fraud-engine, loan-service, mobile-banking, notification-service, payment-service, reporting-db, risk-engine, transaction-db, web-banking before release (GEN-2: Verify security: GET /accounts/{id}/limits, POST /payments, POST /atm/withdrawals, POST /internal/audit/events, POST /auth/token, GET /branch/customers, GET /cards/{id}, GET /internal/customer-store/profiles/{id}, POST /fraud/screenings, POST /loans/applications, POST /mobile/login, POST /notifications, POST /payments, GET /internal/reporting-store/statements/{id}, POST /risk/assessments, POST /internal/ledger/entries, POST /web/login rejects unauthorised access)",
-      "Run the P1 integration tests on account-service, api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, customer-db, fraud-engine, loan-service, mobile-banking, notification-service, payment-service, reporting-db, risk-engine, transaction-db, web-banking before release (GEN-3: Verify operational: GET /accounts/{id}/limits, POST /payments, POST /atm/withdrawals, POST /internal/audit/events, POST /auth/token, GET /branch/customers, GET /cards/{id}, GET /internal/customer-store/profiles/{id}, POST /fraud/screenings, POST /loans/applications, POST /mobile/login, POST /notifications, POST /payments, GET /internal/reporting-store/statements/{id}, POST /risk/assessments, POST /internal/ledger/entries, POST /web/login recovers after a dependency failure)",
-      "Review data minimization, purpose and retention for customer data for account-service, api-gateway, authentication-service, card-service, customer-db, loan-service, notification-service.",
-      "Verify access controls and privacy regression tests for account-service, api-gateway, authentication-service, card-service, customer-db, loan-service, notification-service.",
-      "Verify card-data encryption, masking and access restrictions for card-service, fraud-engine.",
-      "Run card-data security tests and review authentication and API controls for card-service, fraud-engine.",
-      "Reconcile financial results and verify complete, immutable audit records for account-service, audit-db, fraud-engine, payment-service, transaction-db.",
-      "Document control-owner approval and test financial and schema changes for account-service, audit-db, fraud-engine, payment-service, transaction-db.",
-      "Obtain service-owner change approval and record the rollback plan for account-service, fraud-engine, payment-service, transaction-db.",
-      "Verify authorization tests, operational monitoring and release evidence for account-service, fraud-engine, payment-service, transaction-db.",
+      "Run the P1 integration tests on account-service, audit-db, payment-service, transaction-db before release (GEN-1: Compliance: Premium limit increase audit events capture effective limit and premium eligibility)",
+      "Run the P1 integration tests on account-service, api-gateway, fraud-engine, payment-service, transaction-db before release (GEN-2: Operational: Feature flag rollback reverts premium limit to 25,000 AED within one minute)",
+      "Run the P1 integration tests on audit-db, reporting-db, transaction-db before release (GEN-3: Compliance: Reporting projections correctly aggregate premium limit payments for regulatory reporting)",
+      "Run the P1 integration tests on api-gateway, mobile-banking, payment-service, transaction-db, web-banking before release (GEN-4: Operational: Mobile and web banking channels handle premium limit increase without latency degradation)",
+      "Run the P1 integration tests on account-service, fraud-engine, payment-service, risk-engine before release (GEN-5: Compliance: Fraud screening and risk assessment align with new premium limit thresholds)",
+      "Run the P1 integration tests on account-service, mobile-banking, notification-service, web-banking before release (GEN-6: Operational: Premium limit change notifications are delivered reliably to affected customers)",
+      "Run the P1 security tests on account-service, api-gateway, audit-db, authentication-service before release (GEN-7: Security: Unauthorized attempts to override premium limit are blocked and audited)",
+      "Run the P1 regression tests on account-service, card-service, loan-service, transaction-db before release (GEN-8: Regression: Loan disbursement and card replacement workflows remain unaffected by premium limit change)",
+      "Confirm lawful basis, purpose limitation, minimization and retention for the premium-eligibility and effective-limit data exchanged between payment-service and account-service, including attributes sourced from customer-db.",
+      "Verify that access controls, token scopes and logging on api-gateway and authentication-service cover the new limit-check path and do not surface personal data in logs or error payloads.",
+      "Review consent and channel preferences in notification-service before any limit-change messaging, and confirm privacy regression tests exist for the affected flow.",
+      "Confirm that no cardholder data elements are introduced into the new premium-eligibility or daily-limit payloads exchanged between payment-service, account-service and transaction-db.",
+      "Review fraud-engine rule and configuration changes for impact on card-not-present velocity screening and confirm card-data security tests still exercise the affected screening path.",
+      "Re-verify masking, encryption and access restrictions on card-service and its routing through api-gateway and authentication-service after the limit change is deployed.",
+      "Reconcile transaction-db ledger entries and daily totals after the change, and verify idempotent posting behaviour under concurrent payment requests.",
+      "Document control-owner approval, test evidence and rollback criteria for the payment limit business-rule change in payment-service and account-service.",
+      "Verify that audit-db events for limit and eligibility decisions are complete and append-only, and confirm reporting-db projections reflect the revised limit behaviour.",
+      "Obtain service-owner approval and record the rollback plan for payment-service, account-service, fraud-engine and transaction-db before promotion.",
+      "Define feature-flag ownership, safe default, evaluation scope and sunset date, and confirm the flag cannot bypass limit enforcement once disabled.",
+      "Verify authorization tests, concurrency handling and operational monitoring for the affected path, and retain release evidence covering api-gateway and authentication-service interactions.",
       "Sequence deployment of ST-101 and ST-107 (deployment collision on transaction-db)",
       "Sequence the releases of ST-101 and ST-107: deploy ST-107 first behind a feature flag where available and run the shared regression suite for transaction-db before ST-101.",
       "Sequence deployment of ST-101 and ST-110 (deployment collision on payment-service)",
@@ -1762,53 +1849,90 @@
     ],
     "complexity": "high",
     "rollback_plan": [
-      "Declare rollback, notify service owners and release communications, and pause the rollout.",
-      "channels-mobile: disable the change's feature flags where configured and drain in-flight requests.",
-      "channels-mobile: restore the previous known-good service versions and configuration.",
-      "channels-mobile: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "channels-access: disable the change's feature flags where configured and drain in-flight requests.",
-      "channels-access: restore the previous known-good service versions and configuration.",
-      "channels-access: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "identity: disable the change's feature flags where configured and drain in-flight requests.",
-      "identity: restore the previous known-good service versions and configuration.",
-      "identity: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "customer-platform: disable the change's feature flags where configured and drain in-flight requests.",
-      "customer-platform: restore the previous known-good service versions and configuration.",
-      "customer-platform: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "core-payments: disable the change's feature flags where configured and drain in-flight requests.",
-      "core-payments: restore the previous known-good service versions and configuration.",
-      "core-payments: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "core-banking: disable the change's feature flags where configured and drain in-flight requests.",
-      "core-banking: restore the previous known-good service versions and configuration.",
-      "core-banking: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "data-platform: disable the change's feature flags where configured and drain in-flight requests.",
-      "data-platform: restore the previous known-good service versions and configuration.",
-      "data-platform: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "Confirm service recovery with owners, notify stakeholders, and retain incident and rollback evidence."
+      "Notify all stakeholders of impending rollback due to issue detection.",
+      "Disable the feature flag that gates the premium limit increase.",
+      "Notify channels-mobile owners/stakeholders of rollback start.",
+      "Redeploy previous known‑good version of the mobile-banking service; confirm rollout.",
+      "Run health checks on mobile‑banking; monitor for regressions.",
+      "Notify stakeholders of channels-mobile rollback completion.",
+      "Notify channels-access owners/stakeholders.",
+      "Redeploy previous known‑good versions of atm, branch-portal, and web-banking services; confirm rollout.",
+      "Validate that payment limit behavior reverts to the original AED 25,000 limit (feature flag remains off).",
+      "Monitor channel error rates and latency.",
+      "Notify stakeholders of channels-access rollback completion.",
+      "Notify identity owners/stakeholders.",
+      "Redeploy previous known‑good versions of api-gateway and authentication-service; confirm rollout.",
+      "Verify auth token flows and gateway health.",
+      "Notify stakeholders of identity rollback completion.",
+      "Notify customer-platform owners/stakeholders.",
+      "Redeploy previous known‑good versions of customer-db and notification-service; confirm rollout.",
+      "Validate notification rollback and customer-db performance.",
+      "Notify stakeholders of customer-platform rollback completion.",
+      "Notify core-payments owners/stakeholders.",
+      "Redeploy previous known‑good versions of fraud-engine, payment-service, and risk-engine; confirm rollout.",
+      "Ensure payment-service no longer queries account-service for premium eligibility (or uses the old logic).",
+      "Monitor payment logs and fraud‑engine metrics for expected behavior.",
+      "Notify stakeholders of core-payments rollback completion.",
+      "Notify core-banking owners/stakeholders.",
+      "Redeploy previous known‑good versions of account-service, card-service, loan-service, and transaction-db; confirm rollout.",
+      "Run integration smoke tests between core-banking services and data-platform.",
+      "Monitor transaction-db concurrency and latency.",
+      "Notify stakeholders of core-banking rollback completion.",
+      "Notify data-platform owners/stakeholders.",
+      "Redeploy previous known‑good versions of audit-db and reporting-db; confirm rollout.",
+      "Verify audit and reporting data consistency.",
+      "Monitor data‑platform lag and error rates.",
+      "Notify stakeholders of data-platform rollback completion.",
+      "Confirm all services are running previous versions and the feature flag remains off.",
+      "Communicate rollback completion to all owners, stakeholders, and affected customers."
     ],
     "deployment_notes": [
-      "Complete the release conditions and obtain owner sign-off before starting deployment.",
-      "Notify service owners, operations and support of the release window and rollback contacts.",
-      "Deploy data-platform in sequence (step 1); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy core-banking in sequence (step 2); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy core-payments in sequence (step 3); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy customer-platform in sequence (step 4); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy identity in sequence (step 5); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy channels-access in sequence (step 6); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy channels-mobile in sequence (step 7); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Coordinate groups in dependency cycles in one compatible release window; monitor error rates, latency, availability and data integrity after each step.",
-      "Monitor authentication failures and card transaction failures; alert security and operations on regressions.",
-      "Publish rollout status to stakeholders and hand monitoring and rollback ownership to operations."
+      "Verify all GO_WITH_CONDITIONS prerequisites are satisfied (conditions met, feature flag off, monitoring alerts configured, stakeholders notified).",
+      "Notify data-platform owners/stakeholders of impending deployment.",
+      "Deploy/update data-platform services (audit-db, reporting-db); confirm successful rollout.",
+      "Run basic health checks on data-platform services; monitor latency and error rates.",
+      "Notify stakeholders of data-platform deployment completion and readiness to proceed.",
+      "Notify core-banking owners/stakeholders.",
+      "Deploy/update core-banking services (account-service, card-service, loan-service, transaction-db); confirm rollout.",
+      "Perform integration smoke tests between core-banking services and data-platform; monitor transaction-db performance.",
+      "Notify stakeholders of core-banking deployment completion.",
+      "Notify core-payments owners/stakeholders.",
+      "Deploy/update core-payments services (fraud-engine, payment-service, risk-engine); confirm rollout.",
+      "Execute payment‑service specific tests: verify it can call account-service for premium eligibility, fraud-engine integration, and transaction-db allowance calculation with concurrency checks.",
+      "Monitor payment‑service logs, fraud screening metrics, and transaction-db contention.",
+      "Notify stakeholders of core-payments deployment completion.",
+      "Notify customer-platform owners/stakeholders.",
+      "Deploy/update customer-platform services (customer-db, notification-service); confirm rollout.",
+      "Validate notification flows for limit change alerts; monitor customer-db latency.",
+      "Notify stakeholders of customer-platform deployment completion.",
+      "Notify identity owners/stakeholders.",
+      "Deploy/update identity services (api-gateway, authentication-service); confirm rollout.",
+      "Perform auth‑gateway health checks and verify token issuance for downstream services.",
+      "Notify stakeholders of identity deployment completion.",
+      "Notify channels-access owners/stakeholders.",
+      "Deploy/update channels-access services (atm, branch-portal, web-banking); confirm rollout.",
+      "Conduct end‑to‑end payment limit scenarios on each channel (ATM, branch portal, web) with feature flag still off to ensure no behavioral change.",
+      "Monitor channel‑specific error rates and latency.",
+      "Notify stakeholders of channels-access deployment completion.",
+      "Notify channels-mobile owners/stakeholders.",
+      "Deploy/update channels-mobile service (mobile-banking); confirm rollout.",
+      "Perform mobile‑specific payment limit tests with feature flag off.",
+      "Monitor mobile app crash rates and API response times.",
+      "Notify stakeholders of channels-mobile deployment completion.",
+      "After all groups are healthy, notify product and compliance stakeholders that the feature flag can be enabled.",
+      "Enable the feature flag that gates the premium daily limit increase for domestic transfers.",
+      "Observe key business metrics (payment success rate, limit breach alerts, fraud‑engine triggers) and system health for the defined observation window.",
+      "Communicate rollout completion to all owners, stakeholders, and customers via standard channels."
     ]
   },
   "providers_used": {
-    "requirement": "keyword-fallback",
+    "requirement": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
     "dependency": "deterministic",
     "scoring": "deterministic",
-    "testing": "template-fallback",
-    "compliance": "template-fallback",
-    "release": "template-fallback"
+    "testing": "tokenharbor:deepseek-v4.1-flash:free",
+    "compliance": "tokenharbor:deepseek-v4.1-flash:free",
+    "release": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
   },
-  "duration_ms": 573,
-  "created_at": "2026-10-06T18:00:52.964381Z"
+  "duration_ms": 170940,
+  "created_at": "2026-10-06T20:15:07.928908Z"
 }

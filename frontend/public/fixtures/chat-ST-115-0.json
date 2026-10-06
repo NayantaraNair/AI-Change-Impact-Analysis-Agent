@@ -1,5 +1,5 @@
 {
-  "answer": "- **ST-115** directly changes: `document-service`, `reporting-service`.\n- Impacted services: `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `customer-db`, `document-service`, `mobile-banking`, `reporting-db`, `reporting-service`, `web-banking`.\n- Impacted databases: `audit-db`, `customer-db`, `reporting-db`.\n- Impacted APIs: `GET /accounts/{id}/limits`, `GET /documents/templates/{id}`, `GET /internal/audit/events`, `GET /internal/reporting-store/statements/{id}`, `GET /reports/monthly-statements/{id}`, `GET /reports/statement-template`, `PATCH /cards/{id}/status`, `PATCH /customers/{id}/profile`, `POST /auth/biometric/challenges`, `POST /auth/introspect`, `POST /auth/step-up`, `POST /auth/token`, `POST /documents/statements/render`, `POST /internal/audit/events`, `POST /internal/reporting-store/projections`, `POST /loans/applications`, `POST /payments`, `POST /reports/monthly-statements/jobs`, `PUT /documents/templates/{id}`.\n- Downstream systems: `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `customer-db`, `mobile-banking`, `reporting-db`, `web-banking`.",
+  "answer": "**Directly changed:** `document-service`\n\n**Impacted services (`impact.services`):** `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `customer-db`, `document-service`, `mobile-banking`, `reporting-db`, `reporting-service`, `web-banking`\n\n**Downstream (`impact.downstream`):** `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `customer-db`, `mobile-banking`, `reporting-db`, `reporting-service`, `web-banking`\n\n**Databases:** `audit-db`, `customer-db`, `reporting-db`\n\n**APIs:**\n- `GET /accounts/{id}/limits`\n- `GET /documents/templates/{id}`\n- `GET /internal/audit/events`\n- `GET /reports/monthly-statements/{id}`\n- `GET /reports/statement-template`\n- `PATCH /cards/{id}/status`\n- `PATCH /customers/{id}/profile`\n- `POST /auth/biometric/challenges`\n- `POST /auth/introspect`\n- `POST /auth/step-up`\n- `POST /auth/token`\n- `POST /documents/statements/render`\n- `POST /internal/audit/events`\n- `POST /loans/applications`\n- `POST /payments`\n- `POST /reports/monthly-statements/jobs`\n- `PUT /documents/templates/{id}`\n\n**Deployment groups:** `channels-access`, `channels-mobile`, `customer-platform`, `data-platform`, `documents`, `identity`\n\n**Affected capabilities:** Monthly statement PDF rendering; Statement template footer text; Versioned statement template publishing and rollback; Statement PDF preview approval\n\n**Change/impact flags:** `change_type` = `config_change`; `touches_customer_data` = false; `touches_card_data` = false; `touches_financial_data` = false; `changes_auth_flow` = false; `changes_external_api_contract` = false; `changes_db_schema` = false\n\n**Risk context:**\n- Overall risk: 38, highest = `operational`\n- `operational` score 47 medium — top factors: `downstream systems` (20; IDs listed above), `service criticality` (16; `document-service`), `deployment groups` (6; IDs listed above)\n- `delivery` score 40 medium — top factor: `owner coordination` (20; IDs listed above), `low ambiguity` (10; `document-service`)\n- `security` score 28 low, `compliance` score 27 low, `technical` score 21 low, `performance` score 20 low\n\n**Compliance impact:** GDPR applicable (low, 90); SO",
   "cited_nodes": [
     "mobile-banking",
     "web-banking",
@@ -14,7 +14,11 @@
     "reporting-service"
   ],
   "cited_factors": [
-    "downstream systems"
+    "service criticality",
+    "downstream systems",
+    "deployment groups",
+    "low ambiguity",
+    "owner coordination"
   ],
-  "provider": "template"
+  "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

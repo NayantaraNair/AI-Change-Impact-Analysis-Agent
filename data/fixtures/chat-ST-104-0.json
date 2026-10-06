@@ -1,5 +1,5 @@
 {
-  "answer": "- **ST-104** directly changes: `customer-service`, `crm`, `notification-service`, `customer-db`.\n- Impacted services: `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-service`, `risk-engine`, `web-banking`.\n- Impacted databases: `audit-db`, `customer-db`.\n- Impacted APIs: `GET /accounts/{id}/balance`, `GET /accounts/{id}/limits`, `GET /cards/{id}`, `GET /crm/customers/{id}/contacts`, `GET /customers/{id}`, `GET /internal/audit/events`, `GET /internal/customer-store/profiles/{id}`, `GET /loans/{id}`, `GET /notifications/preferences/{customerId}`, `GET /notifications/{id}`, `GET /payments/limits`, `GET /payments/{id}`, `PATCH /cards/{id}/status`, `PATCH /customers/{id}/profile`, `POST /auth/biometric/challenges`, `POST /auth/introspect`, `POST /auth/step-up`, `POST /auth/token`, `POST /cards/{id}/replacement`, `POST /customers/{id}/emails/verification`, `POST /internal/audit/events`, `POST /loans/applications`, `POST /loans/{id}/disbursements`, `POST /notifications`, `POST /payments`, `POST /payments/{id}/cancellation`, `PUT /accounts/{id}/limits`, `PUT /crm/customers/{id}/contacts`, `PUT /internal/customer-store/profiles/{id}`.\n- Downstream systems: `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `document-service`, `fraud-engine`, `loan-service`, `mobile-banking`, `payment-service`, `reporting-service`, `risk-engine`, `web-banking`.",
+  "answer": "**Directly changed services** (ST-104 impact):\n- `customer-service`, `customer-db`, `notification-service`, `crm`\n\n**Impacted services (full set)** — matches risk factor label *blast radius size* (security, 10 pts):\n- `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-service`, `risk-engine`, `web-banking`\n\n**Databases**: `audit-db`, `customer-db` (factor label *database schema change*)\n\n**Downstream systems** (operational risk factor label *downstream systems*, 20 pts): same 15 components excluding the four directly changed ones — `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `document-service`, `fraud-engine`, `loan-service`, `mobile-banking`, `payment-service`, `reporting-service`, `risk-engine`, `web-banking`\n\n**APIs in scope** (26 total), notably:\n- Profile/contact: `GET /customers/{id}`, `PATCH /customers/{id}/profile`, `POST /customers/{id}/emails/verification`, `GET /crm/customers/{id}/contacts`, `PUT /crm/customers/{id}/contacts`\n- Customer store: `GET`/`PUT /internal/customer-store/profiles/{id}`\n- Notifications: `POST /notifications`, `GET /notifications/{id}`, `GET /notifications/preferences/{customerId}`\n- Identity: `POST /auth/token`, `POST /auth/introspect`, `POST /auth/step-up`, `POST /auth/biometric/challenges`\n- Cards/accounts/payments/loans and audit endpoints also listed\n\n**Deployment groups**: `channels-access`, `channels-mobile`, `core-banking`, `core-payments`, `customer-platform`, `data-platform`, `documents`, `identity`\n\n**Risk-factor component groupings**:\n- *service criticality* (32 pts, operational): `customer-service`\n- *critical identity path* (security, 10 pts): `api-gateway`, `authentication-service`\n- *pii data* (compliance, 20 pts): `crm`, `customer-db`, `customer-service`, `notification-service`\n- *nearby card data* (compliance, 12 pts): `card-service`\n- *transaction path* (performance, 20 pts): `payment-service`; *channel path* (15 pts): `api-gateway`, `mobile-banking`, `web-banking`\n- *owner coordination* (delivery, 32 pts): all 19 impacted components\n\n**Change attributes**: `touches_customer_data: true`; `touches_card_data: false`; `touches_financial_data: false`; `changes_db_schema: true`; `changes_external_api_contract: false`; `changes_auth_flow: false`",
   "cited_nodes": [
     "mobile-banking",
     "web-banking",
@@ -22,7 +22,17 @@
     "reporting-service"
   ],
   "cited_factors": [
-    "downstream systems"
+    "critical identity path",
+    "blast radius size",
+    "pii data",
+    "nearby card data",
+    "database schema change",
+    "service criticality",
+    "downstream systems",
+    "deployment groups",
+    "transaction path",
+    "channel path",
+    "owner coordination"
   ],
-  "provider": "template"
+  "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

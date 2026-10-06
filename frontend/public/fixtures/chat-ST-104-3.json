@@ -1,43 +1,27 @@
 {
-  "answer": "- **ST-104**: overall risk 63/100; release decision GO_WITH_CONDITIONS.\n- technical: 63/100 (medium). Top factors: database schema change (+20; `audit-db`, `customer-db`); direct services (+18; `crm`, `customer-service`, `notification-service`); dependency depth (+10; `atm`, `branch-portal`, `document-service`, `fraud-engine`, `mobile-banking`, `reporting-service`, `risk-engine`, `web-banking`).\n- operational: 63/100 (medium). Top factors: service criticality (+32; `customer-service`); downstream systems (+20; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `document-service`, `fraud-engine`, `loan-service`, `mobile-banking`, `payment-service`, `reporting-service`, `risk-engine`, `web-banking`); deployment groups (+6; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-service`, `risk-engine`, `web-banking`).\n- delivery: 62/100 (medium). Top factors: owner coordination (+32; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-service`, `risk-engine`, `web-banking`); direct services (+15; `crm`, `customer-service`, `notification-service`); low ambiguity (+10; `crm`, `customer-db`, `customer-service`, `notification-service`).\n- compliance: 61/100 (medium). Top factors: pii data (+20; `crm`, `customer-db`, `customer-service`, `notification-service`); nearby card data (+12; `card-service`); database schema change (+10; `audit-db`, `customer-db`).\n- security: 48/100 (medium). Top factors: customer data (+20; `account-service`, `api-gateway`, `authentication-service`, `card-service`, `crm`, `customer-db`, `customer-service`, `loan-service`, `notification-service`); critical identity path (+10; `api-gateway`, `authentication-service`); blast radius size (+10; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-service`, `risk-engine`, `web-banking`).\n- performance: 40/100 (medium). Top factors: transaction path (+20; `payment-service`); channel path (+15; `api-gateway`, `mobile-banking`, `web-banking`); baseline (+5; none recorded).\n- This context contains only this story. Open the sprint view to compare risky stories.",
+  "answer": "Only one story is present in the analysis context, so the answer covers that one: **ST-104 — Customer profile: add preferred name and secondary email**.\n\n**Overall risk**\n- Overall risk score: **62**; highest dimension: **operational**.\n- Release decision: **GO_WITH_CONDITIONS** (confidence 53) — triggered by highest risk 63 (≥60), GDPR high, PCI DSS medium, SOX medium.\n\n**Risk dimensions (score / level)**\n- operational: 63 / medium — top factor: service criticality (32 pts, `customer-service`); also downstream systems (20 pts, 15 nodes) and deployment groups (6 pts).\n- delivery: 62 / medium — top factor: owner coordination (32 pts across 19 nodes); direct services (15 pts, `crm`, `customer-service`, `notification-service`).\n- compliance: 61 / medium — top factor: PII data (20 pts, `crm`, `customer-db`, `customer-service`, `notification-service`).\n- technical: 53 / medium — top factor: database schema change (20 pts, `audit-db`, `customer-db`).\n- security: 48 / medium — top factor: customer data (20 pts, 9 nodes); critical identity path (10 pts, `api-gateway`, `authentication-service`).\n- performance: 40 / medium — top factor: transaction path (20 pts, `payment-service`).\n\n**Compliance frameworks (score / level)**\n- GDPR: 55 / **high** — new PII in `customer-service`/`customer-db`; consent purpose for `notification-service`/`crm`; profile read paths via `api-gateway`, `authentication-service`.\n- PCI DSS: 75 / medium — `card-service`, `api-gateway`, `customer-db` shared paths; `audit-db` record integrity.\n- SOX: 75 / medium — `customer-db`/`audit-db` schema change effects on financial joins and audit queries.\n- Internal Governance: 85 / low — tier1 approval and rollback evidence for `customer-service`/`customer-db`.\n\nNote: the framework-level scores are reported as supplied; lower compliance scores correspond to higher risk levels in this context (GDPR is the high-risk framework).",
   "cited_nodes": [
-    "mobile-banking",
-    "web-banking",
-    "atm",
-    "branch-portal",
     "customer-service",
-    "account-service",
     "payment-service",
-    "loan-service",
     "card-service",
     "crm",
     "authentication-service",
     "notification-service",
     "api-gateway",
-    "document-service",
     "customer-db",
-    "audit-db",
-    "fraud-engine",
-    "risk-engine",
-    "reporting-service"
+    "audit-db"
   ],
   "cited_factors": [
-    "baseline",
     "customer data",
     "critical identity path",
-    "blast radius size",
     "pii data",
-    "nearby card data",
     "database schema change",
     "direct services",
-    "dependency depth",
     "service criticality",
     "downstream systems",
     "deployment groups",
     "transaction path",
-    "channel path",
-    "low ambiguity",
     "owner coordination"
   ],
-  "provider": "template"
+  "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

@@ -1,5 +1,5 @@
 {
-  "answer": "- **ST-101**: overall risk 75/100; release decision GO_WITH_CONDITIONS.\n- compliance: 81/100 (high). Top factors: card data (+30; `fraud-engine`); pii data (+20; `account-service`); financial data (+20; `account-service`, `fraud-engine`, `payment-service`, `transaction-db`).\n- security: 73/100 (high). Top factors: card data (+25; `card-service`, `fraud-engine`); customer data (+20; `account-service`, `api-gateway`, `authentication-service`, `card-service`, `customer-db`, `loan-service`, `notification-service`); critical identity path (+10; `api-gateway`, `authentication-service`).\n- operational: 71/100 (high). Top factors: service criticality (+40; `payment-service`); downstream systems (+20; `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `loan-service`, `mobile-banking`, `notification-service`, `reporting-db`, `risk-engine`, `web-banking`); deployment groups (+6; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-db`, `risk-engine`, `transaction-db`, `web-banking`).\n- delivery: 58/100 (medium). Top factors: owner coordination (+28; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-db`, `risk-engine`, `transaction-db`, `web-banking`); direct services (+15; `account-service`, `fraud-engine`, `payment-service`); low ambiguity (+10; `account-service`, `fraud-engine`, `payment-service`, `transaction-db`).\n- performance: 55/100 (medium). Top factors: transaction path (+20; `payment-service`, `transaction-db`); channel path (+15; `api-gateway`, `mobile-banking`, `web-banking`); payment business rule (+15; `payment-service`, `transaction-db`).\n- technical: 33/100 (low). Top factors: direct services (+18; `account-service`, `fraud-engine`, `payment-service`); dependency depth (+10; `atm`, `branch-portal`, `mobile-banking`, `web-banking`); baseline (+5; none recorded).",
+  "answer": "**Overall risk = 70; highest dimension = compliance (81, high)** — this is what the decision rule \"GO_WITH_CONDITIONS: highest risk is 81 (>= 60)\" keys off.\n\nCompliance dimension (81, high) — top factors:\n- \"card data\" — 30 points — `fraud-engine`\n- \"pii data\" — 20 points — `account-service`\n- \"financial data\" — 20 points — `account-service`, `fraud-engine`, `payment-service`, `transaction-db`\n\nOther dimensions also elevated:\n- Operational — 71 (high): \"service criticality\" 40 (`payment-service`); \"downstream systems\" 20 (`api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `loan-service`, `mobile-banking`, `notification-service`, `reporting-db`, `risk-engine`, `web-banking`); \"deployment groups\" 6.\n- Delivery — 58 (medium): \"owner coordination\" 28 across the full service set; \"direct services\" 15 (`account-service`, `fraud-engine`, `payment-service`).\n- Performance — 55 (medium): \"transaction path\" 20 and \"payment business rule\" 15 (`payment-service`, `transaction-db`); \"channel path\" 15 (`api-gateway`, `mobile-banking`, `web-banking`).\n- Security — 48 (medium): \"customer data\" 20; \"critical identity path\" 10 (`api-gateway`, `authentication-service`); \"blast radius size\" 10.\n- Technical — 33 (low).\n\nSupporting compliance findings (framework scores, as supplied):\n- GDPR medium (65), PCI DSS medium (65), SOX medium (65), Internal Governance medium (70); overall compliance score 65, \"0 applicable framework(s) have high risk.\"\n\nAlso note the triggered release conditions for medium GDPR/PCI DSS/SOX/Internal Governance risk and the two sprint deployment collisions (`transaction-db` with ST-107, `payment-service` with ST-110).",
   "cited_nodes": [
     "mobile-banking",
     "web-banking",
@@ -20,22 +20,20 @@
     "risk-engine"
   ],
   "cited_factors": [
-    "baseline",
     "customer data",
-    "card data",
     "critical identity path",
+    "blast radius size",
     "pii data",
+    "card data",
     "financial data",
     "direct services",
-    "dependency depth",
     "service criticality",
     "downstream systems",
     "deployment groups",
     "transaction path",
     "channel path",
     "payment business rule",
-    "low ambiguity",
     "owner coordination"
   ],
-  "provider": "template"
+  "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

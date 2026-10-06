@@ -1,5 +1,5 @@
 {
-  "answer": "- **ST-101**: overall risk 75/100; release decision GO_WITH_CONDITIONS.\n- compliance: 81/100 (high). Top factors: card data (+30; `fraud-engine`); pii data (+20; `account-service`); financial data (+20; `account-service`, `fraud-engine`, `payment-service`, `transaction-db`).\n- security: 73/100 (high). Top factors: card data (+25; `card-service`, `fraud-engine`); customer data (+20; `account-service`, `api-gateway`, `authentication-service`, `card-service`, `customer-db`, `loan-service`, `notification-service`); critical identity path (+10; `api-gateway`, `authentication-service`).\n- operational: 71/100 (high). Top factors: service criticality (+40; `payment-service`); downstream systems (+20; `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `loan-service`, `mobile-banking`, `notification-service`, `reporting-db`, `risk-engine`, `web-banking`); deployment groups (+6; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-db`, `risk-engine`, `transaction-db`, `web-banking`).\n- delivery: 58/100 (medium). Top factors: owner coordination (+28; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-db`, `risk-engine`, `transaction-db`, `web-banking`); direct services (+15; `account-service`, `fraud-engine`, `payment-service`); low ambiguity (+10; `account-service`, `fraud-engine`, `payment-service`, `transaction-db`).\n- performance: 55/100 (medium). Top factors: transaction path (+20; `payment-service`, `transaction-db`); channel path (+15; `api-gateway`, `mobile-banking`, `web-banking`); payment business rule (+15; `payment-service`, `transaction-db`).\n- technical: 33/100 (low). Top factors: direct services (+18; `account-service`, `fraud-engine`, `payment-service`); dependency depth (+10; `atm`, `branch-portal`, `mobile-banking`, `web-banking`); baseline (+5; none recorded).\n- This context contains only this story. Open the sprint view to compare risky stories.",
+  "answer": "Only one story is present in the analysis context — **ST-101** (\"Increase daily payment limits for premium customers\"). Its computed risk profile, as supplied:\n\n- **Overall risk: 70**; highest dimension: **compliance**\n- **Compliance: 81 (high)**\n  - card data (30 pts): `fraud-engine`\n  - pii data (20 pts): `account-service`\n  - financial data (20 pts): `account-service`, `fraud-engine`, `payment-service`, `transaction-db`\n- **Operational: 71 (high)**\n  - service criticality (40 pts): `payment-service`\n  - downstream systems (20 pts): `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `loan-service`, `mobile-banking`, `notification-service`, `reporting-db`, `risk-engine`, `web-banking`\n  - deployment groups (6 pts)\n- **Delivery: 58 (medium)** — owner coordination (28 pts) across 17 components\n- **Performance: 55 (medium)** — transaction path (`payment-service`, `transaction-db`), channel path (`api-gateway`, `mobile-banking`, `web-banking`)\n- **Security: 48 (medium)** — customer data (20 pts), critical identity path (10 pts: `api-gateway`, `authentication-service`)\n- **Technical: 33 (low)**\n\nDecision: **GO_WITH_CONDITIONS**, confidence **24**, triggered by highest risk 81 (≥60), medium GDPR/PCI DSS/SOX/Internal Governance risk, and sprint deployment collisions.\n\nOther story IDs appear only as collision partners, with no risk data in this context:\n- **ST-107** — deployment collision on `transaction-db`; sequence ST-107 first behind a flag, run shared regression suite for `transaction-db` before ST-101.\n- **ST-110** — deployment collision on `payment-service`; sequence ST-110 first behind a flag, run shared regression suite for `payment-service` before ST-101.\n\nI can't assess ST-107 or ST-110 as \"risky\" stories — the context contains no risk analysis for them.",
   "cited_nodes": [
     "mobile-banking",
     "web-banking",
@@ -20,22 +20,17 @@
     "risk-engine"
   ],
   "cited_factors": [
-    "baseline",
     "customer data",
-    "card data",
     "critical identity path",
     "pii data",
+    "card data",
     "financial data",
-    "direct services",
-    "dependency depth",
     "service criticality",
     "downstream systems",
     "deployment groups",
     "transaction path",
     "channel path",
-    "payment business rule",
-    "low ambiguity",
     "owner coordination"
   ],
-  "provider": "template"
+  "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

@@ -12,27 +12,30 @@
     ]
   },
   "requirement": {
-    "business_summary": "Requested banking change: Biometric login for mobile banking.",
-    "technical_summary": "Apply the enhancement to mobile-banking, authentication-service according to the supplied criteria.",
-    "business_domain": "Identity and access",
+    "business_summary": "Customers using the mobile banking app on supported devices can opt in to biometric login after a successful credential login. An opted-in device must complete a fresh signed, device-bound biometric challenge that the authentication service verifies before the normal scoped access token is issued. A failed, expired or replayed challenge yields no authenticated session; unsupported devices keep credential login, and customers can revoke a device registration from session settings.",
+    "technical_summary": "The mobile-banking client invokes the platform biometric prompt and submits the signed challenge result to authentication-service for validation prior to scoped access token issuance. authentication-service challenge validation is modified, and the identity deployment is scheduled jointly with ST-107 because both stories alter authentication-service challenge validation and cannot deploy incompatible authentication policies independently. A shared challenge contract and rollback policy are required to avoid a deployment collision. The existing credential fallback path and existing scoped access token flow are preserved.",
+    "business_domain": "Digital Banking - Authentication and Identity",
     "affected_capabilities": [
-      "Mobile Banking",
-      "Authentication Service"
+      "Biometric device-bound login",
+      "Authentication challenge validation and scoped token issuance",
+      "Device registration opt-in and revocation from session settings",
+      "Credential login fallback for unsupported devices or failed prompts",
+      "Joint identity deployment, shared challenge contract and rollback policy (with ST-107)"
     ],
     "affected_services": [
       "mobile-banking",
       "authentication-service"
     ],
-    "change_type": "enhancement",
+    "change_type": "new_feature",
     "touches_customer_data": true,
     "touches_card_data": false,
-    "touches_financial_data": true,
+    "touches_financial_data": false,
     "changes_auth_flow": true,
-    "changes_external_api_contract": true,
+    "changes_external_api_contract": false,
     "changes_db_schema": false,
-    "ambiguity": "low",
-    "engineering_scope": "Implement Biometric login for mobile banking across mobile-banking, authentication-service; verify 4 acceptance criteria.",
-    "source": "keyword-fallback"
+    "ambiguity": "medium",
+    "engineering_scope": "Mobile-banking client work to invoke the platform biometric prompt and transmit the signed result, plus authentication-service changes to challenge validation and device registration/revocation handling ahead of existing scoped token issuance. Credential fallback must remain intact. Delivery is coupled to ST-107 for a coordinated authentication-service identity deployment, shared challenge contract and rollback policy. Storage location and schema for device registrations, and whether any gateway or contract versioning change is needed, are not stated in the source.",
+    "source": "tokenharbor:deepseek-v4.1-flash:free"
   },
   "graph": {
     "nodes": [
@@ -42,8 +45,8 @@
         "type": "core",
         "hop": 1,
         "severity": "high",
-        "x": -186.8,
-        "y": 247.4,
+        "x": -379.9,
+        "y": 346.3,
         "criticality": 9,
         "owner_team": "Core Banking",
         "data_classes": [
@@ -57,8 +60,8 @@
         "type": "platform",
         "hop": 1,
         "severity": "high",
-        "x": 138.2,
-        "y": -277.5,
+        "x": 309.8,
+        "y": -410.2,
         "criticality": 10,
         "owner_team": "Identity & Access",
         "data_classes": [
@@ -72,8 +75,8 @@
         "type": "channel",
         "hop": 1,
         "severity": "medium",
-        "x": 138.2,
-        "y": 277.5,
+        "x": 140.7,
+        "y": 494.4,
         "criticality": 7,
         "owner_team": "Assisted Channels",
         "data_classes": [
@@ -87,8 +90,8 @@
         "type": "database",
         "hop": 1,
         "severity": "medium",
-        "x": -84.8,
-        "y": -298.2,
+        "x": -47.4,
+        "y": -511.9,
         "criticality": 8,
         "owner_team": "Data & Analytics",
         "data_classes": [
@@ -101,7 +104,7 @@
         "type": "platform",
         "hop": 0,
         "severity": "high",
-        "x": -70.0,
+        "x": -110.0,
         "y": 0.0,
         "criticality": 10,
         "owner_team": "Identity & Access",
@@ -115,8 +118,8 @@
         "type": "channel",
         "hop": 1,
         "severity": "medium",
-        "x": 28.6,
-        "y": 308.7,
+        "x": -47.4,
+        "y": 511.9,
         "criticality": 6,
         "owner_team": "Assisted Channels",
         "data_classes": [
@@ -130,8 +133,8 @@
         "type": "core",
         "hop": 1,
         "severity": "high",
-        "x": -263.6,
-        "y": 163.2,
+        "x": -479.4,
+        "y": 185.7,
         "criticality": 9,
         "owner_team": "Cards Platform",
         "data_classes": [
@@ -145,8 +148,8 @@
         "type": "core",
         "hop": 1,
         "severity": "medium",
-        "x": -304.7,
-        "y": 57.0,
+        "x": -514.1,
+        "y": 0.0,
         "criticality": 6,
         "owner_team": "Customer Platform",
         "data_classes": [
@@ -159,8 +162,8 @@
         "type": "database",
         "hop": 1,
         "severity": "high",
-        "x": 28.6,
-        "y": -308.7,
+        "x": 140.7,
+        "y": -494.4,
         "criticality": 9,
         "owner_team": "Customer Platform",
         "data_classes": [
@@ -173,8 +176,8 @@
         "type": "core",
         "hop": 1,
         "severity": "medium",
-        "x": -304.7,
-        "y": -57.0,
+        "x": -479.4,
+        "y": -185.7,
         "criticality": 8,
         "owner_team": "Customer Platform",
         "data_classes": [
@@ -187,8 +190,8 @@
         "type": "platform",
         "hop": 1,
         "severity": "low",
-        "x": 229.1,
-        "y": -208.8,
+        "x": 437.1,
+        "y": -270.6,
         "criticality": 4,
         "owner_team": "Document Operations",
         "data_classes": []
@@ -199,8 +202,8 @@
         "type": "analytics",
         "hop": 1,
         "severity": "high",
-        "x": 310.0,
-        "y": 0.0,
+        "x": 505.3,
+        "y": 94.5,
         "criticality": 9,
         "owner_team": "Payments Platform",
         "data_classes": [
@@ -214,8 +217,8 @@
         "type": "core",
         "hop": 1,
         "severity": "medium",
-        "x": -263.6,
-        "y": -163.2,
+        "x": -379.9,
+        "y": -346.3,
         "criticality": 8,
         "owner_team": "Core Banking",
         "data_classes": [
@@ -229,7 +232,7 @@
         "type": "channel",
         "hop": 0,
         "severity": "high",
-        "x": 70.0,
+        "x": 110.0,
         "y": 0.0,
         "criticality": 8,
         "owner_team": "Digital Channels",
@@ -244,8 +247,8 @@
         "type": "platform",
         "hop": 1,
         "severity": "medium",
-        "x": 289.1,
-        "y": -112.0,
+        "x": 505.3,
+        "y": -94.5,
         "criticality": 6,
         "owner_team": "Customer Platform",
         "data_classes": [
@@ -258,8 +261,8 @@
         "type": "core",
         "hop": 1,
         "severity": "high",
-        "x": -186.8,
-        "y": -247.4,
+        "x": -229.1,
+        "y": -460.2,
         "criticality": 10,
         "owner_team": "Payments Platform",
         "data_classes": [
@@ -272,7 +275,7 @@
         "type": "database",
         "hop": null,
         "severity": null,
-        "x": 820.0,
+        "x": 854.1,
         "y": 0.0,
         "criticality": 6,
         "owner_team": "Data & Analytics",
@@ -286,8 +289,8 @@
         "type": "analytics",
         "hop": 1,
         "severity": "medium",
-        "x": 289.1,
-        "y": 112.0,
+        "x": 437.1,
+        "y": 270.6,
         "criticality": 5,
         "owner_team": "Data & Analytics",
         "data_classes": []
@@ -298,8 +301,8 @@
         "type": "analytics",
         "hop": 1,
         "severity": "medium",
-        "x": 229.1,
-        "y": 208.8,
+        "x": 309.8,
+        "y": 410.2,
         "criticality": 8,
         "owner_team": "Data & Analytics",
         "data_classes": [
@@ -312,7 +315,7 @@
         "type": "database",
         "hop": 3,
         "severity": "low",
-        "x": 650.0,
+        "x": -684.1,
         "y": 0.0,
         "criticality": 10,
         "owner_team": "Core Banking",
@@ -326,8 +329,8 @@
         "type": "channel",
         "hop": 1,
         "severity": "medium",
-        "x": -84.8,
-        "y": 298.2,
+        "x": -229.1,
+        "y": 460.2,
         "criticality": 8,
         "owner_team": "Digital Channels",
         "data_classes": [
@@ -950,7 +953,7 @@
     "dimensions": [
       {
         "name": "security",
-        "score": 88,
+        "score": 73,
         "level": "high",
         "factors": [
           {
@@ -979,14 +982,6 @@
           {
             "label": "auth flow change",
             "points": 25,
-            "node_ids": [
-              "authentication-service",
-              "mobile-banking"
-            ]
-          },
-          {
-            "label": "external API contract",
-            "points": 15,
             "node_ids": [
               "authentication-service",
               "mobile-banking"
@@ -1026,7 +1021,7 @@
             ]
           }
         ],
-        "explanation": "Security risk is high (88) because auth flow change (+25) on authentication-service, mobile-banking and customer data (+20) on account-service, api-gateway, authentication-service, branch-portal, card-service, crm, customer-db, customer-service, loan-service, mobile-banking, notification-service, web-banking and external API contract (+15) on authentication-service, mobile-banking."
+        "explanation": "Security risk is high (73) because auth flow change (+25) on authentication-service, mobile-banking; customer data (+20) on account-service, api-gateway, authentication-service and 9 more; critical identity path (+10) on api-gateway, authentication-service."
       },
       {
         "name": "compliance",
@@ -1070,12 +1065,12 @@
             ]
           }
         ],
-        "explanation": "Compliance risk is medium (63) because pii data (+20) on authentication-service, mobile-banking and financial data (+20) on mobile-banking and nearby card data (+12) on atm, card-service, fraud-engine."
+        "explanation": "Compliance risk is medium (63) because pii data (+20) on authentication-service, mobile-banking; financial data (+20) on mobile-banking; nearby card data (+12) on atm, card-service, fraud-engine."
       },
       {
         "name": "technical",
-        "score": 32,
-        "level": "low",
+        "score": 42,
+        "level": "medium",
         "factors": [
           {
             "label": "baseline",
@@ -1096,9 +1091,17 @@
             "node_ids": [
               "transaction-db"
             ]
+          },
+          {
+            "label": "new feature",
+            "points": 10,
+            "node_ids": [
+              "authentication-service",
+              "mobile-banking"
+            ]
           }
         ],
-        "explanation": "Technical risk is low (32) because dependency depth (+15) on transaction-db and direct services (+12) on authentication-service, mobile-banking."
+        "explanation": "Technical risk is medium (42) because dependency depth (+15) on transaction-db; direct services (+12) on authentication-service, mobile-banking; new feature (+10) on authentication-service, mobile-banking."
       },
       {
         "name": "operational",
@@ -1168,7 +1171,7 @@
             ]
           }
         ],
-        "explanation": "Operational risk is high (71) because service criticality (+40) on authentication-service and downstream systems (+20) on account-service, api-gateway, atm, audit-db, branch-portal, card-service, crm, customer-db, customer-service, document-service, fraud-engine, loan-service, notification-service, payment-service, reporting-service, risk-engine, transaction-db, web-banking and deployment groups (+6) on account-service, api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, crm, customer-db, customer-service, document-service, fraud-engine, loan-service, mobile-banking, notification-service, payment-service, reporting-service, risk-engine, transaction-db, web-banking."
+        "explanation": "Operational risk is high (71) because service criticality (+40) on authentication-service; downstream systems (+20) on account-service, api-gateway, atm and 15 more; deployment groups (+6) on account-service, api-gateway, atm and 17 more."
       },
       {
         "name": "performance",
@@ -1198,12 +1201,12 @@
             ]
           }
         ],
-        "explanation": "Performance risk is medium (40) because transaction path (+20) on payment-service, transaction-db and channel path (+15) on api-gateway, mobile-banking, web-banking."
+        "explanation": "Performance risk is medium (40) because transaction path (+20) on payment-service, transaction-db; channel path (+15) on api-gateway, mobile-banking, web-banking."
       },
       {
         "name": "delivery",
-        "score": 57,
-        "level": "medium",
+        "score": 77,
+        "level": "high",
         "factors": [
           {
             "label": "baseline",
@@ -1211,8 +1214,8 @@
             "node_ids": []
           },
           {
-            "label": "low ambiguity",
-            "points": 10,
+            "label": "medium ambiguity",
+            "points": 30,
             "node_ids": [
               "authentication-service",
               "mobile-banking"
@@ -1253,11 +1256,11 @@
             ]
           }
         ],
-        "explanation": "Delivery risk is medium (57) because owner coordination (+32) on account-service, api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, crm, customer-db, customer-service, document-service, fraud-engine, loan-service, mobile-banking, notification-service, payment-service, reporting-service, risk-engine, transaction-db, web-banking and low ambiguity (+10) on authentication-service, mobile-banking and direct services (+10) on authentication-service, mobile-banking."
+        "explanation": "Delivery risk is high (77) because owner coordination (+32) on account-service, api-gateway, atm and 17 more; medium ambiguity (+30) on authentication-service, mobile-banking; direct services (+10) on authentication-service, mobile-banking."
       }
     ],
     "overall": 74,
-    "highest": "security"
+    "highest": "delivery"
   },
   "tests": {
     "tests": [
@@ -1518,80 +1521,171 @@
       },
       {
         "id": "GEN-1",
-        "title": "Verify security: GET /accounts/{id}/limits, POST /payments, POST /atm/withdrawals, POST /internal/audit/events, POST /auth/token, GET /branch/customers, GET /cards/{id}, GET /crm/customers/{id}/contacts, GET /internal/customer-store/profiles/{id}, GET /customers/{id}, POST /documents/statements/render, POST /fraud/screenings, POST /loans/applications, POST /mobile/login, POST /notifications, POST /payments, GET /reports/monthly-statements/{id}, POST /risk/assessments, POST /web/login rejects unauthorised access",
+        "title": "Security: Audit database records biometric challenge failure events",
         "type": "security",
         "priority": "P1",
         "covers": [
-          "account-service",
-          "api-gateway",
-          "atm",
           "audit-db",
-          "authentication-service",
-          "branch-portal",
-          "card-service",
-          "crm",
-          "customer-db",
-          "customer-service",
-          "document-service",
-          "fraud-engine",
-          "loan-service",
-          "mobile-banking",
-          "notification-service",
-          "payment-service",
-          "reporting-service",
-          "risk-engine",
-          "web-banking"
+          "authentication-service"
         ],
         "steps": [
-          "Prepare security fixtures for GET /accounts/{id}/limits, POST /payments, POST /atm/withdrawals, POST /internal/audit/events, POST /auth/token, GET /branch/customers, GET /cards/{id}, GET /crm/customers/{id}/contacts, GET /internal/customer-store/profiles/{id}, GET /customers/{id}, POST /documents/statements/render, POST /fraud/screenings, POST /loans/applications, POST /mobile/login, POST /notifications, POST /payments, GET /reports/monthly-statements/{id}, POST /risk/assessments, POST /web/login.",
-          "Exercise the change and verify it rejects unauthorised access.",
-          "Compare the observed result with the documented requirements."
+          "User has biometric login opted-in on a supported device.",
+          "Attempt biometric login but provide a tampered signed challenge (invalid signature).",
+          "Authentication-service receives the challenge validation request.",
+          "Authentication-service validates the challenge and determines it is invalid.",
+          "Authentication-service logs an audit event to audit-db with correlation ID, user ID, outcome='failure', and timestamp."
         ],
-        "expected": "Access is denied without exposing protected data.",
+        "expected": "An audit entry is present in audit-db capturing the failed biometric challenge with correct correlation ID and failure status.",
         "source": "generated",
         "automation_candidate": false
       },
       {
         "id": "GEN-2",
-        "title": "Verify operational: GET /accounts/{id}/limits, POST /payments, POST /atm/withdrawals, POST /internal/audit/events, POST /auth/token, GET /branch/customers, GET /cards/{id}, GET /crm/customers/{id}/contacts, GET /internal/customer-store/profiles/{id}, GET /customers/{id}, POST /documents/statements/render, POST /fraud/screenings, POST /loans/applications, POST /mobile/login, POST /notifications, POST /payments, GET /reports/monthly-statements/{id}, POST /risk/assessments, POST /internal/ledger/entries, POST /web/login recovers after a dependency failure",
+        "title": "Security: Transaction ledger logs biometric login attempts for fraud detection",
+        "type": "security",
+        "priority": "P1",
+        "covers": [
+          "authentication-service",
+          "transaction-db"
+        ],
+        "steps": [
+          "User completes a successful biometric login on mobile banking app.",
+          "Authentication-service validates the device-bound challenge and issues a scoped access token.",
+          "Authentication-service inserts a login audit record into the transaction-ledger database (transaction-db) including user ID, login method='biometric', timestamp, and token identifier.",
+          "Commit the transaction."
+        ],
+        "expected": "A row exists in transaction-db (login_events table or similar) reflecting the successful biometric login with correct user ID, timestamp, and biometric method.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-3",
+        "title": "Delivery: Joint rollback policy preserves credential fallback when authentication-service deployment fails",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "api-gateway",
+          "authentication-service",
+          "mobile-banking"
+        ],
+        "steps": [
+          "Simulate a deployment failure of authentication-service (e.g., service returns HTTP 500 for /auth/token).",
+          "On a supported device with biometric opt-in, open the mobile banking app and attempt to log in using biometric.",
+          "Mobile-banking client invokes platform biometric prompt, obtains signed challenge, and posts to authentication-service.",
+          "Authentication-service endpoint returns error; client detects failure.",
+          "Client falls back to credential login path: user enters username/password, client sends credentials to authentication-service.",
+          "Authentication-service validates credentials and issues a scoped access token.",
+          "Token is returned to mobile-banking client."
+        ],
+        "expected": "User receives a valid scoped access token via credential fallback, and no authenticated session is created from the failed biometric challenge.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-4",
+        "title": "Delivery: Coordinated deployment with ST-107 does not break existing API contracts for account balance retrieval",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "account-service",
+          "api-gateway"
+        ],
+        "steps": [
+          "After joint deployment of authentication-service and ST-107, obtain a valid access token via any login method (credential or biometric).",
+          "Send a GET request to /accounts/{id}/balance with the token in the Authorization header.",
+          "API gateway forwards the request to account-service.",
+          "Account-service processes the request and returns the account balance."
+        ],
+        "expected": "Response returns HTTP 200 with a JSON body containing the account balance field matching the expected value; no new errors introduced.",
+        "source": "generated",
+        "automation_candidate": true
+      },
+      {
+        "id": "GEN-5",
+        "title": "Operational: High availability of authentication-service under load does not degrade downstream account service response times",
         "type": "integration",
         "priority": "P1",
         "covers": [
           "account-service",
           "api-gateway",
-          "atm",
-          "audit-db",
+          "authentication-service"
+        ],
+        "steps": [
+          "Deploy a load generator to simulate 100 concurrent biometric login requests to authentication-service.",
+          "In parallel, send 100 concurrent GET /accounts/{id}/balance requests using valid tokens.",
+          "Measure the latency (response time) of the account balance requests.",
+          "Ensure the authentication-service remains responsive (no more than 5% error rate)."
+        ],
+        "expected": "95th percentile latency of account balance requests remains under 200 ms (or within defined SLA), showing no significant degradation due to authentication-service load.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-6",
+        "title": "Operational: Device registration revocation via session settings propagates to notification-service to alert user",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
           "authentication-service",
-          "branch-portal",
-          "card-service",
-          "crm",
-          "customer-db",
-          "customer-service",
-          "document-service",
-          "fraud-engine",
-          "loan-service",
           "mobile-banking",
-          "notification-service",
-          "payment-service",
-          "reporting-service",
-          "risk-engine",
-          "transaction-db",
+          "notification-service"
+        ],
+        "steps": [
+          "User logs in via biometric and opts in the device for biometric login.",
+          "User navigates to session settings and revokes the device registration for biometric login.",
+          "Mobile-banking client calls authentication-service to delete the device registration.",
+          "Authentication-service confirms deletion and publishes a device-revocation event.",
+          "Notification-service consumes the event and sends a notification (push/email) to the user’s registered contact channels."
+        ],
+        "expected": "User receives a notification indicating that biometric login has been disabled for the revoked device, containing device identifier and timestamp.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-7",
+        "title": "Security: Web banking session respects biometric token scope and does not allow elevated privileges",
+        "type": "security",
+        "priority": "P1",
+        "covers": [
+          "api-gateway",
+          "authentication-service",
           "web-banking"
         ],
         "steps": [
-          "Prepare operational fixtures for GET /accounts/{id}/limits, POST /payments, POST /atm/withdrawals, POST /internal/audit/events, POST /auth/token, GET /branch/customers, GET /cards/{id}, GET /crm/customers/{id}/contacts, GET /internal/customer-store/profiles/{id}, GET /customers/{id}, POST /documents/statements/render, POST /fraud/screenings, POST /loans/applications, POST /mobile/login, POST /notifications, POST /payments, GET /reports/monthly-statements/{id}, POST /risk/assessments, POST /internal/ledger/entries, POST /web/login.",
-          "Exercise the change and verify it recovers after a dependency failure.",
-          "Compare the observed result with the documented requirements."
+          "Complete a biometric login on the mobile banking app to obtain a scoped access token (standard user scope).",
+          "Use that token to call a privileged web‑banking API endpoint that requires elevated staff or account‑limit scope, e.g., PUT /accounts/{id}/limits with a new limit value.",
+          "Send the request from a web‑banking client (or API simulator) with the token in the Authorization header.",
+          "API gateway forwards the request to authentication-service for token introspection.",
+          "Authentication-service validates the token and checks scopes."
         ],
-        "expected": "Recovery preserves data and restores the documented service behavior.",
+        "expected": "The request is rejected with HTTP 403 Forbidden (or 401 Unauthorized) and an error message indicating insufficient scope; no limit change is applied.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-8",
+        "title": "Delivery: Document service statement PDF generation unaffected by authentication-service changes",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "authentication-service",
+          "document-service"
+        ],
+        "steps": [
+          "Authenticate a user via biometric login on mobile banking to obtain a valid scoped access token.",
+          "Request a statement PDF via GET /documents/templates/{id}/render (or appropriate endpoint) with the token.",
+          "Document-service processes the request, retrieves statement data, and renders the PDF.",
+          "Return the PDF to the client."
+        ],
+        "expected": "PDF is generated successfully, contains the statement data, and the footer renders within page margins on all supported templates, identical to output before the authentication-service changes.",
         "source": "generated",
         "automation_candidate": false
       }
     ],
-    "coverage_estimate": 1.0,
-    "effort_hours": 4.233333333333333,
-    "automation_candidates": 15,
-    "summary": "Selected 15 catalog tests and 2 new tests, covering 20 of 20 impacted nodes (100%); estimated effort is 4.2 hours."
+    "coverage_estimate": 0.65,
+    "effort_hours": 13.233333333333334,
+    "automation_candidates": 16,
+    "summary": "Selected 15 catalog tests and 8 new tests, covering 13 of 20 impacted nodes (65%); estimated effort is 13.2 hours."
   },
   "compliance": {
     "frameworks": [
@@ -1599,114 +1693,97 @@
         "framework": "GDPR",
         "applicable": true,
         "reason": "PII-bearing components are impacted; the change touches customer data.",
-        "risk_level": "high",
-        "score": 55,
+        "risk_level": "medium",
+        "score": 65,
         "findings": [
           {
-            "text": "GDPR review applies because PII-bearing components are impacted; the change touches customer data.",
+            "text": "The change adds a device-bound biometric login path in mobile-banking and authentication-service, both of which handle customer identifiers, authentication attributes and device registration data; this expands the personal-data processing surface that lawful basis, purpose limitation and data-minimisation obligations attach to.",
             "node_ids": [
-              "account-service",
-              "api-gateway",
-              "authentication-service",
-              "branch-portal",
-              "card-service",
-              "crm",
-              "customer-db",
-              "customer-service",
-              "loan-service",
               "mobile-banking",
-              "notification-service",
-              "web-banking"
+              "authentication-service"
             ]
           },
           {
-            "text": "Deterministic control exposure: PII impacted directly (-20); customer data touched (-15); external API contract changes (-10).",
+            "text": "Device registration, challenge validation and revocation artefacts pass through authentication-service and may be persisted in customer-db and recorded in audit-db, so retention, storage limitation and erasure handling for these new artefacts need review.",
             "node_ids": [
-              "account-service",
-              "api-gateway",
               "authentication-service",
-              "branch-portal",
-              "card-service",
-              "crm",
               "customer-db",
-              "customer-service",
-              "loan-service",
-              "mobile-banking",
-              "notification-service",
-              "web-banking"
+              "audit-db"
+            ]
+          },
+          {
+            "text": "The PII-bearing entry and servicing nodes api-gateway, web-banking and branch-portal remain in the identity path, so opt-in capture, credential fallback and revocation from session settings need to be checked for consistent treatment of the new biometric option across channels.",
+            "node_ids": [
+              "api-gateway",
+              "web-banking",
+              "branch-portal",
+              "authentication-service"
             ]
           }
         ],
         "recommendations": [
-          "Review data minimization, purpose and retention for customer data for account-service, api-gateway, authentication-service, branch-portal, card-service, crm, customer-db, customer-service, loan-service, mobile-banking, notification-service, web-banking.",
-          "Verify access controls and privacy regression tests for account-service, api-gateway, authentication-service, branch-portal, card-service, crm, customer-db, customer-service, loan-service, mobile-banking, notification-service, web-banking."
+          "Confirm the lawful basis, customer notice text and explicit opt-in recording for biometric login across mobile-banking and authentication-service, including that revocation from session settings is honoured.",
+          "Verify data minimisation, retention and deletion for device registration and challenge artefacts held by authentication-service and any persistence in customer-db or audit-db.",
+          "Review access control and privacy regression tests covering mobile-banking, authentication-service, api-gateway and web-banking for both the biometric and credential fallback paths."
         ]
       },
       {
         "framework": "PCI DSS",
         "applicable": true,
         "reason": "card-data components are impacted.",
-        "risk_level": "high",
-        "score": 50,
+        "risk_level": "medium",
+        "score": 65,
         "findings": [
           {
-            "text": "PCI DSS review applies because card-data components are impacted.",
+            "text": "No new cardholder-data handling is introduced, but authentication-service token and step-up validation is shared by card-data paths in card-service, fraud-engine and atm; changes to challenge validation could alter how card-related sessions are authenticated.",
             "node_ids": [
-              "atm",
-              "card-service",
-              "fraud-engine"
-            ]
-          },
-          {
-            "text": "Deterministic control exposure: card data touched (-25); external API contract changes (-15); authentication flow changes (-10).",
-            "node_ids": [
-              "atm",
               "authentication-service",
               "card-service",
               "fraud-engine",
-              "mobile-banking"
+              "atm"
+            ]
+          },
+          {
+            "text": "mobile-banking exposes card freeze/unfreeze controls that depend on authentication-service step-up proof, so the biometric path must be checked to ensure it does not bypass or weaken step-up verification used for card actions.",
+            "node_ids": [
+              "mobile-banking",
+              "authentication-service",
+              "card-service"
             ]
           }
         ],
         "recommendations": [
-          "Verify card-data encryption, masking and access restrictions for atm, authentication-service, card-service, fraud-engine, mobile-banking.",
-          "Run card-data security tests and review authentication and API controls for atm, authentication-service, card-service, fraud-engine, mobile-banking."
+          "Verify that the new challenge validation preserves step-up and scoped token semantics relied on by card-service, fraud-engine and atm, and that card-data access restrictions remain unchanged.",
+          "Run card-data authentication and session regression tests covering authentication-service, mobile-banking and card-service before release, including failure, expiry and replay-rejection cases."
         ]
       },
       {
         "framework": "SOX",
         "applicable": true,
-        "reason": "financial-data components are impacted; audit-data components are impacted; the change touches financial data.",
+        "reason": "financial-data components are impacted; audit-data components are impacted.",
         "risk_level": "medium",
         "score": 75,
         "findings": [
           {
-            "text": "SOX review applies because financial-data components are impacted; audit-data components are impacted; the change touches financial data.",
+            "text": "Authentication events generated by the new biometric path flow through authentication-service into audit-db, so the completeness and integrity of access audit records supporting financial-system controls depend on the new logging behaviour.",
             "node_ids": [
-              "account-service",
-              "api-gateway",
-              "atm",
-              "audit-db",
-              "branch-portal",
-              "fraud-engine",
-              "loan-service",
-              "mobile-banking",
-              "payment-service",
-              "risk-engine",
-              "web-banking"
+              "authentication-service",
+              "audit-db"
             ]
           },
           {
-            "text": "Deterministic control exposure: financial data touched (-15); audit database impacted (-10).",
+            "text": "Failures, expirations, replay rejections and device revocations during authentication may affect the audit trail for financially relevant activity in mobile-banking sessions that reach account-service, payment-service and loan-service.",
             "node_ids": [
-              "audit-db",
-              "mobile-banking"
+              "mobile-banking",
+              "account-service",
+              "payment-service",
+              "loan-service"
             ]
           }
         ],
         "recommendations": [
-          "Reconcile financial results and verify complete, immutable audit records for audit-db, mobile-banking.",
-          "Document control-owner approval and test financial and schema changes for audit-db, mobile-banking."
+          "Check that authentication-service emits complete, immutable audit events to audit-db for biometric success, failure, expiry, replay rejection and device revocation.",
+          "Confirm audit coverage and control-owner sign-off for authentication changes affecting mobile-banking sessions that reach account-service, payment-service and loan-service."
         ]
       },
       {
@@ -1714,49 +1791,55 @@
         "applicable": true,
         "reason": "directly changed components have criticality >= 8; the authentication flow changes.",
         "risk_level": "medium",
-        "score": 60,
+        "score": 70,
         "findings": [
           {
-            "text": "Internal Governance review applies because directly changed components have criticality >= 8; the authentication flow changes.",
+            "text": "The change modifies authentication-service and mobile-banking and alters the authentication flow, triggering elevated change-control attention, service-owner approval and a documented rollback path for these high-criticality components.",
             "node_ids": [
               "authentication-service",
               "mobile-banking"
             ]
           },
           {
-            "text": "Deterministic control exposure: direct components have criticality >= 9 (-15); authentication flow changes (-15); external API contract changes (-10).",
+            "text": "Delivery is coupled with ST-107 for a shared identity deployment and challenge contract, so cross-story coordination and a joint rollback policy are required to avoid a deployment collision between incompatible authentication policies.",
             "node_ids": [
               "authentication-service",
               "mobile-banking"
             ]
+          },
+          {
+            "text": "Open scope items remain unresolved, including the storage location and schema for device registrations and whether gateway or API contract versioning is needed in api-gateway or customer-db, which affects design sign-off and test coverage.",
+            "node_ids": [
+              "api-gateway",
+              "customer-db",
+              "authentication-service"
+            ]
           }
         ],
         "recommendations": [
-          "Obtain service-owner change approval and record the rollback plan for authentication-service, mobile-banking.",
-          "Verify authorization tests, operational monitoring and release evidence for authentication-service, mobile-banking."
+          "Obtain service-owner approval from Identity & Access and Digital Channels, and record a joint rollback plan with ST-107 for authentication-service and mobile-banking.",
+          "Resolve the unresolved design questions on device-registration storage and gateway or contract versioning for api-gateway and customer-db before implementation sign-off.",
+          "Verify authorization tests, operational monitoring and release evidence for the biometric path and the preserved credential fallback in authentication-service and mobile-banking."
         ]
       }
     ],
-    "overall_score": 50,
-    "summary": "4 of 4 frameworks apply; the minimum compliance score is 50/100. 2 applicable framework(s) have high risk."
+    "overall_score": 65,
+    "summary": "4 of 4 frameworks apply; the minimum compliance score is 65/100. 0 applicable framework(s) have high risk."
   },
   "release": {
-    "confidence": 24,
+    "confidence": 27,
     "decision": "NO_GO",
     "triggered_rules": [
-      "NO_GO: security risk is 88 (>= 85)",
-      "NO_GO: GDPR risk is high and the change touches authentication",
-      "NO_GO: PCI DSS risk is high and the change touches authentication",
-      "GO_WITH_CONDITIONS: highest risk is 88 (>= 60)",
-      "GO_WITH_CONDITIONS: GDPR risk is high",
-      "GO_WITH_CONDITIONS: PCI DSS risk is high",
+      "NO_GO: highest risk 77 with test coverage 65% (< 70%)",
+      "GO_WITH_CONDITIONS: highest risk is 77 (>= 60)",
+      "GO_WITH_CONDITIONS: GDPR risk is medium",
+      "GO_WITH_CONDITIONS: PCI DSS risk is medium",
       "GO_WITH_CONDITIONS: SOX risk is medium",
       "GO_WITH_CONDITIONS: Internal Governance risk is medium",
-      "GO_WITH_CONDITIONS: sprint deployment collision between ST-107 and ST-112 on authentication-service",
-      "GO_WITH_CONDITIONS: sprint shared api change between ST-107 and ST-112 on mobile-banking"
+      "GO_WITH_CONDITIONS: sprint deployment collision between ST-107 and ST-112 on authentication-service"
     ],
     "conditions": [
-      "Reduce security risk below 85 and reassess release readiness",
+      "Increase test coverage to at least 70% and rerun the release assessment",
       "Run the P1 api tests on mobile-banking before release (TC-002: Mobile card status route requires a valid device session)",
       "Run the P1 api tests on account-service before release (TC-012: Account limits endpoint rejects unauthorized limit overrides)",
       "Run the P1 api tests on payment-service before release (TC-014: Payment creation returns the same instruction for a repeated idempotency key)",
@@ -1772,74 +1855,75 @@
       "Run the P1 functional tests on authentication-service before release (TC-021: Biometric login verifies a device-bound challenge before issuing a token)",
       "Run the P1 functional tests on api-gateway before release (TC-025: Gateway routes payment requests with the original correlation identifier)",
       "Run the P1 functional tests on customer-db before release (TC-029: Customer profile persistence preserves optional preferred name fields)",
-      "Run the P1 security tests on account-service, api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, crm, customer-db, customer-service, document-service, fraud-engine, loan-service, mobile-banking, notification-service, payment-service, reporting-service, risk-engine, web-banking before release (GEN-1: Verify security: GET /accounts/{id}/limits, POST /payments, POST /atm/withdrawals, POST /internal/audit/events, POST /auth/token, GET /branch/customers, GET /cards/{id}, GET /crm/customers/{id}/contacts, GET /internal/customer-store/profiles/{id}, GET /customers/{id}, POST /documents/statements/render, POST /fraud/screenings, POST /loans/applications, POST /mobile/login, POST /notifications, POST /payments, GET /reports/monthly-statements/{id}, POST /risk/assessments, POST /web/login rejects unauthorised access)",
-      "Run the P1 integration tests on account-service, api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, crm, customer-db, customer-service, document-service, fraud-engine, loan-service, mobile-banking, notification-service, payment-service, reporting-service, risk-engine, transaction-db, web-banking before release (GEN-2: Verify operational: GET /accounts/{id}/limits, POST /payments, POST /atm/withdrawals, POST /internal/audit/events, POST /auth/token, GET /branch/customers, GET /cards/{id}, GET /crm/customers/{id}/contacts, GET /internal/customer-store/profiles/{id}, GET /customers/{id}, POST /documents/statements/render, POST /fraud/screenings, POST /loans/applications, POST /mobile/login, POST /notifications, POST /payments, GET /reports/monthly-statements/{id}, POST /risk/assessments, POST /internal/ledger/entries, POST /web/login recovers after a dependency failure)",
-      "Review data minimization, purpose and retention for customer data for account-service, api-gateway, authentication-service, branch-portal, card-service, crm, customer-db, customer-service, loan-service, mobile-banking, notification-service, web-banking.",
-      "Verify access controls and privacy regression tests for account-service, api-gateway, authentication-service, branch-portal, card-service, crm, customer-db, customer-service, loan-service, mobile-banking, notification-service, web-banking.",
-      "Verify card-data encryption, masking and access restrictions for atm, authentication-service, card-service, fraud-engine, mobile-banking.",
-      "Run card-data security tests and review authentication and API controls for atm, authentication-service, card-service, fraud-engine, mobile-banking.",
-      "Reconcile financial results and verify complete, immutable audit records for audit-db, mobile-banking.",
-      "Document control-owner approval and test financial and schema changes for audit-db, mobile-banking.",
-      "Obtain service-owner change approval and record the rollback plan for authentication-service, mobile-banking.",
-      "Verify authorization tests, operational monitoring and release evidence for authentication-service, mobile-banking.",
+      "Run the P1 security tests on audit-db, authentication-service before release (GEN-1: Security: Audit database records biometric challenge failure events)",
+      "Run the P1 security tests on authentication-service, transaction-db before release (GEN-2: Security: Transaction ledger logs biometric login attempts for fraud detection)",
+      "Run the P1 functional tests on api-gateway, authentication-service, mobile-banking before release (GEN-3: Delivery: Joint rollback policy preserves credential fallback when authentication-service deployment fails)",
+      "Run the P1 api tests on account-service, api-gateway before release (GEN-4: Delivery: Coordinated deployment with ST-107 does not break existing API contracts for account balance retrieval)",
+      "Run the P1 integration tests on account-service, api-gateway, authentication-service before release (GEN-5: Operational: High availability of authentication-service under load does not degrade downstream account service response times)",
+      "Run the P1 functional tests on authentication-service, mobile-banking, notification-service before release (GEN-6: Operational: Device registration revocation via session settings propagates to notification-service to alert user)",
+      "Run the P1 security tests on api-gateway, authentication-service, web-banking before release (GEN-7: Security: Web banking session respects biometric token scope and does not allow elevated privileges)",
+      "Run the P1 functional tests on authentication-service, document-service before release (GEN-8: Delivery: Document service statement PDF generation unaffected by authentication-service changes)",
+      "Confirm the lawful basis, customer notice text and explicit opt-in recording for biometric login across mobile-banking and authentication-service, including that revocation from session settings is honoured.",
+      "Verify data minimisation, retention and deletion for device registration and challenge artefacts held by authentication-service and any persistence in customer-db or audit-db.",
+      "Review access control and privacy regression tests covering mobile-banking, authentication-service, api-gateway and web-banking for both the biometric and credential fallback paths.",
+      "Verify that the new challenge validation preserves step-up and scoped token semantics relied on by card-service, fraud-engine and atm, and that card-data access restrictions remain unchanged.",
+      "Run card-data authentication and session regression tests covering authentication-service, mobile-banking and card-service before release, including failure, expiry and replay-rejection cases.",
+      "Check that authentication-service emits complete, immutable audit events to audit-db for biometric success, failure, expiry, replay rejection and device revocation.",
+      "Confirm audit coverage and control-owner sign-off for authentication changes affecting mobile-banking sessions that reach account-service, payment-service and loan-service.",
+      "Obtain service-owner approval from Identity & Access and Digital Channels, and record a joint rollback plan with ST-107 for authentication-service and mobile-banking.",
+      "Resolve the unresolved design questions on device-registration storage and gateway or contract versioning for api-gateway and customer-db before implementation sign-off.",
+      "Verify authorization tests, operational monitoring and release evidence for the biometric path and the preserved credential fallback in authentication-service and mobile-banking.",
       "Sequence deployment of ST-107 and ST-112 (deployment collision on authentication-service)",
-      "Sequence the releases of ST-107 and ST-112: deploy ST-112 first behind a feature flag where available and run the shared regression suite for authentication-service before ST-107.",
-      "Sequence deployment of ST-107 and ST-112 (shared api change on mobile-banking)",
-      "Align the ST-107 and ST-112 external API changes on mobile-banking; agree on a versioned compatible contract and run consumer contract tests before either release."
+      "Sequence the releases of ST-107 and ST-112: deploy ST-112 first behind a feature flag where available and run the shared regression suite for authentication-service before ST-107."
     ],
     "complexity": "high",
     "rollback_plan": [
-      "Declare rollback, notify service owners and release communications, and pause the rollout.",
-      "channels-mobile: disable the change's feature flags where configured and drain in-flight requests.",
-      "channels-mobile: restore the previous known-good service versions and configuration.",
-      "channels-mobile: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "channels-access: disable the change's feature flags where configured and drain in-flight requests.",
-      "channels-access: restore the previous known-good service versions and configuration.",
-      "channels-access: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "identity: disable the change's feature flags where configured and drain in-flight requests.",
-      "identity: restore the previous known-good service versions and configuration.",
-      "identity: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "documents: disable the change's feature flags where configured and drain in-flight requests.",
-      "documents: restore the previous known-good service versions and configuration.",
-      "documents: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "data-platform: disable the change's feature flags where configured and drain in-flight requests.",
-      "data-platform: restore the previous known-good service versions and configuration.",
-      "data-platform: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "customer-platform: disable the change's feature flags where configured and drain in-flight requests.",
-      "customer-platform: restore the previous known-good service versions and configuration.",
-      "customer-platform: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "core-payments: disable the change's feature flags where configured and drain in-flight requests.",
-      "core-payments: restore the previous known-good service versions and configuration.",
-      "core-payments: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "core-banking: disable the change's feature flags where configured and drain in-flight requests.",
-      "core-banking: restore the previous known-good service versions and configuration.",
-      "core-banking: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "Confirm service recovery with owners, notify stakeholders, and retain incident and rollback evidence."
+      "On a rollback trigger, the release owner declares rollback and notifies the stakeholder set (Digital Banking - Authentication and Identity domain owner, mobile-banking owner, authentication-service owner, ST-107 owner, incident management/on-call, platform owners and customer support), recording the timestamp and reason.",
+      "Stop all further deployment activity immediately; do not start the next deployment group, and mark the release record as halted.",
+      "Disable the feature flags configured for this capability in the release configuration, in the reverse of the order in which they were enabled for the release; do not assume or invent flag names that are not recorded.",
+      "Roll back channels-mobile first: revert mobile-banking to the previous build so the biometric prompt and signed-challenge submission stop, and confirm credential login still works for all supported and unsupported devices.",
+      "Roll back channels-access next: revert atm, branch-portal and web-banking to their last known-good versions.",
+      "Roll back identity jointly with ST-107 under the shared challenge contract and rollback policy: revert authentication-service challenge validation and api-gateway together to the last known-good versions compatible with the pre-change shared challenge contract, so the two stories never leave a mixed authentication policy in place.",
+      "Roll back documents: revert document-service to its last known-good version.",
+      "Roll back data-platform: revert reporting-service and audit-db (configuration and artifacts only; no schema change is in scope).",
+      "Roll back customer-platform: revert notification-service, customer-service, crm and customer-db (configuration and artifacts only; no schema change is in scope).",
+      "Roll back core-payments: revert risk-engine, fraud-engine and payment-service.",
+      "Roll back core-banking last: revert transaction-db, loan-service, card-service and account-service.",
+      "Database rollback: changes_db_schema is false, so no schema migration rollback is required; verify and record that no schema migration ran during the rollout.",
+      "Data reconciliation: if any device registrations were written during the partial rollout, locate the registration store through the authentication-service owner (its storage location and schema are not stated in the source) and revoke registrations created in the window or restore them to the recorded pre-deployment state; confirm no challenge or token artifacts remain that could permit replay.",
+      "Post-rollback verification: confirm credential login works across all channels, unsupported devices fall back to credential login, failed/expired/replayed challenges yield no authenticated session, device revocation from session settings still works, and scoped token issuance follows the pre-change path.",
+      "Monitoring during and after rollback: watch authentication success/failure rates, challenge validation errors, token issuance, mobile-banking crash/error rates, api-gateway errors and audit-db entries until metrics return to baseline.",
+      "Communications: confirm rollback completion and current system state to the stakeholder set, update the incident and release records, and schedule a review with the ST-107 owner before any retry is proposed."
     ],
     "deployment_notes": [
-      "Hold production deployment until all blocking rules are resolved and the release assessment is rerun.",
-      "Notify service owners, operations and support of the release window and rollback contacts.",
-      "Deploy core-banking in sequence (step 1); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy core-payments in sequence (step 2); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy customer-platform in sequence (step 3); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy data-platform in sequence (step 4); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy documents in sequence (step 5); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy identity in sequence (step 6); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy channels-access in sequence (step 7); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy channels-mobile in sequence (step 8); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Coordinate groups in dependency cycles in one compatible release window; monitor error rates, latency, availability and data integrity after each step.",
-      "Monitor authentication failures and card transaction failures; alert security and operations on regressions.",
-      "Publish rollout status to stakeholders and hand monitoring and rollback ownership to operations."
+      "Hold production deployment: the decision is NO_GO, so no deployment group is to be released to production by these steps; treat this plan as preparation for a later release that is explicitly approved by the release owner after the gate is re-evaluated.",
+      "Record the release owner, the change/advisory approval, and the reason for the hold in the release record; confirm that all conditions attached to the decision are closed before any step below is executed against production.",
+      "Before anything else, confirm with the ST-107 owner that the joint identity deployment, the shared challenge contract and the shared rollback policy for authentication-service challenge validation are agreed and signed off; identity must not deploy independently of ST-107.",
+      "Pre-deployment verification: confirm the existing credential login fallback path is intact, the existing scoped access token flow is unchanged, no external API contract change is introduced, and changes_db_schema is false (no schema migration is in scope for this change).",
+      "Confirm the database groups listed for this change (core-banking, customer-platform, data-platform) require no migration for this story; verify and record that no schema change and therefore no migration step is included.",
+      "Notify stakeholders before the window: Digital Banking - Authentication and Identity domain owner, mobile-banking owner, authentication-service owner, ST-107 owner, incident management/on-call, database and platform owners for the affected groups, and customer support; state the hold status and the go/no-go checkpoint.",
+      "Deploy core-banking group in order: account-service, card-service, loan-service, transaction-db.",
+      "Deploy core-payments group in order: fraud-engine, payment-service, risk-engine.",
+      "Deploy customer-platform group in order: crm, customer-db, customer-service, notification-service.",
+      "Deploy data-platform group in order: audit-db, reporting-service.",
+      "Deploy documents group: document-service.",
+      "Deploy identity group (api-gateway, authentication-service) only jointly with ST-107 and only under the shared challenge contract and rollback policy; apply the authentication-service challenge validation change ahead of the existing scoped token issuance.",
+      "Deploy channels-access group: atm, branch-portal, web-banking.",
+      "Deploy channels-mobile group last: mobile-banking client work to invoke the platform biometric prompt and transmit the signed challenge result; keep credential login fallback available for unsupported devices and failed prompts.",
+      "Feature flags: for any feature flags configured for this capability in the release configuration, follow the enablement sequence recorded for the release; do not assume or invent flag names that are not recorded, and do not change authentication decisions, scores or confidence values through flags.",
+      "Post-deployment verification: confirm an opted-in device completes a fresh signed, device-bound challenge before scoped token issuance, that failed/expired/replayed challenges yield no authenticated session, that unsupported devices keep credential login, and that a customer can revoke a device registration from session settings.",
+      "Monitoring: watch authentication success/failure rates, challenge validation errors, scoped token issuance, mobile-banking crash/error rates, api-gateway errors and audit-db entries across the window; hold an extended watch until metrics return to the pre-deployment baseline.",
+      "Communications: report deployment progress at each group boundary, report completion or halt to the stakeholder set, and record the outcome and any follow-up actions in the release record."
     ]
   },
   "providers_used": {
-    "requirement": "keyword-fallback",
+    "requirement": "tokenharbor:deepseek-v4.1-flash:free",
     "dependency": "deterministic",
     "scoring": "deterministic",
-    "testing": "template-fallback",
-    "compliance": "template-fallback",
-    "release": "template-fallback"
+    "testing": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "compliance": "tokenharbor:deepseek-v4.1-flash:free",
+    "release": "tokenharbor:deepseek-v4.1-flash:free"
   },
-  "duration_ms": 479,
-  "created_at": "2026-10-06T18:00:53.044020Z"
+  "duration_ms": 153526,
+  "created_at": "2026-10-06T20:14:51.148632Z"
 }

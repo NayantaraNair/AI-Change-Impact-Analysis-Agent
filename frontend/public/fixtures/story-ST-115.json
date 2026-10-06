@@ -12,18 +12,19 @@
     ]
   },
   "requirement": {
-    "business_summary": "Requested banking change: Update the footer text on monthly statement PDFs.",
-    "technical_summary": "Apply the enhancement to document-service, reporting-service according to the supplied criteria.",
-    "business_domain": "Statements and documents",
+    "business_summary": "Update the English monthly statement PDF footer text to read 'Thank you for banking with us.' The approved sentence is applied to the existing English statement template while retaining the current font, alignment, page margins, page numbering and all other template content, including on multi-page statements. Template selection and the render payload supplied by the reporting service remain unchanged, and the change is released as a versioned template after preview approval, with rollback by selecting the previous template version.",
+    "technical_summary": "Presentation-only update to the versioned English monthly statement PDF template rendered by document-service: the footer layout asset text is replaced with the approved sentence, with font, alignment, margins and page-numbering settings left as-is. No changes to the rendering workflow, template selection interface or render payload contract used between reporting-service and document-service. Delivery is a new published template version after an approved PDF preview; rollback is performed by selecting the previous template version for subsequent statement rendering.",
+    "business_domain": "Retail Banking — Statements and Document Rendering",
     "affected_capabilities": [
-      "Document Service",
-      "Reporting Service"
+      "Monthly statement PDF rendering",
+      "Statement template footer text",
+      "Versioned statement template publishing and rollback",
+      "Statement PDF preview approval"
     ],
     "affected_services": [
-      "document-service",
-      "reporting-service"
+      "document-service"
     ],
-    "change_type": "enhancement",
+    "change_type": "config_change",
     "touches_customer_data": false,
     "touches_card_data": false,
     "touches_financial_data": false,
@@ -31,8 +32,8 @@
     "changes_external_api_contract": false,
     "changes_db_schema": false,
     "ambiguity": "low",
-    "engineering_scope": "Implement Update the footer text on monthly statement PDFs across document-service, reporting-service; verify 4 acceptance criteria.",
-    "source": "keyword-fallback"
+    "engineering_scope": "Update the footer text in the English monthly statement PDF template within document-service using a versioned layout asset, preserving font, alignment, margins, page numbering and all other template content. Verify via an approved PDF preview that the footer fits the existing layout on every page, including multi-page statements, and that the render payload and template selection interfaces used with reporting-service are untouched. Publish the versioned template after approval; rollback consists of selecting the previous template version.",
+    "source": "tokenharbor:deepseek-v4.1-flash:free"
   },
   "graph": {
     "nodes": [
@@ -42,8 +43,8 @@
         "type": "core",
         "hop": null,
         "severity": null,
-        "x": 253.4,
-        "y": 779.9,
+        "x": 157.6,
+        "y": 485.0,
         "criticality": 9,
         "owner_team": "Core Banking",
         "data_classes": [
@@ -57,8 +58,8 @@
         "type": "platform",
         "hop": 1,
         "severity": "high",
-        "x": -310.0,
-        "y": 0.0,
+        "x": -120.2,
+        "y": -120.2,
         "criticality": 10,
         "owner_team": "Identity & Access",
         "data_classes": [
@@ -72,7 +73,7 @@
         "type": "channel",
         "hop": 2,
         "severity": "low",
-        "x": 480.0,
+        "x": 340.0,
         "y": 0.0,
         "criticality": 7,
         "owner_team": "Assisted Channels",
@@ -87,8 +88,8 @@
         "type": "database",
         "hop": 1,
         "severity": "medium",
-        "x": 310.0,
-        "y": 0.0,
+        "x": -120.2,
+        "y": 120.2,
         "criticality": 8,
         "owner_team": "Data & Analytics",
         "data_classes": [
@@ -101,8 +102,8 @@
         "type": "platform",
         "hop": 1,
         "severity": "high",
-        "x": -0.0,
-        "y": -310.0,
+        "x": 120.2,
+        "y": -120.2,
         "criticality": 10,
         "owner_team": "Identity & Access",
         "data_classes": [
@@ -115,8 +116,8 @@
         "type": "channel",
         "hop": 2,
         "severity": "low",
-        "x": 148.3,
-        "y": 456.5,
+        "x": 170.0,
+        "y": 294.4,
         "criticality": 6,
         "owner_team": "Assisted Channels",
         "data_classes": [
@@ -130,8 +131,8 @@
         "type": "core",
         "hop": null,
         "severity": null,
-        "x": -253.4,
-        "y": 779.9,
+        "x": -157.6,
+        "y": 485.0,
         "criticality": 9,
         "owner_team": "Cards Platform",
         "data_classes": [
@@ -145,8 +146,8 @@
         "type": "core",
         "hop": null,
         "severity": null,
-        "x": -663.4,
-        "y": 482.0,
+        "x": -412.6,
+        "y": 299.8,
         "criticality": 6,
         "owner_team": "Customer Platform",
         "data_classes": [
@@ -159,8 +160,8 @@
         "type": "database",
         "hop": 2,
         "severity": "medium",
-        "x": 148.3,
-        "y": -456.5,
+        "x": -170.0,
+        "y": -294.4,
         "criticality": 9,
         "owner_team": "Customer Platform",
         "data_classes": [
@@ -173,7 +174,7 @@
         "type": "core",
         "hop": null,
         "severity": null,
-        "x": -820.0,
+        "x": -510.0,
         "y": 0.0,
         "criticality": 8,
         "owner_team": "Customer Platform",
@@ -187,7 +188,7 @@
         "type": "platform",
         "hop": 0,
         "severity": "medium",
-        "x": -70.0,
+        "x": 0.0,
         "y": 0.0,
         "criticality": 4,
         "owner_team": "Document Operations",
@@ -199,7 +200,7 @@
         "type": "analytics",
         "hop": null,
         "severity": null,
-        "x": 820.0,
+        "x": 510.0,
         "y": 0.0,
         "criticality": 9,
         "owner_team": "Payments Platform",
@@ -214,8 +215,8 @@
         "type": "core",
         "hop": null,
         "severity": null,
-        "x": -663.4,
-        "y": -482.0,
+        "x": -412.6,
+        "y": -299.8,
         "criticality": 8,
         "owner_team": "Core Banking",
         "data_classes": [
@@ -229,8 +230,8 @@
         "type": "channel",
         "hop": 2,
         "severity": "medium",
-        "x": -388.3,
-        "y": 282.1,
+        "x": -170.0,
+        "y": 294.4,
         "criticality": 8,
         "owner_team": "Digital Channels",
         "data_classes": [
@@ -244,8 +245,8 @@
         "type": "platform",
         "hop": null,
         "severity": null,
-        "x": 663.4,
-        "y": -482.0,
+        "x": 412.6,
+        "y": -299.8,
         "criticality": 6,
         "owner_team": "Customer Platform",
         "data_classes": [
@@ -258,8 +259,8 @@
         "type": "core",
         "hop": null,
         "severity": null,
-        "x": -253.4,
-        "y": -779.9,
+        "x": -157.6,
+        "y": -485.0,
         "criticality": 10,
         "owner_team": "Payments Platform",
         "data_classes": [
@@ -270,10 +271,10 @@
         "id": "reporting-db",
         "label": "Reporting Database",
         "type": "database",
-        "hop": 1,
-        "severity": "medium",
-        "x": 0.0,
-        "y": 310.0,
+        "hop": 2,
+        "severity": "low",
+        "x": 170.0,
+        "y": -294.4,
         "criticality": 6,
         "owner_team": "Data & Analytics",
         "data_classes": [
@@ -284,10 +285,10 @@
         "id": "reporting-service",
         "label": "Reporting Service",
         "type": "analytics",
-        "hop": 0,
+        "hop": 1,
         "severity": "medium",
-        "x": 70.0,
-        "y": 0.0,
+        "x": 120.2,
+        "y": 120.2,
         "criticality": 5,
         "owner_team": "Data & Analytics",
         "data_classes": []
@@ -298,8 +299,8 @@
         "type": "analytics",
         "hop": null,
         "severity": null,
-        "x": 663.4,
-        "y": 482.0,
+        "x": 412.6,
+        "y": 299.8,
         "criticality": 8,
         "owner_team": "Data & Analytics",
         "data_classes": [
@@ -312,8 +313,8 @@
         "type": "database",
         "hop": null,
         "severity": null,
-        "x": 253.4,
-        "y": -779.9,
+        "x": 157.6,
+        "y": -485.0,
         "criticality": 10,
         "owner_team": "Core Banking",
         "data_classes": [
@@ -326,8 +327,8 @@
         "type": "channel",
         "hop": 2,
         "severity": "medium",
-        "x": -388.3,
-        "y": -282.1,
+        "x": -340.0,
+        "y": 0.0,
         "criticality": 8,
         "owner_team": "Digital Channels",
         "data_classes": [
@@ -607,7 +608,7 @@
         "id": "document-service->reporting-service",
         "source": "document-service",
         "target": "reporting-service",
-        "on_impact_path": false,
+        "on_impact_path": true,
         "conflict": false
       },
       {
@@ -768,14 +769,14 @@
         "id": "reporting-service->audit-db",
         "source": "reporting-service",
         "target": "audit-db",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
         "id": "reporting-service->authentication-service",
         "source": "reporting-service",
         "target": "authentication-service",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -857,7 +858,6 @@
       "GET /accounts/{id}/limits",
       "GET /documents/templates/{id}",
       "GET /internal/audit/events",
-      "GET /internal/reporting-store/statements/{id}",
       "GET /reports/monthly-statements/{id}",
       "GET /reports/statement-template",
       "PATCH /cards/{id}/status",
@@ -868,7 +868,6 @@
       "POST /auth/token",
       "POST /documents/statements/render",
       "POST /internal/audit/events",
-      "POST /internal/reporting-store/projections",
       "POST /loans/applications",
       "POST /payments",
       "POST /reports/monthly-statements/jobs",
@@ -883,6 +882,7 @@
       "customer-db",
       "mobile-banking",
       "reporting-db",
+      "reporting-service",
       "web-banking"
     ],
     "deployment_groups": [
@@ -932,7 +932,7 @@
             ]
           }
         ],
-        "explanation": "Security risk is low (28) because critical identity path (+10) on api-gateway, authentication-service and blast radius size (+10) on api-gateway, atm, audit-db, authentication-service, branch-portal, customer-db, document-service, mobile-banking, reporting-db, reporting-service, web-banking."
+        "explanation": "Security risk is low (28) because critical identity path (+10) on api-gateway, authentication-service; blast radius size (+10) on api-gateway, atm, audit-db and 8 more."
       },
       {
         "name": "compliance",
@@ -956,8 +956,7 @@
             "label": "nearby financial data",
             "points": 8,
             "node_ids": [
-              "api-gateway",
-              "reporting-db"
+              "api-gateway"
             ]
           },
           {
@@ -968,11 +967,11 @@
             ]
           }
         ],
-        "explanation": "Compliance risk is low (27) because nearby pii data (+8) on api-gateway, authentication-service and nearby financial data (+8) on api-gateway, reporting-db and nearby audit data (+6) on audit-db."
+        "explanation": "Compliance risk is low (27) because nearby pii data (+8) on api-gateway, authentication-service; nearby financial data (+8) on api-gateway; nearby audit data (+6) on audit-db."
       },
       {
         "name": "technical",
-        "score": 27,
+        "score": 21,
         "level": "low",
         "factors": [
           {
@@ -982,10 +981,9 @@
           },
           {
             "label": "direct services",
-            "points": 12,
+            "points": 6,
             "node_ids": [
-              "document-service",
-              "reporting-service"
+              "document-service"
             ]
           },
           {
@@ -996,15 +994,16 @@
               "branch-portal",
               "customer-db",
               "mobile-banking",
+              "reporting-db",
               "web-banking"
             ]
           }
         ],
-        "explanation": "Technical risk is low (27) because direct services (+12) on document-service, reporting-service and dependency depth (+10) on atm, branch-portal, customer-db, mobile-banking, web-banking."
+        "explanation": "Technical risk is low (21) because dependency depth (+10) on atm, branch-portal, customer-db and 3 more; direct services (+6) on document-service."
       },
       {
         "name": "operational",
-        "score": 49,
+        "score": 47,
         "level": "medium",
         "factors": [
           {
@@ -1014,14 +1013,14 @@
           },
           {
             "label": "service criticality",
-            "points": 20,
+            "points": 16,
             "node_ids": [
-              "reporting-service"
+              "document-service"
             ]
           },
           {
             "label": "downstream systems",
-            "points": 18,
+            "points": 20,
             "node_ids": [
               "api-gateway",
               "atm",
@@ -1031,6 +1030,7 @@
               "customer-db",
               "mobile-banking",
               "reporting-db",
+              "reporting-service",
               "web-banking"
             ]
           },
@@ -1052,7 +1052,7 @@
             ]
           }
         ],
-        "explanation": "Operational risk is medium (49) because service criticality (+20) on reporting-service and downstream systems (+18) on api-gateway, atm, audit-db, authentication-service, branch-portal, customer-db, mobile-banking, reporting-db, web-banking and deployment groups (+6) on api-gateway, atm, audit-db, authentication-service, branch-portal, customer-db, document-service, mobile-banking, reporting-db, reporting-service, web-banking."
+        "explanation": "Operational risk is medium (47) because downstream systems (+20) on api-gateway, atm, audit-db and 7 more; service criticality (+16) on document-service; deployment groups (+6) on api-gateway, atm, audit-db and 8 more."
       },
       {
         "name": "performance",
@@ -1078,7 +1078,7 @@
       },
       {
         "name": "delivery",
-        "score": 45,
+        "score": 40,
         "level": "medium",
         "factors": [
           {
@@ -1090,16 +1090,14 @@
             "label": "low ambiguity",
             "points": 10,
             "node_ids": [
-              "document-service",
-              "reporting-service"
+              "document-service"
             ]
           },
           {
             "label": "direct services",
-            "points": 10,
+            "points": 5,
             "node_ids": [
-              "document-service",
-              "reporting-service"
+              "document-service"
             ]
           },
           {
@@ -1120,10 +1118,10 @@
             ]
           }
         ],
-        "explanation": "Delivery risk is medium (45) because owner coordination (+20) on api-gateway, atm, audit-db, authentication-service, branch-portal, customer-db, document-service, mobile-banking, reporting-db, reporting-service, web-banking and low ambiguity (+10) on document-service, reporting-service and direct services (+10) on document-service, reporting-service."
+        "explanation": "Delivery risk is medium (40) because owner coordination (+20) on api-gateway, atm, audit-db and 8 more; low ambiguity (+10) on document-service; direct services (+5) on document-service."
       }
     ],
-    "overall": 41,
+    "overall": 38,
     "highest": "operational"
   },
   "tests": {
@@ -1393,46 +1391,12 @@
         "expected": "Customer store adapter rejects stale profile versions meets its documented acceptance criteria.",
         "source": "catalog",
         "automation_candidate": true
-      },
-      {
-        "id": "GEN-1",
-        "title": "Verify GET /internal/reporting-store/statements/{id} persists valid changes and rejects invalid writes",
-        "type": "integration",
-        "priority": "P2",
-        "covers": [
-          "reporting-db"
-        ],
-        "steps": [
-          "Prepare valid and invalid fixtures for GET /internal/reporting-store/statements/{id}.",
-          "Exercise GET /internal/reporting-store/statements/{id} with both fixture sets.",
-          "Check responses and persisted state against acceptance criteria."
-        ],
-        "expected": "Valid data is persisted, and rejected writes leave existing data intact.",
-        "source": "generated",
-        "automation_candidate": false
-      },
-      {
-        "id": "GEN-2",
-        "title": "Verify GET /reports/monthly-statements/{id} preserves the required banking behavior",
-        "type": "regression",
-        "priority": "P2",
-        "covers": [
-          "reporting-service"
-        ],
-        "steps": [
-          "Prepare valid and invalid fixtures for GET /reports/monthly-statements/{id}.",
-          "Exercise GET /reports/monthly-statements/{id} with both fixture sets.",
-          "Check responses and persisted state against acceptance criteria."
-        ],
-        "expected": "The changed behavior meets acceptance criteria without breaking existing behavior.",
-        "source": "generated",
-        "automation_candidate": true
       }
     ],
-    "coverage_estimate": 1.0,
-    "effort_hours": 5.183333333333334,
-    "automation_candidates": 15,
-    "summary": "Selected 15 catalog tests and 2 new tests, covering 11 of 11 impacted nodes (100%); estimated effort is 5.2 hours."
+    "coverage_estimate": 0.8181818181818182,
+    "effort_hours": 2.183333333333333,
+    "automation_candidates": 14,
+    "summary": "Selected 15 catalog tests and 0 new tests, covering 9 of 11 impacted nodes (82%); estimated effort is 2.2 hours."
   },
   "compliance": {
     "frameworks": [
@@ -1444,23 +1408,32 @@
         "score": 90,
         "findings": [
           {
-            "text": "GDPR review applies because PII-bearing components are impacted.",
+            "text": "The described change is confined to a versioned English statement template layout asset in document-service, and the template selection interface and render payload contract used with reporting-service are stated to be untouched, so the personal-data exposure introduced by this change appears bounded to the existing statement rendering path rather than a new data flow. Confirm that footer text and template version metadata contain no customer-identifying content.",
             "node_ids": [
-              "api-gateway",
-              "authentication-service"
+              "document-service",
+              "reporting-service"
             ]
           },
           {
-            "text": "Deterministic control exposure: PII impacted through dependencies (-10).",
+            "text": "Statement rendering consumes projections held in reporting-db and supplied via reporting-service, which are derived from financially relevant transactional data and may carry customer references. Required checks should confirm the footer edit does not copy, expose or persist customer-identifying fields into template assets, preview artefacts or version history.",
             "node_ids": [
-              "api-gateway",
-              "authentication-service"
+              "reporting-service",
+              "reporting-db"
+            ]
+          },
+          {
+            "text": "document-service and reporting-service sit upstream of authentication-service and audit-db, so publishing a new template version and approving a PDF preview involve privileged actions and traceable records. Exposure should be assessed against least-privilege access, preview artefact handling and retention expectations for those records.",
+            "node_ids": [
+              "document-service",
+              "authentication-service",
+              "audit-db"
             ]
           }
         ],
         "recommendations": [
-          "Review data minimization, purpose and retention for customer data for api-gateway, authentication-service.",
-          "Verify access controls and privacy regression tests for api-gateway, authentication-service."
+          "Confirm the footer text asset and its version metadata contain no personal data, and that statement preview artefacts used for approval are access-controlled and disposed of in line with retention expectations, focusing on document-service and reporting-service.",
+          "Verify that template publishing, approval and rollback permissions for document-service are restricted to authorised roles, with authentication-service enforcing the appropriate session and step-up checks and resulting events recorded in audit-db.",
+          "Re-check that selecting the new template version introduces no additional personal-data flows through reporting-service or reporting-db beyond those already present in the existing statement rendering path."
         ]
       },
       {
@@ -1480,25 +1453,43 @@
         "score": 85,
         "findings": [
           {
-            "text": "SOX review applies because financial-data components are impacted; audit-data components are impacted.",
+            "text": "The change is presentation-only within a versioned template in document-service, but the rendered output is a customer-facing statement derived from reporting projections. Exposure relates to change-management and version-control evidence for financially relevant output; required checks should confirm the new version is controlled and the prior version remains selectable for rollback.",
             "node_ids": [
-              "api-gateway",
-              "audit-db",
+              "document-service",
+              "reporting-service",
               "reporting-db"
             ]
           },
           {
-            "text": "Deterministic control exposure: financial data impacted through dependencies (-5); audit database impacted (-10).",
+            "text": "Template publishing and rollback are privileged configuration actions in document-service. Required checks should confirm that approval of the final preview is documented, that publish and rollback actions are restricted to authorised operators, and that the render payload and template selection contracts consumed by reporting-service remain unchanged.",
+            "node_ids": [
+              "document-service",
+              "reporting-service",
+              "authentication-service"
+            ]
+          },
+          {
+            "text": "Statement rendering and its supporting events feed the append-only audit store. Exposure concerns completeness and integrity of the record trail; required checks should confirm that template publish and rollback actions, and the scheduling of statement rendering jobs, continue to append immutable events to audit-db without altering existing fields.",
+            "node_ids": [
+              "document-service",
+              "audit-db",
+              "reporting-service"
+            ]
+          },
+          {
+            "text": "api-gateway carries the external entry point for related financial routing and is upstream of audit-db. Required checks should confirm that no routing, policy or request-trace behaviour on api-gateway is altered as a side effect of publishing the new template version for document-service.",
             "node_ids": [
               "api-gateway",
               "audit-db",
-              "reporting-db"
+              "document-service"
             ]
           }
         ],
         "recommendations": [
-          "Reconcile financial results and verify complete, immutable audit records for api-gateway, audit-db, reporting-db.",
-          "Document control-owner approval and test financial and schema changes for api-gateway, audit-db, reporting-db."
+          "Confirm versioned template change control, documented preview approval and rollback evidence for document-service and reporting-service before the new template version is relied upon for statement rendering.",
+          "Verify that template publish, template selection and statement job events continue to append immutable records to audit-db, and that no audit fields, retention settings or integrity checks are changed by this release.",
+          "Reconcile a sample of rendered statements before and after the change to confirm financial figures, page numbering and multi-page continuity are unaffected across document-service and reporting-db.",
+          "Confirm that api-gateway routing, policy and tracing configuration is unchanged and that no financial-data interface contracts with reporting-service are modified by this config change."
         ]
       },
       {
@@ -1515,7 +1506,7 @@
     "summary": "2 of 4 frameworks apply; the minimum compliance score is 85/100. 0 applicable framework(s) have high risk."
   },
   "release": {
-    "confidence": 78,
+    "confidence": 73,
     "decision": "GO",
     "triggered_rules": [
       "GO: no blocking or conditional release rules fired"
@@ -1523,47 +1514,48 @@
     "conditions": [],
     "complexity": "high",
     "rollback_plan": [
-      "Declare rollback, notify service owners and release communications, and pause the rollout.",
-      "channels-mobile: disable the change's feature flags where configured and drain in-flight requests.",
-      "channels-mobile: restore the previous known-good service versions and configuration.",
-      "channels-mobile: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "channels-access: disable the change's feature flags where configured and drain in-flight requests.",
-      "channels-access: restore the previous known-good service versions and configuration.",
-      "channels-access: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "identity: disable the change's feature flags where configured and drain in-flight requests.",
-      "identity: restore the previous known-good service versions and configuration.",
-      "identity: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "documents: disable the change's feature flags where configured and drain in-flight requests.",
-      "documents: restore the previous known-good service versions and configuration.",
-      "documents: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "data-platform: disable the change's feature flags where configured and drain in-flight requests.",
-      "data-platform: restore the previous known-good service versions and configuration.",
-      "data-platform: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "customer-platform: disable the change's feature flags where configured and drain in-flight requests.",
-      "customer-platform: restore the previous known-good service versions and configuration.",
-      "customer-platform: verify health checks, error rates and data integrity before proceeding to the next group.",
-      "Confirm service recovery with owners, notify stakeholders, and retain incident and rollback evidence."
+      "Trigger rollback if monitoring shows footer or layout regression, multi-page rendering failure, statement generation failures, or reporting-service integration issues; obtain release owner and stakeholder approval before executing.",
+      "Stop further rollout and do not proceed to any remaining deployment groups.",
+      "Rollback group channels-mobile first, in reverse deployment order: verify whether mobile-banking has any change artifact for this release; if none, confirm mobile-banking health and close the group.",
+      "Rollback group channels-access next: verify whether atm, branch-portal, or web-banking has any change artifact for this release; if none, confirm their health and close the group.",
+      "Rollback group identity next: verify whether api-gateway or authentication-service has any change artifact for this release; if none, confirm their health and close the group.",
+      "Rollback group documents next: select the previous published English monthly statement PDF template version in document-service for subsequent statement rendering; rollback is by template version selection, not by editing the new version.",
+      "Rollback group documents: render test statements, including multi-page statements, using the previous template version and verify footer text, page numbering, margins, and layout are restored.",
+      "Rollback group data-platform next: verify reporting-service, reporting-db, and audit-db are unaffected; no schema rollback or data migration rollback is required because changes_db_schema is false.",
+      "Rollback group customer-platform last: verify customer-db is unaffected; no schema rollback or data migration rollback is required because changes_db_schema is false.",
+      "Feature flags: if an existing configured feature flag was changed for document-service template rollout, restore it to its pre-change state; do not create, rename, or invent feature flag names.",
+      "Data reconciliation: confirm no database schema change, no data migration, and no customer, card, or financial data were touched; if any unexpected data impact is found, escalate to the data owner before proceeding.",
+      "Monitoring after rollback: watch document-service render success rate, template version selection, error logs, and reporting-service integration until stable.",
+      "Owner and stakeholder communications: notify the release owner and stakeholders that rollback is complete, including the restored template version, monitoring status, and any follow-up actions; record the rollback in the change record.",
+      "Post-rollback review: document root cause, decide whether to revise the template or preview, and do not redeploy until a new approval is recorded."
     ],
     "deployment_notes": [
-      "Notify service owners, operations and support of the release window and rollback contacts.",
-      "Deploy customer-platform in sequence (step 1); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy data-platform in sequence (step 2); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy documents in sequence (step 3); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy identity in sequence (step 4); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy channels-access in sequence (step 5); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Deploy channels-mobile in sequence (step 6); keep feature flags disabled where configured, validate health, then enable gradually.",
-      "Coordinate groups in dependency cycles in one compatible release window; monitor error rates, latency, availability and data integrity after each step.",
-      "Publish rollout status to stakeholders and hand monitoring and rollback ownership to operations."
+      "Confirm the release decision is GO, the change record is approved, the PDF preview is approved, and the document-service template version to publish is recorded.",
+      "Confirm no database schema changes, no DB migrations, and no data reconciliation are required for this change because changes_db_schema is false.",
+      "Notify the release owner and stakeholders that production deployment is starting; record start time, change ticket, monitoring plan, and rollback trigger criteria.",
+      "Review any existing feature flags configured for document-service template rollout and record their pre-change state; do not create, rename, or invent feature flag names.",
+      "Deployment group customer-platform: verify no change artifact for customer-db is included in this release; confirm customer-db health and confirm no schema or data migration.",
+      "Deployment group data-platform: verify reporting-service, reporting-db, and audit-db remain unchanged; confirm the reporting-service to document-service render payload and template selection contracts are untouched.",
+      "Deployment group documents: publish the new versioned English monthly statement PDF template in document-service using the approved footer text while keeping font, alignment, page margins, page numbering, and all other template content unchanged.",
+      "Deployment group documents: render an approved preview or test statement, including a multi-page statement, and verify footer text, pagination, margins, and layout before exposing the new template version.",
+      "Deployment group identity: verify api-gateway and authentication-service have no release changes; confirm their health checks and dependency connectivity to document-service.",
+      "Deployment group channels-access: verify atm, branch-portal, and web-banking have no release changes; run smoke checks for statement access and rendering through existing channels.",
+      "Deployment group channels-mobile: verify mobile-banking has no release changes; run smoke checks for statement access and rendering through mobile channels.",
+      "Monitoring: watch document-service PDF render success and failure rates, template version selection, render latency, error logs, and reporting-service integration metrics; alert on any footer or layout regression or multi-page rendering failure.",
+      "Feature flags: if an existing configured flag gates document-service template rollout, apply the approved flag state and monitor; otherwise leave flag configuration unchanged.",
+      "Owner and stakeholder communications: notify the release owner and stakeholders after each major group and at completion with status, monitoring results, and any incidents.",
+      "Post-deployment verification: confirm statements render the approved footer, the previous template version remains selectable for rollback, and no changes occurred to customer, card, or financial data, auth flow, or external API contracts.",
+      "Closeout: record the published template version, deployment timestamps, approvals, monitoring evidence, and communications in the change record."
     ]
   },
   "providers_used": {
-    "requirement": "keyword-fallback",
+    "requirement": "tokenharbor:deepseek-v4.1-flash:free",
     "dependency": "deterministic",
     "scoring": "deterministic",
-    "testing": "template-fallback",
-    "compliance": "template-fallback",
-    "release": "template-fallback"
+    "testing": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "compliance": "tokenharbor:deepseek-v4.1-flash:free",
+    "release": "tokenharbor:deepseek-v4.1-flash:free"
   },
-  "duration_ms": 386,
-  "created_at": "2026-10-06T18:00:53.056794Z"
+  "duration_ms": 151410,
+  "created_at": "2026-10-06T20:14:49.031889Z"
 }

@@ -1,6 +1,14 @@
 {
-  "answer": "- **ST-115**: release confidence 78/100; decision GO.\n- Triggered rule: GO: no blocking or conditional release rules fired",
-  "cited_nodes": [],
-  "cited_factors": [],
-  "provider": "template"
+  "answer": "The analysis context does **not** state that release confidence is low, and it does not provide a breakdown of how confidence was derived.\n\n- Release confidence is reported as **73** with decision **GO**.\n- Triggered rules: **\"GO: no blocking or conditional release rules fired\"**; conditions list is empty, so nothing lowered it to a conditional or no-go state.\n- The only medium-level risk dimensions are **operational (47)** and **delivery (40)**; all others are low (security 28, compliance 27, technical 21, performance 20); overall risk is 38.\n\nFactors listed under those two medium dimensions (reported as supplied, not as an explanation of confidence):\n- operational: downstream systems (20, all downstream node IDs), service criticality (16, `document-service`), deployment groups (6)\n- delivery: owner coordination (20, broad node set), low ambiguity (10, `document-service`)\n\nIf you're looking for the specific inputs behind the 73 score, they are not present in this context.",
+  "cited_nodes": [
+    "document-service"
+  ],
+  "cited_factors": [
+    "service criticality",
+    "downstream systems",
+    "deployment groups",
+    "low ambiguity",
+    "owner coordination"
+  ],
+  "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

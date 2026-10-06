@@ -1,5 +1,5 @@
 {
-  "answer": "- **ST-110**: overall risk 75/100; release decision GO_WITH_CONDITIONS.\n- compliance: 81/100 (high). Top factors: card data (+30; `card-service`, `fraud-engine`); pii data (+20; `card-service`); financial data (+20; `fraud-engine`, `payment-service`, `risk-engine`).\n- security: 73/100 (high). Top factors: card data (+25; `card-service`, `fraud-engine`); customer data (+20; `account-service`, `api-gateway`, `authentication-service`, `card-service`, `customer-db`, `loan-service`, `notification-service`); critical identity path (+10; `api-gateway`, `authentication-service`).\n- operational: 71/100 (high). Top factors: service criticality (+40; `payment-service`); downstream systems (+20; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `customer-db`, `loan-service`, `mobile-banking`, `notification-service`, `reporting-db`, `transaction-db`, `web-banking`); deployment groups (+6; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-db`, `risk-engine`, `transaction-db`, `web-banking`).\n- delivery: 63/100 (medium). Top factors: owner coordination (+28; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-db`, `risk-engine`, `transaction-db`, `web-banking`); direct services (+20; `card-service`, `fraud-engine`, `payment-service`, `risk-engine`); low ambiguity (+10; `card-service`, `fraud-engine`, `payment-service`, `risk-engine`).\n- performance: 55/100 (medium). Top factors: transaction path (+20; `payment-service`, `transaction-db`); channel path (+15; `api-gateway`, `mobile-banking`, `web-banking`); payment business rule (+15; `payment-service`, `transaction-db`).\n- technical: 39/100 (low). Top factors: direct services (+24; `card-service`, `fraud-engine`, `payment-service`, `risk-engine`); dependency depth (+10; `atm`, `branch-portal`, `mobile-banking`, `reporting-db`, `web-banking`); baseline (+5; none recorded).",
+  "answer": "**High-risk dimensions (as computed):**\n- **Delivery — score 78 (high)**\n  - `medium ambiguity` — 30 pts: fraud-engine, payment-service, risk-engine\n  - `owner coordination` — 28 pts: account-service, api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, customer-db, fraud-engine, loan-service, mobile-banking, notification-service, payment-service, reporting-db, risk-engine, transaction-db, web-banking\n  - `direct services` — 15 pts: fraud-engine, payment-service, risk-engine\n- **Operational — score 71 (high)**\n  - `service criticality` — 40 pts: payment-service\n  - `downstream systems` — 20 pts: account-service, api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, customer-db, loan-service, mobile-banking, notification-service, reporting-db, transaction-db, web-banking\n  - `deployment groups` — 6 pts (all listed components)\n\n**Overall risk:** 73, highest dimension = delivery (78).\n\n**Related supplied context:**\n- Release decision: NO_GO, confidence 30, with rule \"NO_GO: highest risk 78 with test coverage 59% (< 70%)\"; also GO_WITH_CONDITIONS rules citing the 78 score, medium PCI DSS/SOX/Internal Governance risk, and the ST-101/ST-110 sprint deployment collision on payment-service.\n- Other dimensions are medium/low: security 53, compliance 69, performance 55, technical 33.",
   "cited_nodes": [
     "mobile-banking",
     "web-banking",
@@ -20,22 +20,12 @@
     "risk-engine"
   ],
   "cited_factors": [
-    "baseline",
-    "customer data",
-    "card data",
-    "critical identity path",
-    "pii data",
-    "financial data",
     "direct services",
-    "dependency depth",
     "service criticality",
     "downstream systems",
     "deployment groups",
-    "transaction path",
-    "channel path",
-    "payment business rule",
-    "low ambiguity",
+    "medium ambiguity",
     "owner coordination"
   ],
-  "provider": "template"
+  "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

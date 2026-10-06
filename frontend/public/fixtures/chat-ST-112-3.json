@@ -1,44 +1,28 @@
 {
-  "answer": "- **ST-112**: overall risk 74/100; release decision NO_GO.\n- security: 88/100 (high). Top factors: auth flow change (+25; `authentication-service`, `mobile-banking`); customer data (+20; `account-service`, `api-gateway`, `authentication-service`, `branch-portal`, `card-service`, `crm`, `customer-db`, `customer-service`, `loan-service`, `mobile-banking`, `notification-service`, `web-banking`); external API contract (+15; `authentication-service`, `mobile-banking`).\n- operational: 71/100 (high). Top factors: service criticality (+40; `authentication-service`); downstream systems (+20; `account-service`, `api-gateway`, `atm`, `audit-db`, `branch-portal`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `fraud-engine`, `loan-service`, `notification-service`, `payment-service`, `reporting-service`, `risk-engine`, `transaction-db`, `web-banking`); deployment groups (+6; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-service`, `risk-engine`, `transaction-db`, `web-banking`).\n- compliance: 63/100 (medium). Top factors: pii data (+20; `authentication-service`, `mobile-banking`); financial data (+20; `mobile-banking`); nearby card data (+12; `atm`, `card-service`, `fraud-engine`).\n- delivery: 57/100 (medium). Top factors: owner coordination (+32; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-service`, `risk-engine`, `transaction-db`, `web-banking`); low ambiguity (+10; `authentication-service`, `mobile-banking`); direct services (+10; `authentication-service`, `mobile-banking`).\n- performance: 40/100 (medium). Top factors: transaction path (+20; `payment-service`, `transaction-db`); channel path (+15; `api-gateway`, `mobile-banking`, `web-banking`); baseline (+5; none recorded).\n- technical: 32/100 (low). Top factors: dependency depth (+15; `transaction-db`); direct services (+12; `authentication-service`, `mobile-banking`); baseline (+5; none recorded).\n- This context contains only this story. Open the sprint view to compare risky stories.",
+  "answer": "Only one story has risk data in this context: **ST-112 (Biometric login for mobile banking)**. ST-107 is referenced only as a coupled story — no risk scores are supplied for it.\n\n**ST-112 risk profile**\n- Overall risk: **74**\n- Highest dimension: **delivery (77)**\n\nPer dimension:\n- **Delivery — 77 (high)**: owner coordination (32), medium ambiguity (30), direct services (10)\n- **Security — 73 (high)**: auth flow change (25; authentication-service, mobile-banking), customer data (20), critical identity path (10)\n- **Operational — 71 (high)**: service criticality (40; authentication-service), downstream systems (20), deployment groups (6)\n- **Compliance — 63 (medium)**: pii data (20), financial data (20), nearby card data (12)\n- **Technical — 42 (medium)**: dependency depth (15; transaction-db), direct services (12), new feature (10)\n- **Performance — 40 (medium)**: transaction path (20), channel path (15), baseline (5)\n\n**Decision context (as computed by code)**\n- Decision: **NO_GO**; confidence 27; test coverage 65%\n- Triggered rules include: highest risk 77 with test coverage 65% (< 70%); sprint deployment collision between ST-107 and ST-112 on authentication-service; GDPR/PCI DSS/SOX/Internal Governance all medium.\n- Compliance: 4 of 4 frameworks apply, minimum score 65/100, overall 65.\n\nThe context does not contain risk assessments for any other stories.",
   "cited_nodes": [
     "mobile-banking",
-    "web-banking",
-    "atm",
-    "branch-portal",
-    "customer-service",
-    "account-service",
-    "payment-service",
-    "loan-service",
-    "card-service",
-    "crm",
     "authentication-service",
-    "notification-service",
-    "api-gateway",
-    "document-service",
-    "customer-db",
-    "transaction-db",
-    "audit-db",
-    "fraud-engine",
-    "risk-engine",
-    "reporting-service"
+    "transaction-db"
   ],
   "cited_factors": [
     "baseline",
     "customer data",
     "auth flow change",
-    "external API contract",
+    "critical identity path",
     "pii data",
     "nearby card data",
     "financial data",
     "direct services",
     "dependency depth",
+    "new feature",
     "service criticality",
     "downstream systems",
     "deployment groups",
     "transaction path",
     "channel path",
-    "low ambiguity",
+    "medium ambiguity",
     "owner coordination"
   ],
-  "provider": "template"
+  "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

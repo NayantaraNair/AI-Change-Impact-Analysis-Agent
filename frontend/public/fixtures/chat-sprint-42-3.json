@@ -1,6 +1,10 @@
 {
-  "answer": "- **ST-101**: Increase daily payment limits for premium customers; overall risk 75/100; decision GO_WITH_CONDITIONS.\n- **ST-107**: Card freeze/unfreeze in mobile app with step-up authentication; overall risk 84/100; decision NO_GO.\n- **ST-110**: Fraud rule update: velocity check for card-not-present payments; overall risk 75/100; decision GO_WITH_CONDITIONS.\n- **ST-112**: Biometric login for mobile banking; overall risk 74/100; decision NO_GO.",
-  "cited_nodes": [],
+  "answer": "High-risk stories per the sprint analysis (`kpis.high_risk_stories`): **ST-101, ST-107, ST-110, ST-112**.\n\nSupplied risk scores and release decisions (as computed):\n\n- **ST-107** — overall risk 89, highest dimension `security` 100 (high); decision **NO_GO**.\n- **ST-112** — overall risk 74, highest dimension `delivery` 77 (high); decision **NO_GO**.\n- **ST-110** — overall risk 73, highest dimension `delivery` 78 (high); decision **NO_GO**.\n- **ST-101** — overall risk 70, highest dimension `compliance` 81 (high); decision **GO_WITH_CONDITIONS**.\n\nLower-risk stories in the same sprint:\n\n- **ST-104** — overall risk 62, highest dimension `operational` 63 (medium); decision **GO_WITH_CONDITIONS**.\n- **ST-115** — overall risk 38, highest dimension `operational` 47 (medium); decision **GO**.\n\nRelated conflict context (all `deployment_collision`, risk score 100, high): C-ST-101-ST-107 on `transaction-db`, C-ST-101-ST-110 on `payment-service`, C-ST-107-ST-112 on `authentication-service`.",
+  "cited_nodes": [
+    "payment-service",
+    "authentication-service",
+    "transaction-db"
+  ],
   "cited_factors": [],
-  "provider": "template"
+  "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

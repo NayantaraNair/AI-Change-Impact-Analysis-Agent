@@ -1,5 +1,5 @@
 {
-  "answer": "- **ST-112**: overall risk 74/100; release decision NO_GO.\n- security: 88/100 (high). Top factors: auth flow change (+25; `authentication-service`, `mobile-banking`); customer data (+20; `account-service`, `api-gateway`, `authentication-service`, `branch-portal`, `card-service`, `crm`, `customer-db`, `customer-service`, `loan-service`, `mobile-banking`, `notification-service`, `web-banking`); external API contract (+15; `authentication-service`, `mobile-banking`).\n- operational: 71/100 (high). Top factors: service criticality (+40; `authentication-service`); downstream systems (+20; `account-service`, `api-gateway`, `atm`, `audit-db`, `branch-portal`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `fraud-engine`, `loan-service`, `notification-service`, `payment-service`, `reporting-service`, `risk-engine`, `transaction-db`, `web-banking`); deployment groups (+6; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-service`, `risk-engine`, `transaction-db`, `web-banking`).\n- compliance: 63/100 (medium). Top factors: pii data (+20; `authentication-service`, `mobile-banking`); financial data (+20; `mobile-banking`); nearby card data (+12; `atm`, `card-service`, `fraud-engine`).\n- delivery: 57/100 (medium). Top factors: owner coordination (+32; `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `fraud-engine`, `loan-service`, `mobile-banking`, `notification-service`, `payment-service`, `reporting-service`, `risk-engine`, `transaction-db`, `web-banking`); low ambiguity (+10; `authentication-service`, `mobile-banking`); direct services (+10; `authentication-service`, `mobile-banking`).\n- performance: 40/100 (medium). Top factors: transaction path (+20; `payment-service`, `transaction-db`); channel path (+15; `api-gateway`, `mobile-banking`, `web-banking`); baseline (+5; none recorded).\n- technical: 32/100 (low). Top factors: dependency depth (+15; `transaction-db`); direct services (+12; `authentication-service`, `mobile-banking`); baseline (+5; none recorded).",
+  "answer": "**Overall risk is 74. Three dimensions are rated high:**\n\n- **Delivery — 77 (highest; this is the score driving the NO_GO):**\n  - *owner coordination* +32 — broad node set across all 20 components (account-service, api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, crm, customer-db, customer-service, document-service, fraud-engine, loan-service, mobile-banking, notification-service, payment-service, reporting-service, risk-engine, transaction-db, web-banking)\n  - *medium ambiguity* +30 — authentication-service, mobile-banking\n  - *direct services* +10 — authentication-service, mobile-banking\n- **Security — 73:**\n  - *auth flow change* +25 — authentication-service, mobile-banking\n  - *customer data* +20 — spans 12 components (account-service, api-gateway, authentication-service, branch-portal, card-service, crm, customer-db, customer-service, loan-service, mobile-banking, notification-service, web-banking)\n  - *critical identity path* +10 — api-gateway, authentication-service\n- **Operational — 71:**\n  - *service criticality* +40 — authentication-service\n  - *downstream systems* +20 — 18 downstream components\n  - *deployment groups* +6 — all listed groups\n\n**Remaining dimensions are medium:** compliance 63, technical 42, performance 40.\n\n**Contributing decision context:**\n- Triggered rules: \"NO_GO: highest risk 77 with test coverage 65% (< 70%)\", \"GO_WITH_CONDITIONS: highest risk is 77 (>= 60)\", medium GDPR/PCI DSS/SOX/Internal Governance risk, and the sprint deployment collision between ST-107 and ST-112 on authentication-service.\n- Compliance scores are also medium-high: SOX 75, Internal Governance 70, GDPR 65, PCI DSS 65.\n- The coupling to ST-107 (joint identity deployment, shared challenge contract and rollback policy) and unresolved scope items (device-registration storage/schema, gateway or contract versioning in api-gateway / customer-db) underpin the delivery and governance risk.\n\nScores and decisions are as computed by the release assessment; not recalculated here.",
   "cited_nodes": [
     "mobile-banking",
     "web-banking",
@@ -23,22 +23,15 @@
     "reporting-service"
   ],
   "cited_factors": [
-    "baseline",
     "customer data",
     "auth flow change",
-    "external API contract",
-    "pii data",
-    "nearby card data",
-    "financial data",
+    "critical identity path",
     "direct services",
-    "dependency depth",
     "service criticality",
     "downstream systems",
     "deployment groups",
-    "transaction path",
-    "channel path",
-    "low ambiguity",
+    "medium ambiguity",
     "owner coordination"
   ],
-  "provider": "template"
+  "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }
