@@ -8,3 +8,4 @@ data/cache/
 __pycache__/
 .pytest_cache/
 *.pyc
+.pytest_tmp/
