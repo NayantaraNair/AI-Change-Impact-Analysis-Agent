@@ -1,43 +1,17 @@
 {
-  "answer": "**Per the supplied analysis (ST-104):**\n\n- **Overall risk: 62** (as computed). Highest dimension: **operational, 63** — this is what triggers `GO_WITH_CONDITIONS: highest risk is 63 (>= 60)`.\n- **Compliance: GDPR is flagged high risk** (score 55), one of the release triggers. Overall compliance 55/100; 1 applicable framework has high risk.\n\n**Operational (63) — top factors:**\n- `service criticality` 32 → `customer-service`\n- `downstream systems` 20 → `account-service`, `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `document-service`, `fraud-engine`, `loan-service`, `mobile-banking`, `payment-service`, `reporting-service`, `risk-engine`, `web-banking`\n- `deployment groups` 6 → all 19 nodes / 8 groups\n\n**Delivery (62):** `owner coordination` 32 (all 19 nodes), `direct services` 15 (`crm`, `customer-service`, `notification-service`), `low ambiguity` 10.\n\n**Compliance (61):** `pii data` 20 (`crm`, `customer-db`, `customer-service`, `notification-service`), `nearby card data` 12 (`card-service`), `database schema change` 10 (`audit-db`, `customer-db`).\n\n**Technical (53):** `database schema change` 20, `direct services` 18, `dependency depth` 10.\n\n**Security (48):** `customer data` 20, `critical identity path` 10 (`api-gateway`, `authentication-service`), `blast radius size` 10.\n\n**Performance (40):** `transaction path` 20 (`payment-service`), `channel path` 15 (`api-gateway`, `mobile-banking`, `web-banking`), baseline 5.\n\n**GDPR \"high\" is driven by findings on:**\n- New PII fields `preferred_name` / `secondary_email` in `customer-service`, `customer-db`\n- Verification/consent purpose and evidence handling in `notification-service`, `crm`\n- CRM contact projection widening access/correction/erasure scope (`crm`, `customer-db`)\n- Profile read paths through `api-gateway`, `authentication-service`, `customer-service`\n\nOther triggers present (medium, not the \"high\"): PCI DSS (score 75) and SOX (score 75).\n\nNote: as supplied, the per-dimension `level` labels for these dimensions read `medium` while their scores (63/62/61) exceed the 60 threshold used in the release rule — I'm reporting both as given, not recalculating.",
+  "answer": "Short answer: overall risk is **57 (medium)** — not high. The \"high\" label applies to one compliance framework only.\n\n**Overall risk (risk.overall = 57, level medium)**\n- Highest dimension: **compliance = 61 (medium)** — not high.\n- Other dimensions: technical 58 (medium), operational 53 (medium), delivery 46 (medium), security 38 (low), performance 25 (low).\n\n**Why compliance leads (score 61, medium)** — top factors:\n- `pii data` (20 pts) — nodes: crm, customer-db, customer-service, notification-service\n- `nearby card data` (12 pts) — node: card-service\n- `database schema change` (10 pts) — nodes: audit-db, customer-db\n\n**The only \"high\" rating: GDPR framework (risk_level high, score 55)**\n- New optional PII fields (preferred name, secondary email) in customer-service / customer-db with a contact projection to crm — exposure around data minimisation, purpose limitation, accuracy and retention (nodes: customer-service, customer-db, crm).\n- Secondary email as a notification destination — consent validity, completed-verification gate and stop-on-withdrawal handling (nodes: notification-service, crm, customer-service).\n- Access/correction/erasure coverage plus consent evidence completeness in audit-db (nodes: customer-db, customer-service, audit-db).\n\n**Why the release decision reflects it**\n- Decision: **GO_WITH_CONDITIONS** (confidence 58), triggered by \"GDPR risk is high\" plus highest risk 61 (>= 60), PCI DSS medium, SOX medium.\n\nOther frameworks are medium/low: PCI DSS 75, SOX 75, Internal Governance 85 (framework risk levels: medium, medium, low).",
   "cited_nodes": [
-    "mobile-banking",
-    "web-banking",
-    "atm",
-    "branch-portal",
     "customer-service",
-    "account-service",
-    "payment-service",
-    "loan-service",
     "card-service",
     "crm",
-    "authentication-service",
     "notification-service",
-    "api-gateway",
-    "document-service",
     "customer-db",
-    "audit-db",
-    "fraud-engine",
-    "risk-engine",
-    "reporting-service"
+    "audit-db"
   ],
   "cited_factors": [
-    "baseline",
-    "customer data",
-    "critical identity path",
-    "blast radius size",
     "pii data",
     "nearby card data",
-    "database schema change",
-    "direct services",
-    "dependency depth",
-    "service criticality",
-    "downstream systems",
-    "deployment groups",
-    "transaction path",
-    "channel path",
-    "low ambiguity",
-    "owner coordination"
+    "database schema change"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

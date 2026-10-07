@@ -1,23 +1,31 @@
 {
-  "answer": "The context only covers one story — **ST-107** (Card freeze/unfreeze in mobile app with step-up authentication), and it is rated risky:\n\n**Release decision (as computed):** NO_GO — overall risk **89**, confidence 15, complexity high.\n\n**Risk dimensions:**\n- security — **100 (high)**; top factors: card data (25, atm/card-service/fraud-engine), auth flow change (25, api-gateway/authentication-service/card-service/mobile-banking), customer data (20)\n- delivery — **87 (high)**; top factors: owner coordination (32, all 21 impacted services), medium ambiguity (30, api-gateway/authentication-service/card-service/mobile-banking), direct services (20)\n- compliance — **81 (high)**; card data (30, card-service), pii data (20), financial data (20, api-gateway/mobile-banking)\n- operational — **71 (high)**; service criticality (40, api-gateway/authentication-service), downstream systems (20)\n- technical — 49 (medium); performance — 40 (medium)\n\n**Compliance frameworks:** 3 of 4 applicable frameworks are high risk — GDPR high (55), PCI DSS high (40), Internal Governance high (45), SOX medium (75). Overall compliance score 40.\n\n**Highlighted rule triggers:** security risk 100 ≥ 85; delivery risk 87 ≥ 85; GDPR, PCI DSS and Internal Governance high while touching card data and authentication.\n\n**Other stories named in the context (collisions only, no risk scores given):**\n- ST-101 — sprint deployment collision with ST-107 on transaction-db\n- ST-112 — sprint deployment collision with ST-107 on authentication-service\n\nNo risk assessments for ST-101 or ST-112 are present in the context.",
+  "answer": "Only one story is present in the analysis context: **ST-107** — \"Card freeze/unfreeze in mobile app with step-up authentication.\"\n\n**Risk verdict (as computed)**\n- Overall risk: **85**; highest dimension: **security**\n- Release decision: **NO_GO**, confidence 39\n\n**Risk dimensions (scores as supplied)**\n- security — 93 (high): top factors \"card data\" 25 pts (`atm`, `card-service`, `fraud-engine`), \"auth flow change\" 25 pts (`api-gateway`, `authentication-service`, `card-service`, `mobile-banking`), \"external API contract\" 15 pts (same four)\n- delivery — 87 (high): \"owner coordination\" 32 pts (20 components incl. `api-gateway`, `card-service`, `authentication-service`, `mobile-banking`), \"medium ambiguity\" 30 pts, \"direct services\" 20 pts\n- compliance — 75 (high): \"card data\" 30 pts (`card-service`), \"pii data\" 20 pts, \"financial data\" 20 pts\n- operational — 71 (high): \"service criticality\" 40 pts (`api-gateway`, `authentication-service`), \"downstream systems\" 20 pts, \"deployment groups\" 6 pts\n- technical — 49 (medium): \"direct services\" 24 pts, \"dependency depth\" 10 pts (`reporting-db`), \"new feature\" 10 pts\n- performance — 40 (medium): \"transaction path\" 20 pts (`payment-service`, `transaction-db`), \"channel path\" 15 pts (`api-gateway`, `mobile-banking`, `web-banking`)\n\n**Compliance view**\n- 4 of 4 frameworks apply; minimum compliance score 40/100\n- High: PCI DSS (40) and Internal Governance (45); GDPR medium (70); SOX low (85)\n\n**Key NO_GO triggers (as supplied)**\n- security risk 93 (>= 85)\n- delivery risk 87 (>= 85)\n- PCI DSS risk high and change touches card data and authentication\n- Internal Governance risk high and change touches card data and authentication\n\nNo other stories are included in this context, so I can't compare or list additional risky stories.",
   "cited_nodes": [
     "mobile-banking",
+    "web-banking",
     "atm",
+    "payment-service",
     "card-service",
     "authentication-service",
     "api-gateway",
     "transaction-db",
+    "reporting-db",
     "fraud-engine"
   ],
   "cited_factors": [
-    "customer data",
     "card data",
     "auth flow change",
+    "external API contract",
     "pii data",
     "financial data",
     "direct services",
+    "dependency depth",
+    "new feature",
     "service criticality",
     "downstream systems",
+    "deployment groups",
+    "transaction path",
+    "channel path",
     "medium ambiguity",
     "owner coordination"
   ],

@@ -55,3 +55,33 @@ delivery:
     high: 55
   direct_service: 5
   additional_owner_team: 4
+# How far impact spreads, by change size (see engine/scope.py).
+scope:
+  max_hops:
+    small: 1
+    medium: 2
+    large: 3
+  # How hard each component is hit, scaled by change size.
+  severity_scale:
+    small: 0.6
+    medium: 0.85
+    large: 1.0
+  # Every service authenticates and writes audit records; these count as
+  # impacted only when the change touches what they do.
+  shared_platform: [authentication-service, api-gateway, audit-db]
+  auth_platform: [authentication-service, api-gateway]
+  api_platform: [api-gateway]
+  schema_platform: [audit-db]
+# A small, contained change (engine/scope.py) earns a named credit in each area,
+# so a limit or text change in a critical service is not scored like a redesign.
+contained_change:
+  security: -5
+  compliance: -5
+  technical: -5
+  operational: -15
+  performance: -10
+  delivery: -10
+# Tests per change size: existing catalog tests, then new tests for gaps.
+tests:
+  catalog: {small: 5, medium: 8, large: 15}
+  generated: {small: 3, medium: 5, large: 8}

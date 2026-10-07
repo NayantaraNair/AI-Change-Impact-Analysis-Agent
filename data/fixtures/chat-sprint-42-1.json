@@ -1,26 +1,31 @@
 {
-  "answer": "**Sprint-level drivers** (sprint-42: health 20, release confidence 37; 1 GO / 2 GO_WITH_CONDITIONS / 3 NO_GO)\n\n- **Three high-risk deployment collisions, all risk score 100:** C-ST-101-ST-107-transaction-db, C-ST-101-ST-110-payment-service, C-ST-107-ST-112-authentication-service.\n- **4 compliance issues**; 4 of 4 frameworks apply across the sprint, and 3 stories carry high-risk compliance frameworks (ST-107: GDPR/PCI DSS/Internal Governance high; ST-104: GDPR high; ST-101: compliance score 81).\n- **Blast radius:** 6 stories, 17 applications, 21 dependencies, 68.28 testing hours.\n\n**Per-story high ratings**\n\n- **ST-107 (risk 89, highest: security 100)** — NO_GO. Factors: *card data* (atm, card-service, fraud-engine), *auth flow change* (api-gateway, authentication-service, card-service, mobile-banking), *customer data*; delivery 87 (*medium ambiguity*, *owner coordination*); compliance 81 (*card data* card-service). NO_GO rules fired: security ≥85, delivery ≥85, GDPR/PCI DSS/Internal Governance high + card data + authentication.\n- **ST-112 (risk 74, highest: delivery 77)** — NO_GO. *auth flow change* (authentication-service, mobile-banking), *owner coordination*, *medium ambiguity*; security 73, operational 71 (*service criticality* authentication-service 40).\n- **ST-110 (risk 73, highest: delivery 78)** — NO_GO. *medium ambiguity* (fraud-engine, payment-service, risk-engine), *owner coordination*; operational 71 (*service criticality* payment-service 40); NO_GO rule: highest risk 78 with test coverage 59% (<70%).\n- **ST-101 (risk 70, highest: compliance 81)** — GO_WITH_CONDITIONS. *card data* (fraud-engine), *pii data* (account-service), *financial data* (account-service, fraud-engine, payment-service, transaction-db); operational 71 (*service criticality* payment-service 40).\n- Lower-risk: **ST-115 (risk 38, GO)**, **ST-104 (risk 62, GO_WITH_CONDITIONS, GDPR high)**.\n\n**Common threads**\n\n- Repeated *owner coordination* across 17–21 components in every story.\n- Shared tier-1 components (payment-service, authentication-service, card-service, transaction-db) drive *service criticality* and *blast radius size* points.\n- *Medium ambiguity* is a 30-point delivery factor for ST-107, ST-110 and ST-112.",
+  "answer": "**\"High risk\" appears at two levels in this analysis — both are supplied by the computed scores.**\n\n**Sprint level (health_score 49, release_confidence 58)**\n- 3 high-risk deployment collisions, all flagged `\"risk\":\"high\"`:\n  - C-ST-101-ST-107-account-service — risk_score 100\n  - C-ST-101-ST-110-payment-service — risk_score 80\n  - C-ST-107-ST-112-authentication-service — risk_score 100\n- 17 applications impacted, 19 dependencies impacted, 3 compliance issues, ST-107 flagged as the high-risk story.\n\n**Story level — ST-107 is the driver (risk.overall 85, highest = security)**\n- **security 93 (high)** — top factors: `card data` 25 pts (atm, card-service, fraud-engine); `auth flow change` 25 pts (api-gateway, authentication-service, card-service, mobile-banking); `external API contract` 15 pts on the same four components.\n- **delivery 87 (high)** — `owner coordination` 32 pts (20 components incl. account-service, payment-service, reporting-db, risk-engine, web-banking…); `medium ambiguity` 30 pts (api-gateway, authentication-service, card-service, mobile-banking); `direct services` 20 pts.\n- **compliance 75 (high)** — `card data` 30 (card-service), `pii data` 20 (api-gateway, authentication-service, card-service, mobile-banking), `financial data` 20 (api-gateway, mobile-banking).\n- **operational 71 (high)** — `service criticality` 40 (api-gateway, authentication-service), `downstream systems` 20, `deployment groups` 6.\n- Resulting decision: **NO_GO**, triggered by `security risk is 93 (>= 85)`, `delivery risk is 87 (>= 85)`, `PCI DSS risk is high and the change touches card data and authentication`, `Internal Governance risk is high and the change touches card data and authentication`.\n\n**Secondary contributor**\n- **ST-112** security dimension is also `high` at 73 (`auth flow change` 25, `customer data` 20, `critical identity path` 10), with overall risk 64 — hence 5 security-related GO_WITH_CONDITIONS conditions.\n\n**Not high elsewhere:** ST-101 (overall 39), ST-104 (overall 57, highest compliance 61 medium), ST-110 (overall 39), ST-115 (overall 12, GO).\n\nNote: the NO_GO conditions for ST-107 state \"Reduce security risk below 85\" and \"Reduce delivery risk below 85\" — the analysis does not contain a plan for how those reductions would be achieved.",
   "cited_nodes": [
     "mobile-banking",
+    "web-banking",
     "atm",
     "account-service",
     "payment-service",
     "card-service",
     "authentication-service",
     "api-gateway",
-    "transaction-db",
+    "reporting-db",
     "fraud-engine",
     "risk-engine"
   ],
   "cited_factors": [
     "customer data",
-    "blast radius size",
     "pii data",
-    "card data",
     "financial data",
+    "direct services",
     "service criticality",
+    "downstream systems",
+    "deployment groups",
     "owner coordination",
+    "card data",
     "auth flow change",
+    "external API contract",
+    "critical identity path",
     "medium ambiguity"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"

@@ -92,14 +92,19 @@ def _change_type(text: str) -> ChangeType:
 
 def _fallback(story: StoryInput, arch: Architecture) -> RequirementFacts:
     text = "\n".join((story.title, story.description, *story.acceptance_criteria))
-    matched = [
-        component
-        for component in arch.components
-        if _matches(
-            text,
-            (component.id, component.name, *_SERVICE_KEYWORDS.get(component.id, ())),
-        )
-    ]
+    def matching(source: str):
+        return [
+            component
+            for component in arch.components
+            if _matches(
+                source,
+                (component.id, component.name, *_SERVICE_KEYWORDS.get(component.id, ())),
+            )
+        ]
+
+    # The title names what changes; the description also names what it merely
+    # calls or reads. Use the full text only when the title names no service.
+    matched = matching(story.title) or matching(text)
     service_ids = list(dict.fromkeys(component.id for component in matched))
     # Use only directly matched components, never their graph neighbours.
     data_classes = {data_class for component in matched for data_class in component.data_classes}
@@ -150,6 +155,15 @@ async def analyze_requirement(story: StoryInput, arch: Architecture) -> Requirem
         "Return the requested categorical facts and human-readable summaries only. "
         "Do not produce scores or release decisions. "
         "affected_services must use only catalog IDs; do not invent IDs or infer downstream dependencies.\n"
+        "Be practical and keep the scope as small as the story really is:\n"
+        "- affected_services: only services whose code, configuration or schema must change. "
+        "Leave out services the change merely calls, reads from or keeps using unchanged.\n"
+        "- Set a data flag true only if the change alters how that data is stored, shown, shared "
+        "or processed, not just because a listed service holds such data.\n"
+        "- changes_auth_flow, changes_external_api_contract and changes_db_schema are true only "
+        "when the story itself changes the login flow, a public API contract or a database schema.\n"
+        "- A limit, threshold, rule, text or configuration change in one service is a small, "
+        "contained change: say so in engineering_scope.\n"
         f"Allowed change_type values: {', '.join(get_args(ChangeType))}.\n"
         f"Component catalog (id: name — description):\n{catalog}"
     )

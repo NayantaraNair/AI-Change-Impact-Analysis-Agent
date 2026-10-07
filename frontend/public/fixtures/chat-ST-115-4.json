@@ -1,14 +1,6 @@
 {
-  "answer": "The analysis context does **not** state that release confidence is low, and it does not provide a breakdown of how confidence was derived.\n\n- Release confidence is reported as **73** with decision **GO**.\n- Triggered rules: **\"GO: no blocking or conditional release rules fired\"**; conditions list is empty, so nothing lowered it to a conditional or no-go state.\n- The only medium-level risk dimensions are **operational (47)** and **delivery (40)**; all others are low (security 28, compliance 27, technical 21, performance 20); overall risk is 38.\n\nFactors listed under those two medium dimensions (reported as supplied, not as an explanation of confidence):\n- operational: downstream systems (20, all downstream node IDs), service criticality (16, `document-service`), deployment groups (6)\n- delivery: owner coordination (20, broad node set), low ambiguity (10, `document-service`)\n\nIf you're looking for the specific inputs behind the 73 score, they are not present in this context.",
-  "cited_nodes": [
-    "document-service"
-  ],
-  "cited_factors": [
-    "service criticality",
-    "downstream systems",
-    "deployment groups",
-    "low ambiguity",
-    "owner coordination"
-  ],
+  "answer": "Release confidence is not low — it is **94** with a decision of **GO** (triggered rule: \"GO: no blocking or conditional release rules fired\", conditions: none).\n\n- The **risk** dimensions are all *low* (overall risk 12, highest dimension \"delivery\" at 14), which may be the source of confusion — low risk scores are separate from the confidence score.\n- Confidence is reported by the analysis as **94**; it is not recalculated or re-derived here.",
+  "cited_nodes": [],
+  "cited_factors": [],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

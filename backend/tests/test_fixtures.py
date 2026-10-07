@@ -59,8 +59,13 @@ async def test_builder_exports_final_analyses_and_all_starters(monkeypatch, tmp_
     assert fixtures["demo-sprint.json"] == demo
     assert sprint.conflicts
     for analysis in sprint.stories:
-        assert fixtures[f"story-{analysis.story.id}.json"] == analysis
-        assert db.latest_story_analysis(analysis.story.id) == analysis
+        standalone = fixtures[f"story-{analysis.story.id}.json"]
+        # Same facts and graph as in the sprint, but judged alone: no clash rules.
+        assert (standalone.story, standalone.requirement, standalone.graph) == (
+            analysis.story, analysis.requirement, analysis.graph,
+        )
+        assert not any("sprint" in rule for rule in standalone.release.triggered_rules)
+        assert db.latest_story_analysis(analysis.story.id) == standalone
     for context_type, context_id in contexts:
         for n, question in enumerate(chat.STARTER_QUESTIONS):
             response = await chat.answer(ChatRequest(

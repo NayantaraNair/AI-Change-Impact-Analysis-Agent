@@ -42,7 +42,7 @@ export function AnalysisResults({ analysis, components, run, onRerunLive }: { an
             {highlight.length > 0 && <Button type="button" variant="outline" size="sm" onClick={() => setHighlight([])}>Clear highlight</Button>}
           </div>
           <p className="sr-only" role="status" aria-live="polite">{highlight.length ? `Highlighted: ${highlight.join(", ")}` : "Showing all affected components"}</p>
-          <DependencyGraph graph={analysis.graph} highlight={highlight} selectedId={selectedId} onNodeSelect={setSelectedId} height="clamp(560px, 76vh, 860px)" />
+          <DependencyGraph graph={analysis.graph} highlight={highlight} selectedId={selectedId} onNodeSelect={setSelectedId} />
         </section>
         {selectedNode && <aside aria-label="Selected component" className="min-w-0 border-b border-line py-4 min-[1024px]:col-start-2 min-[1024px]:row-start-1 min-[1024px]:row-span-2 min-[1024px]:border-b-0 min-[1024px]:border-l min-[1024px]:pl-4">
           <div className="sticky top-4">

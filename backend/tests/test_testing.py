@@ -233,6 +233,6 @@ async def test_no_gap_skips_llm_and_empty_graph_is_zero(st107, monkeypatch):
     assert len(plan.tests) == 1
     empty = with_severities(graph, {})
     plan, provider = await plan_tests(facts, empty, risk, [])
-    assert provider == "template-fallback"
+    assert provider == "deterministic"
     assert plan.tests == []
     assert plan.coverage_estimate == plan.effort_hours == plan.automation_candidates == 0

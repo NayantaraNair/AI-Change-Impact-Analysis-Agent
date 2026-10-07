@@ -18,6 +18,9 @@ export function TestsTab({ plan, nodes }: { plan: TestPlan; nodes: GraphNode[] }
   const [selectedPriorities, setPriorities] = useState<TestCase["priority"][]>([]);
   const [selectedTypes, setTypes] = useState<TestCase["type"][]>([]);
   const tests = filterTests(plan.tests, selectedPriorities, selectedTypes);
+  const rank = { P1: 0, P2: 1, P3: 2 } as const;
+  // Must-run first; existing catalog tests before new ones within a priority.
+  const top = [...plan.tests].sort((a, b) => rank[a.priority] - rank[b.priority] || Number(a.source === "generated") - Number(b.source === "generated")).slice(0, 5);
   function toggle<T>(items: T[], item: T): T[] {
     return items.includes(item) ? items.filter((value) => value !== item) : [...items, item];
   }
@@ -31,7 +34,24 @@ export function TestsTab({ plan, nodes }: { plan: TestPlan; nodes: GraphNode[] }
         <p className="flex items-baseline gap-1"><span className="font-semibold tabular-nums">{formatHours(plan.effort_hours)}</span> <span className="text-meta text-muted">effort</span><InfoTip label="effort">{explain.effort}</InfoTip></p>
         <p className="flex items-baseline gap-1"><span className="font-semibold tabular-nums">{formatNumber(plan.automation_candidates)}</span> <span className="text-meta text-muted">automation candidates</span><InfoTip label="automation candidates">{explain.automation}</InfoTip></p>
       </div>
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+      <div>
+        <h3 className="flex items-center gap-1.5 text-body font-medium">Top {top.length} to run <InfoTip label="test priority">{explain.priority}</InfoTip></h3>
+        <ol className="mt-2 divide-y divide-line border-y border-line">
+          {top.map((test, index) => (
+            <li key={test.id} className="grid grid-cols-[1.5rem_auto_minmax(0,1fr)] items-baseline gap-x-3 py-2.5">
+              <span className="tabular-nums text-muted">{index + 1}</span>
+              <span className={`rounded border px-1.5 py-0.5 text-meta font-medium ${priorityStyle[test.priority]}`}>{test.priority}</span>
+              <span className="min-w-0">
+                <span className="block text-body">{test.title}</span>
+                <span className="block text-meta text-muted">{typeLabel(test.type)} · {test.covers.slice(0, 3).join(", ")}{test.covers.length > 3 ? ` +${test.covers.length - 3}` : ""}{test.automation_candidate ? " · automatable" : ""}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </div>
+      {plan.tests.length > top.length && <details className="group space-y-4">
+      <summary className="cursor-pointer list-none text-dense font-medium"><span aria-hidden="true" className="mr-2 inline-block text-muted transition-transform duration-150 group-open:rotate-90">›</span>All {plan.tests.length} tests</summary>
+      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3">
         <div role="group" aria-label="Filter by priority" className="flex items-center gap-1.5">
           <span className="mr-1 text-meta text-muted">Priority</span>
           {priorities.map((priority) => <button key={priority} type="button" aria-pressed={selectedPriorities.includes(priority)} className={chipClass} onClick={() => setPriorities(toggle(selectedPriorities, priority))}>{priority}</button>)}
@@ -69,6 +89,7 @@ export function TestsTab({ plan, nodes }: { plan: TestPlan; nodes: GraphNode[] }
           </tbody>
         </table>
       </div>
+      </details>}
     </section>
   );
 }

@@ -9,6 +9,7 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, ValidationError, create_model
 
 from app import llm
+from app.engine.scope import change_size
 from app.contracts import (
     Architecture,
     ComplianceFinding,
@@ -21,6 +22,7 @@ from app.contracts import (
 
 Framework = Literal["GDPR", "PCI DSS", "SOX", "Internal Governance"]
 DATA_HOP_LIMIT = 1
+SMALL_CHANGE_CREDIT = 15  # a contained change is easier to control and review
 FRAMEWORK_ORDER: tuple[Framework, ...] = ("GDPR", "PCI DSS", "SOX", "Internal Governance")
 
 # Each condition is charged once, regardless of node count, except governance's
@@ -101,12 +103,15 @@ def _assess_rules(
     impacted = sorted(hops)
     direct = [node_id for node_id in impacted if hops[node_id] == 0]
     anchors = direct or impacted
+    small = change_size(facts, arch)[0] == "small"
+    # A small change counts only the data it changes, not data one step away.
+    data_hop_limit = 0 if small else DATA_HOP_LIMIT
     # Regulated data counts when the change touches it directly or one step away;
     # data further out is reached through unchanged, already-controlled interfaces.
     data_nodes = {
         kind: [
             node_id for node_id in impacted
-            if hops[node_id] <= DATA_HOP_LIMIT and kind in components[node_id].data_classes
+            if hops[node_id] <= data_hop_limit and kind in components[node_id].data_classes
         ]
         for kind in ("pii", "card", "financial", "audit")
     }
@@ -303,6 +308,10 @@ def _assess_rules(
         anchors,
     )
 
+    if small:
+        for name in FRAMEWORK_ORDER:
+            deduct(name, True, "small, contained change", -SMALL_CHANGE_CREDIT, [])
+
     non_applicable_reasons = {
         "GDPR": "No impacted PII-bearing component and no customer-data touch.",
         "PCI DSS": "No impacted card-data component and no card-data touch.",
@@ -331,7 +340,9 @@ def _assess_rules(
         evidence_nodes = (
             sorted({node_id for rule in rules[name] for node_id in rule.node_ids}) or nodes
         )
-        evidence = "; ".join(f"{rule.text} (-{rule.points})" for rule in rules[name])
+        evidence = "; ".join(
+            f"{rule.text} ({-rule.points:+d})" for rule in rules[name]
+        )
         findings = [
             ComplianceFinding(text=f"{name} review applies because {reason}", node_ids=nodes),
             ComplianceFinding(
@@ -368,7 +379,8 @@ async def assess_compliance(
     """Return all frameworks in fixed order; the LLM cannot alter any score."""
     assessments = _assess_rules(facts, graph, arch)
     applicable = [assessment for assessment in assessments if assessment.applicable]
-    provider = "template-fallback"
+    # No applicable framework means nothing for a model to write.
+    provider = "template-fallback" if applicable else "deterministic"
     if applicable:
         # Exact framework keys avoid missing entries or LLM-supplied decisions.
         schema = create_model(

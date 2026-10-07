@@ -167,6 +167,9 @@ class RiskReport(BaseModel):
     dimensions: list[RiskDimension]
     overall: int
     highest: str  # name of the highest-scoring dimension
+    # How far the change reaches, decided in code (engine/scope.py).
+    change_size: Literal["small", "medium", "large"] = "medium"
+    change_size_reason: str = ""
 
 
 # ---------------------------------------------------------------- tests

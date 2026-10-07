@@ -1,25 +1,17 @@
 {
-  "answer": "Only one story is present in the analysis context: **ST-115** — “Update the footer text on monthly statement PDFs.”\n\n- **ST-115** overall risk: **38**; highest dimension: **operational**.\n- **Operational**: score **47 / medium**.\n  - Top factors: `downstream systems` (20 pts; nodes include `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `customer-db`, `document-service`, `mobile-banking`, `reporting-db`, `reporting-service`, `web-banking`), `service criticality` (16 pts; `document-service`), `deployment groups` (6 pts).\n- **Delivery**: score **40 / medium**.\n  - Top factors: `owner coordination` (20 pts; same broad node set), `low ambiguity` (10 pts; `document-service`), `baseline` (5 pts).\n- Other risk dimensions for ST-115 are low: security **28**, compliance **27**, technical **21**, performance **20**.\n- Supplied release decision for ST-115: **GO**, confidence **73**, complexity **high**.\n\nNo other stories appear in the provided context, so no additional risky stories can be identified.",
+  "answer": "The context contains only one story, so I can't compare across a backlog.\n\n**ST-115 — Update the footer text on monthly statement PDFs**\n- Overall risk: **12** (highest dimension: **delivery**, 14 — level: low)\n- Dimension scores (as supplied):\n  - security 7 (low) — top factors: baseline (8), blast radius size (4; document-service, reporting-service), small contained change (-5; document-service)\n  - compliance 0 (low) — baseline (5), small contained change (-5; document-service)\n  - technical 11 (low) — direct services (6; document-service), baseline (5), dependency depth (5; reporting-service)\n  - operational 12 (low) — service criticality (16; document-service), baseline (5), deployment groups (4)\n  - performance 0 (low) — baseline (5), small contained change (-10; document-service)\n  - delivery 14 (low) — low ambiguity (10; document-service), baseline (5), direct services (5; document-service)\n- Release decision: **GO**, confidence **94**, complexity medium, no triggered blocking/conditional rules, no conditions.\n\nNo story in this context reaches a medium or high risk level, so none would be flagged as risky on these scores. If you have other story analyses, share them and I'll compare.",
   "cited_nodes": [
-    "mobile-banking",
-    "web-banking",
-    "atm",
-    "branch-portal",
-    "authentication-service",
-    "api-gateway",
     "document-service",
-    "customer-db",
-    "audit-db",
-    "reporting-db",
     "reporting-service"
   ],
   "cited_factors": [
     "baseline",
+    "blast radius size",
+    "direct services",
+    "dependency depth",
     "service criticality",
-    "downstream systems",
     "deployment groups",
-    "low ambiguity",
-    "owner coordination"
+    "low ambiguity"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

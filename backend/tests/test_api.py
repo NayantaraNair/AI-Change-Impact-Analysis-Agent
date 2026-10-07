@@ -137,7 +137,7 @@ def test_sprint_persistence_kpis_and_union(client, stages):
         ]
     ]
     assert result.kpis.model_dump() == {
-        "stories": 6, "applications_impacted": 17, "dependencies_impacted": 18,
+        "stories": 6, "applications_impacted": 17, "dependencies_impacted": 17,
         "conflicts": 30, "compliance_issues": 0, "testing_effort_hours": 21.0,
         "health_score": 0, "release_confidence": 0,
         "high_risk_stories": [s.id for s in demo.stories],

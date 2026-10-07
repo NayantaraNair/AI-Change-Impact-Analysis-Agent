@@ -1,36 +1,23 @@
 {
-  "answer": "**Overall risk is 74. Three dimensions are rated high:**\n\n- **Delivery — 77 (highest; this is the score driving the NO_GO):**\n  - *owner coordination* +32 — broad node set across all 20 components (account-service, api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, crm, customer-db, customer-service, document-service, fraud-engine, loan-service, mobile-banking, notification-service, payment-service, reporting-service, risk-engine, transaction-db, web-banking)\n  - *medium ambiguity* +30 — authentication-service, mobile-banking\n  - *direct services* +10 — authentication-service, mobile-banking\n- **Security — 73:**\n  - *auth flow change* +25 — authentication-service, mobile-banking\n  - *customer data* +20 — spans 12 components (account-service, api-gateway, authentication-service, branch-portal, card-service, crm, customer-db, customer-service, loan-service, mobile-banking, notification-service, web-banking)\n  - *critical identity path* +10 — api-gateway, authentication-service\n- **Operational — 71:**\n  - *service criticality* +40 — authentication-service\n  - *downstream systems* +20 — 18 downstream components\n  - *deployment groups* +6 — all listed groups\n\n**Remaining dimensions are medium:** compliance 63, technical 42, performance 40.\n\n**Contributing decision context:**\n- Triggered rules: \"NO_GO: highest risk 77 with test coverage 65% (< 70%)\", \"GO_WITH_CONDITIONS: highest risk is 77 (>= 60)\", medium GDPR/PCI DSS/SOX/Internal Governance risk, and the sprint deployment collision between ST-107 and ST-112 on authentication-service.\n- Compliance scores are also medium-high: SOX 75, Internal Governance 70, GDPR 65, PCI DSS 65.\n- The coupling to ST-107 (joint identity deployment, shared challenge contract and rollback policy) and unresolved scope items (device-registration storage/schema, gateway or contract versioning in api-gateway / customer-db) underpin the delivery and governance risk.\n\nScores and decisions are as computed by the release assessment; not recalculated here.",
+  "answer": "**Overall risk is 64/100 (medium)** — but the highest dimension, **security, is 73/100 (high)**, which is what triggered `GO_WITH_CONDITIONS: highest risk is 73 (>= 60)`.\n\nSecurity dimension factors (score 73, level high):\n- **auth flow change** — 25 pts → `authentication-service`, `mobile-banking`\n- **customer data** — 20 pts → `api-gateway`, `authentication-service`, `customer-db`, `mobile-banking`\n- **critical identity path** — 10 pts → `api-gateway`, `authentication-service`\n\nOther dimensions at medium (not high):\n- **operational** 69 (medium): service criticality 40 → `authentication-service`; downstream systems 18; deployment groups 6\n- **compliance** 45 (medium): pii data 20, financial data 20\n- **delivery** 49 (medium): owner coordination 24\n- **performance** 40 (medium): transaction path 20 → `payment-service`; channel path 15\n- **technical** 37 (low)\n\nCompliance frameworks driving medium risk: GDPR (medium, 65) and Internal Governance (medium, 70); SOX is low (85); PCI DSS not applicable. Overall compliance score is 65/100, with no applicable framework at high risk.",
   "cited_nodes": [
     "mobile-banking",
-    "web-banking",
-    "atm",
-    "branch-portal",
-    "customer-service",
-    "account-service",
     "payment-service",
-    "loan-service",
-    "card-service",
-    "crm",
     "authentication-service",
-    "notification-service",
     "api-gateway",
-    "document-service",
-    "customer-db",
-    "transaction-db",
-    "audit-db",
-    "fraud-engine",
-    "risk-engine",
-    "reporting-service"
+    "customer-db"
   ],
   "cited_factors": [
     "customer data",
     "auth flow change",
     "critical identity path",
-    "direct services",
+    "pii data",
+    "financial data",
     "service criticality",
     "downstream systems",
     "deployment groups",
-    "medium ambiguity",
+    "transaction path",
+    "channel path",
     "owner coordination"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"

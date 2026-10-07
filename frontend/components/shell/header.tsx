@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { InfoTip } from "@/components/ui/info-tip";
 import { explain } from "@/lib/explain";
 import { useAppContext } from "./app-context";
+import { ThemeToggle } from "./theme-toggle";
 
 export function Header() {
   const { usingSampleData, run, setDebugOpen } = useAppContext();
@@ -23,10 +24,13 @@ export function Header() {
       <span role="status" aria-live="polite" className="flex items-center gap-1.5">
         {usingSampleData && <><Badge variant="outline" className="text-muted">Sample data</Badge><InfoTip label="sample data" side="bottom">{explain.sampleData}</InfoTip></>}
       </span>
-      <Button type="button" variant="ghost" size="sm" className="ml-auto text-muted hover:text-text" onClick={() => setDebugOpen(true)}>
+      <span className="ml-auto flex items-center gap-1">
+      <ThemeToggle />
+      <Button type="button" variant="ghost" size="sm" className="text-muted hover:text-text" onClick={() => setDebugOpen(true)}>
         {running && <span aria-hidden="true" className="size-1.5 rounded-full bg-model" />}
         <Bug aria-hidden="true" />Details{running ? " (running)" : ""}
       </Button>
+      </span>
     </header>
   );
 }

@@ -25,6 +25,7 @@ from app.agents import chat  # noqa: E402
 from app.architecture import load_demo_sprint  # noqa: E402
 from app.contracts import ChatRequest  # noqa: E402
 from app.engine.sprint import analyze_sprint  # noqa: E402
+from app.pipeline import analyze_story  # noqa: E402
 
 FIXTURE_DIRS = (
     REPO_ROOT / "data" / "fixtures",
@@ -49,9 +50,11 @@ async def build_fixtures(
         demo.sprint_id, demo.name, demo.stories, refresh=refresh,
     )
     fixtures: dict[str, BaseModel] = {"demo-sprint.json": demo, "sprint.json": sprint}
-    for analysis in sprint.stories:
-        # These are the final, post-conflict release assessments.
-        fixtures[f"story-{analysis.story.id}.json"] = analysis
+    for story in demo.stories:
+        # The Story page analyses one story on its own, so its saved result must
+        # not cite clashes with other sprint stories. Cached stages from the
+        # sprint run are reused; only the release decision is recomputed.
+        fixtures[f"story-{story.id}.json"] = await analyze_story(story)
 
     contexts = [("story", story.story.id) for story in sprint.stories]
     contexts.append(("sprint", sprint.sprint_id))

@@ -7,9 +7,9 @@ import { plainRule, shorten } from "./impact-summary";
 function Steps({ title, items }: { title: string; items: string[] }) {
   if (!items.length) return null;
   return (
-    <details className="group border-t border-line py-3">
-      <summary className="cursor-pointer list-none text-dense font-medium"><span aria-hidden="true" className="mr-2 inline-block text-muted transition-transform duration-150 group-open:rotate-90">›</span>{title} <span className="font-normal text-muted">({items.length} steps)</span></summary>
-      <ol className="mt-3 list-decimal space-y-1.5 pl-9 text-dense">{items.map((item, index) => <li key={index}>{item}</li>)}</ol>
+    <details open className="group border-t border-line py-3">
+      <summary className="cursor-pointer list-none text-dense font-medium"><span aria-hidden="true" className="mr-2 inline-block text-muted transition-transform duration-150 group-open:rotate-90">›</span>{title}</summary>
+      <ol className="mt-3 list-decimal space-y-1.5 pl-9 text-dense">{items.slice(0, 3).map((item, index) => <li key={index}>{item}</li>)}</ol>
     </details>
   );
 }

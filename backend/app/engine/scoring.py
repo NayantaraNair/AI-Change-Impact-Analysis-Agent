@@ -8,6 +8,7 @@ from typing import Any
 
 import yaml
 
+from app.engine.scope import change_size
 from app.contracts import (
     Architecture,
     ImpactGraph,
@@ -103,11 +104,14 @@ def score_risk(
     anchors = (
         direct or impacted or sorted(set(facts.affected_services) & components.keys())
     )
-    # Regulated data counts when it is changed directly or one hop away.
+    size, reason = change_size(facts, arch)
+    # Regulated data counts when it is changed directly or one hop away; a small
+    # change counts only the data it changes.
+    data_hop_limit = 0 if size == "small" else 1
     data_nodes = {
         data_class: [
             node_id for node_id in impacted
-            if hops[node_id] <= 1 and data_class in components[node_id].data_classes
+            if hops[node_id] <= data_hop_limit and data_class in components[node_id].data_classes
         ]
         for data_class in ("pii", "card", "financial", "audit")
     }
@@ -274,10 +278,16 @@ def score_risk(
         max(0, len(owners) - 1) * delivery["additional_owner_team"], impacted,
     )
 
+    if size == "small":
+        for name, points in cfg.get("contained_change", {}).items():
+            add(name, "small, contained change", int(points), anchors)
+
     dimensions = [_dimension(name, factors[name]) for name in DIMENSION_ORDER]
     top_three = sorted((dimension.score for dimension in dimensions), reverse=True)[:3]
     return RiskReport(
         dimensions=dimensions,
         overall=round(sum(top_three) / len(top_three)),
         highest=max(dimensions, key=lambda dimension: dimension.score).name,
+        change_size=size,
+        change_size_reason=reason,
     )

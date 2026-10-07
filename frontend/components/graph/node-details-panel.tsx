@@ -3,9 +3,8 @@
 import { useId } from "react";
 import { X } from "lucide-react";
 import type { Component, GraphNode } from "@/lib/types";
-import { NodeIcon } from "./impact-nodes";
+import { hopLabel, NodeIcon } from "./node-icon";
 import styles from "./graph.module.css";
-import { hopLabel } from "./graph-model";
 
 export interface NodeDetailsPanelProps {
   node: GraphNode;

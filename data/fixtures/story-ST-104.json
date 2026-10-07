@@ -12,21 +12,22 @@
     ]
   },
   "requirement": {
-    "business_summary": "Add optional preferred name and secondary email fields to the customer profile for personalized service notifications, with verification and consent controls while preserving existing legal name and primary email behavior.",
-    "technical_summary": "Extend customer-service and customer-db with optional preferred_name (1-80 chars) and secondary_email fields, including verification and consent flags; update notification-service to check verification and consent before using the secondary email; synchronize changes to CRM contact projection; apply existing retention, access, correction, and erasure controls to the new fields; record consent evidence for GDPR compliance.",
-    "business_domain": "Customer Profile",
+    "business_summary": "The bank is extending the customer profile to hold an optional preferred name and an optional secondary email used for service notifications. Secondary email notifications are only enabled after the address is verified and the customer gives explicit consent, and consent withdrawal immediately stops them. Legal name and primary email behaviour stay unchanged, including for customers who leave the new fields blank. Existing retention, access, correction and erasure controls extend to both new fields, and consent evidence is recorded for GDPR review.",
+    "technical_summary": "Add two optional personal-data fields (preferred name, secondary email) to the customer profile handled by customer-service, persisted in customer-db via a backward-compatible schema change and synchronised as a contact projection to CRM without overwriting the primary email. notification-service may use the secondary email as a destination only after verification and explicit consent, and must stop using it on consent withdrawal. Preferred name is validated to 1-80 characters; secondary email requires valid email syntax and completed verification. Existing retention, access, correction and erasure processes are applied to both fields, and consent evidence is retained for GDPR review. Legal name and primary email paths are untouched, including blank-value handling.",
+    "business_domain": "Retail Banking — Customer Profile and Contact Preferences",
     "affected_capabilities": [
-      "Preferred name management",
-      "Secondary email verification and consent",
-      "Contact projection synchronization with CRM"
+      "Customer profile management",
+      "Contact preference and destination management",
+      "Consent capture and GDPR data subject rights (access, correction, erasure)",
+      "Service notification delivery"
     ],
     "affected_services": [
       "customer-service",
       "customer-db",
-      "notification-service",
-      "crm"
+      "crm",
+      "notification-service"
     ],
-    "change_type": "enhancement",
+    "change_type": "new_feature",
     "touches_customer_data": true,
     "touches_card_data": false,
     "touches_financial_data": false,
@@ -34,8 +35,8 @@
     "changes_external_api_contract": false,
     "changes_db_schema": true,
     "ambiguity": "low",
-    "engineering_scope": "Add fields to customer-service and customer-db schema, update notification-service logic for verification and consent, synchronize with CRM contact projection, and apply existing data governance controls.",
-    "source": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
+    "engineering_scope": "Contained change: add two optional profile fields (preferred name 1-80 chars, secondary email with syntax check) to customer-service, apply a backward-compatible schema change in customer-db, sync the updated contact projection to CRM without touching the primary email, and gate notification-service use of the secondary email on completed verification plus explicit consent with stop-on-withdrawal. Existing retention, access, correction and erasure controls are extended to both fields and consent evidence is recorded. No login/authentication flow change, no breaking public API contract change, and legal name / primary email behaviour remains as-is.",
+    "source": "tokenharbor:deepseek-v4.1-flash:free"
   },
   "graph": {
     "nodes": [
@@ -44,9 +45,9 @@
         "label": "Account Service",
         "type": "core",
         "hop": 1,
-        "severity": "high",
-        "x": 262.1,
-        "y": 126.2,
+        "severity": "medium",
+        "x": 235.4,
+        "y": 171.0,
         "criticality": 9,
         "owner_team": "Core Banking",
         "data_classes": [
@@ -58,10 +59,10 @@
         "id": "api-gateway",
         "label": "API Gateway",
         "type": "platform",
-        "hop": 1,
-        "severity": "high",
-        "x": 64.7,
-        "y": -283.7,
+        "hop": null,
+        "severity": null,
+        "x": -0.0,
+        "y": -461.0,
         "criticality": 10,
         "owner_team": "Identity & Access",
         "data_classes": [
@@ -73,10 +74,10 @@
         "id": "atm",
         "label": "ATM Network",
         "type": "channel",
-        "hop": 2,
-        "severity": "low",
-        "x": -325.9,
-        "y": 325.9,
+        "hop": null,
+        "severity": null,
+        "x": 0.0,
+        "y": 461.0,
         "criticality": 7,
         "owner_team": "Assisted Channels",
         "data_classes": [
@@ -90,8 +91,8 @@
         "type": "database",
         "hop": 1,
         "severity": "medium",
-        "x": -181.4,
-        "y": -227.5,
+        "x": 235.4,
+        "y": -171.0,
         "criticality": 8,
         "owner_team": "Data & Analytics",
         "data_classes": [
@@ -102,10 +103,10 @@
         "id": "authentication-service",
         "label": "Authentication Service",
         "type": "platform",
-        "hop": 1,
-        "severity": "high",
-        "x": 262.1,
-        "y": -126.2,
+        "hop": null,
+        "severity": null,
+        "x": 230.5,
+        "y": -399.2,
         "criticality": 10,
         "owner_team": "Identity & Access",
         "data_classes": [
@@ -116,10 +117,10 @@
         "id": "branch-portal",
         "label": "Branch Portal",
         "type": "channel",
-        "hop": 2,
-        "severity": "low",
-        "x": -461.0,
-        "y": 0.0,
+        "hop": null,
+        "severity": null,
+        "x": -230.5,
+        "y": 399.2,
         "criticality": 6,
         "owner_team": "Assisted Channels",
         "data_classes": [
@@ -132,9 +133,9 @@
         "label": "Card Service",
         "type": "core",
         "hop": 1,
-        "severity": "high",
-        "x": 64.7,
-        "y": 283.7,
+        "severity": "medium",
+        "x": -89.9,
+        "y": 276.7,
         "criticality": 9,
         "owner_team": "Cards Platform",
         "data_classes": [
@@ -147,7 +148,7 @@
         "label": "Customer Relationship Management",
         "type": "core",
         "hop": 0,
-        "severity": "high",
+        "severity": "medium",
         "x": 121.0,
         "y": 0.0,
         "criticality": 6,
@@ -188,10 +189,10 @@
         "id": "document-service",
         "label": "Document Service",
         "type": "platform",
-        "hop": 2,
-        "severity": "low",
-        "x": 325.9,
-        "y": -325.9,
+        "hop": null,
+        "severity": null,
+        "x": 399.2,
+        "y": -230.5,
         "criticality": 4,
         "owner_team": "Document Operations",
         "data_classes": []
@@ -200,8 +201,8 @@
         "id": "fraud-engine",
         "label": "Fraud Engine",
         "type": "analytics",
-        "hop": 2,
-        "severity": "medium",
+        "hop": null,
+        "severity": null,
         "x": 461.0,
         "y": 0.0,
         "criticality": 9,
@@ -217,8 +218,8 @@
         "type": "core",
         "hop": 1,
         "severity": "medium",
-        "x": -181.4,
-        "y": 227.5,
+        "x": -291.0,
+        "y": 0.0,
         "criticality": 8,
         "owner_team": "Core Banking",
         "data_classes": [
@@ -230,10 +231,10 @@
         "id": "mobile-banking",
         "label": "Mobile Banking",
         "type": "channel",
-        "hop": 2,
-        "severity": "medium",
-        "x": -325.9,
-        "y": -325.9,
+        "hop": null,
+        "severity": null,
+        "x": -399.2,
+        "y": 230.5,
         "criticality": 8,
         "owner_team": "Digital Channels",
         "data_classes": [
@@ -246,7 +247,7 @@
         "label": "Notification Service",
         "type": "platform",
         "hop": 0,
-        "severity": "high",
+        "severity": "medium",
         "x": -0.0,
         "y": -121.0,
         "criticality": 6,
@@ -260,9 +261,9 @@
         "label": "Payment Service",
         "type": "core",
         "hop": 1,
-        "severity": "high",
-        "x": -291.0,
-        "y": 0.0,
+        "severity": "medium",
+        "x": -89.9,
+        "y": -276.7,
         "criticality": 10,
         "owner_team": "Payments Platform",
         "data_classes": [
@@ -275,8 +276,8 @@
         "type": "database",
         "hop": null,
         "severity": null,
-        "x": 631.0,
-        "y": 0.0,
+        "x": -399.2,
+        "y": -230.5,
         "criticality": 6,
         "owner_team": "Data & Analytics",
         "data_classes": [
@@ -287,10 +288,10 @@
         "id": "reporting-service",
         "label": "Reporting Service",
         "type": "analytics",
-        "hop": 2,
-        "severity": "low",
-        "x": 325.9,
-        "y": 325.9,
+        "hop": null,
+        "severity": null,
+        "x": 399.2,
+        "y": 230.5,
         "criticality": 5,
         "owner_team": "Data & Analytics",
         "data_classes": []
@@ -299,10 +300,10 @@
         "id": "risk-engine",
         "label": "Risk Engine",
         "type": "analytics",
-        "hop": 2,
-        "severity": "medium",
-        "x": 0.0,
-        "y": 461.0,
+        "hop": null,
+        "severity": null,
+        "x": 230.5,
+        "y": 399.2,
         "criticality": 8,
         "owner_team": "Data & Analytics",
         "data_classes": [
@@ -315,8 +316,8 @@
         "type": "database",
         "hop": null,
         "severity": null,
-        "x": -631.0,
-        "y": 0.0,
+        "x": -230.5,
+        "y": -399.2,
         "criticality": 10,
         "owner_team": "Core Banking",
         "data_classes": [
@@ -327,10 +328,10 @@
         "id": "web-banking",
         "label": "Web Banking",
         "type": "channel",
-        "hop": 2,
-        "severity": "medium",
-        "x": -0.0,
-        "y": -461.0,
+        "hop": null,
+        "severity": null,
+        "x": -461.0,
+        "y": 0.0,
         "criticality": 8,
         "owner_team": "Digital Channels",
         "data_classes": [
@@ -400,21 +401,21 @@
         "id": "api-gateway->crm",
         "source": "api-gateway",
         "target": "crm",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
         "id": "api-gateway->customer-service",
         "source": "api-gateway",
         "target": "customer-service",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
         "id": "api-gateway->document-service",
         "source": "api-gateway",
         "target": "document-service",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -435,21 +436,21 @@
         "id": "atm->api-gateway",
         "source": "atm",
         "target": "api-gateway",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
         "id": "atm->audit-db",
         "source": "atm",
         "target": "audit-db",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
         "id": "atm->authentication-service",
         "source": "atm",
         "target": "authentication-service",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -463,28 +464,28 @@
         "id": "authentication-service->customer-db",
         "source": "authentication-service",
         "target": "customer-db",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
         "id": "branch-portal->api-gateway",
         "source": "branch-portal",
         "target": "api-gateway",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
         "id": "branch-portal->audit-db",
         "source": "branch-portal",
         "target": "audit-db",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
         "id": "branch-portal->authentication-service",
         "source": "branch-portal",
         "target": "authentication-service",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -519,7 +520,7 @@
         "id": "card-service->fraud-engine",
         "source": "card-service",
         "target": "fraud-engine",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -540,7 +541,7 @@
         "id": "crm->authentication-service",
         "source": "crm",
         "target": "authentication-service",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -568,7 +569,7 @@
         "id": "customer-service->authentication-service",
         "source": "customer-service",
         "target": "authentication-service",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -596,14 +597,14 @@
         "id": "document-service->audit-db",
         "source": "document-service",
         "target": "audit-db",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
         "id": "document-service->authentication-service",
         "source": "document-service",
         "target": "authentication-service",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -617,14 +618,14 @@
         "id": "fraud-engine->audit-db",
         "source": "fraud-engine",
         "target": "audit-db",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
         "id": "fraud-engine->authentication-service",
         "source": "fraud-engine",
         "target": "authentication-service",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -673,7 +674,7 @@
         "id": "loan-service->risk-engine",
         "source": "loan-service",
         "target": "risk-engine",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -687,21 +688,21 @@
         "id": "mobile-banking->api-gateway",
         "source": "mobile-banking",
         "target": "api-gateway",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
         "id": "mobile-banking->audit-db",
         "source": "mobile-banking",
         "target": "audit-db",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
         "id": "mobile-banking->authentication-service",
         "source": "mobile-banking",
         "target": "authentication-service",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -715,7 +716,7 @@
         "id": "notification-service->authentication-service",
         "source": "notification-service",
         "target": "authentication-service",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -750,7 +751,7 @@
         "id": "payment-service->fraud-engine",
         "source": "payment-service",
         "target": "fraud-engine",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -771,14 +772,14 @@
         "id": "reporting-service->audit-db",
         "source": "reporting-service",
         "target": "audit-db",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
         "id": "reporting-service->authentication-service",
         "source": "reporting-service",
         "target": "authentication-service",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -792,14 +793,14 @@
         "id": "risk-engine->audit-db",
         "source": "risk-engine",
         "target": "audit-db",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
         "id": "risk-engine->authentication-service",
         "source": "risk-engine",
         "target": "authentication-service",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -820,44 +821,34 @@
         "id": "web-banking->api-gateway",
         "source": "web-banking",
         "target": "api-gateway",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
         "id": "web-banking->audit-db",
         "source": "web-banking",
         "target": "audit-db",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
         "id": "web-banking->authentication-service",
         "source": "web-banking",
         "target": "authentication-service",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       }
     ],
     "impacted_services": [
       "account-service",
-      "api-gateway",
-      "atm",
       "audit-db",
-      "authentication-service",
-      "branch-portal",
       "card-service",
       "crm",
       "customer-db",
       "customer-service",
-      "document-service",
-      "fraud-engine",
       "loan-service",
-      "mobile-banking",
       "notification-service",
-      "payment-service",
-      "reporting-service",
-      "risk-engine",
-      "web-banking"
+      "payment-service"
     ],
     "impacted_databases": [
       "audit-db",
@@ -878,10 +869,6 @@
       "GET /payments/{id}",
       "PATCH /cards/{id}/status",
       "PATCH /customers/{id}/profile",
-      "POST /auth/biometric/challenges",
-      "POST /auth/introspect",
-      "POST /auth/step-up",
-      "POST /auth/token",
       "POST /cards/{id}/replacement",
       "POST /customers/{id}/emails/verification",
       "POST /internal/audit/events",
@@ -896,38 +883,24 @@
     ],
     "downstream_systems": [
       "account-service",
-      "api-gateway",
-      "atm",
       "audit-db",
-      "authentication-service",
-      "branch-portal",
       "card-service",
-      "document-service",
-      "fraud-engine",
       "loan-service",
-      "mobile-banking",
-      "payment-service",
-      "reporting-service",
-      "risk-engine",
-      "web-banking"
+      "payment-service"
     ],
     "deployment_groups": [
-      "channels-access",
-      "channels-mobile",
       "core-banking",
       "core-payments",
       "customer-platform",
-      "data-platform",
-      "documents",
-      "identity"
+      "data-platform"
     ]
   },
   "risk": {
     "dimensions": [
       {
         "name": "security",
-        "score": 48,
-        "level": "medium",
+        "score": 38,
+        "level": "low",
         "factors": [
           {
             "label": "baseline",
@@ -939,8 +912,6 @@
             "points": 20,
             "node_ids": [
               "account-service",
-              "api-gateway",
-              "authentication-service",
               "card-service",
               "crm",
               "customer-db",
@@ -950,40 +921,22 @@
             ]
           },
           {
-            "label": "critical identity path",
-            "points": 10,
-            "node_ids": [
-              "api-gateway",
-              "authentication-service"
-            ]
-          },
-          {
             "label": "blast radius size",
             "points": 10,
             "node_ids": [
               "account-service",
-              "api-gateway",
-              "atm",
               "audit-db",
-              "authentication-service",
-              "branch-portal",
               "card-service",
               "crm",
               "customer-db",
               "customer-service",
-              "document-service",
-              "fraud-engine",
               "loan-service",
-              "mobile-banking",
               "notification-service",
-              "payment-service",
-              "reporting-service",
-              "risk-engine",
-              "web-banking"
+              "payment-service"
             ]
           }
         ],
-        "explanation": "Security risk is medium (48) because customer data (+20) on account-service, api-gateway, authentication-service and 6 more; critical identity path (+10) on api-gateway, authentication-service; blast radius size (+10) on account-service, api-gateway, atm and 16 more."
+        "explanation": "Security risk is low (38) because customer data (+20) on account-service, card-service, crm and 4 more; blast radius size (+10) on account-service, audit-db, card-service and 6 more."
       },
       {
         "name": "compliance",
@@ -1017,7 +970,6 @@
             "points": 8,
             "node_ids": [
               "account-service",
-              "api-gateway",
               "loan-service",
               "payment-service"
             ]
@@ -1042,7 +994,7 @@
       },
       {
         "name": "technical",
-        "score": 53,
+        "score": 58,
         "level": "medium",
         "factors": [
           {
@@ -1069,24 +1021,31 @@
           },
           {
             "label": "dependency depth",
+            "points": 5,
+            "node_ids": [
+              "account-service",
+              "audit-db",
+              "card-service",
+              "loan-service",
+              "payment-service"
+            ]
+          },
+          {
+            "label": "new feature",
             "points": 10,
             "node_ids": [
-              "atm",
-              "branch-portal",
-              "document-service",
-              "fraud-engine",
-              "mobile-banking",
-              "reporting-service",
-              "risk-engine",
-              "web-banking"
+              "crm",
+              "customer-db",
+              "customer-service",
+              "notification-service"
             ]
           }
         ],
-        "explanation": "Technical risk is medium (53) because database schema change (+20) on audit-db, customer-db; direct services (+18) on crm, customer-service, notification-service; dependency depth (+10) on atm, branch-portal, document-service and 5 more."
+        "explanation": "Technical risk is medium (58) because database schema change (+20) on audit-db, customer-db; direct services (+18) on crm, customer-service, notification-service; new feature (+10) on crm, customer-db, customer-service and 1 more."
       },
       {
         "name": "operational",
-        "score": 63,
+        "score": 53,
         "level": "medium",
         "factors": [
           {
@@ -1103,23 +1062,13 @@
           },
           {
             "label": "downstream systems",
-            "points": 20,
+            "points": 10,
             "node_ids": [
               "account-service",
-              "api-gateway",
-              "atm",
               "audit-db",
-              "authentication-service",
-              "branch-portal",
               "card-service",
-              "document-service",
-              "fraud-engine",
               "loan-service",
-              "mobile-banking",
-              "payment-service",
-              "reporting-service",
-              "risk-engine",
-              "web-banking"
+              "payment-service"
             ]
           },
           {
@@ -1127,33 +1076,23 @@
             "points": 6,
             "node_ids": [
               "account-service",
-              "api-gateway",
-              "atm",
               "audit-db",
-              "authentication-service",
-              "branch-portal",
               "card-service",
               "crm",
               "customer-db",
               "customer-service",
-              "document-service",
-              "fraud-engine",
               "loan-service",
-              "mobile-banking",
               "notification-service",
-              "payment-service",
-              "reporting-service",
-              "risk-engine",
-              "web-banking"
+              "payment-service"
             ]
           }
         ],
-        "explanation": "Operational risk is medium (63) because service criticality (+32) on customer-service; downstream systems (+20) on account-service, api-gateway, atm and 12 more; deployment groups (+6) on account-service, api-gateway, atm and 16 more."
+        "explanation": "Operational risk is medium (53) because service criticality (+32) on customer-service; downstream systems (+10) on account-service, audit-db, card-service and 2 more; deployment groups (+6) on account-service, audit-db, card-service and 6 more."
       },
       {
         "name": "performance",
-        "score": 40,
-        "level": "medium",
+        "score": 25,
+        "level": "low",
         "factors": [
           {
             "label": "baseline",
@@ -1166,22 +1105,13 @@
             "node_ids": [
               "payment-service"
             ]
-          },
-          {
-            "label": "channel path",
-            "points": 15,
-            "node_ids": [
-              "api-gateway",
-              "mobile-banking",
-              "web-banking"
-            ]
           }
         ],
-        "explanation": "Performance risk is medium (40) because transaction path (+20) on payment-service; channel path (+15) on api-gateway, mobile-banking, web-banking."
+        "explanation": "Performance risk is low (25) because transaction path (+20) on payment-service."
       },
       {
         "name": "delivery",
-        "score": 62,
+        "score": 46,
         "level": "medium",
         "factors": [
           {
@@ -1210,35 +1140,27 @@
           },
           {
             "label": "owner coordination",
-            "points": 32,
+            "points": 16,
             "node_ids": [
               "account-service",
-              "api-gateway",
-              "atm",
               "audit-db",
-              "authentication-service",
-              "branch-portal",
               "card-service",
               "crm",
               "customer-db",
               "customer-service",
-              "document-service",
-              "fraud-engine",
               "loan-service",
-              "mobile-banking",
               "notification-service",
-              "payment-service",
-              "reporting-service",
-              "risk-engine",
-              "web-banking"
+              "payment-service"
             ]
           }
         ],
-        "explanation": "Delivery risk is medium (62) because owner coordination (+32) on account-service, api-gateway, atm and 16 more; direct services (+15) on crm, customer-service, notification-service; low ambiguity (+10) on crm, customer-db, customer-service and 1 more."
+        "explanation": "Delivery risk is medium (46) because owner coordination (+16) on account-service, audit-db, card-service and 6 more; direct services (+15) on crm, customer-service, notification-service; low ambiguity (+10) on crm, customer-db, customer-service and 1 more."
       }
     ],
-    "overall": 62,
-    "highest": "operational"
+    "overall": 57,
+    "highest": "compliance",
+    "change_size": "medium",
+    "change_size_reason": "3 services change, including an API, schema or login change"
   },
   "tests": {
     "tests": [
@@ -1256,125 +1178,6 @@
           "Check the documented outcome for Customer profile patch rejects malformed secondary email addresses."
         ],
         "expected": "Customer profile patch rejects malformed secondary email addresses meets its documented acceptance criteria.",
-        "source": "catalog",
-        "automation_candidate": true
-      },
-      {
-        "id": "TC-012",
-        "title": "Account limits endpoint rejects unauthorized limit overrides",
-        "type": "api",
-        "priority": "P1",
-        "covers": [
-          "account-service"
-        ],
-        "steps": [
-          "Prepare fixtures for Account limits endpoint rejects unauthorized limit overrides.",
-          "Execute the scenario: Account limits endpoint rejects unauthorized limit overrides.",
-          "Check the documented outcome for Account limits endpoint rejects unauthorized limit overrides."
-        ],
-        "expected": "Account limits endpoint rejects unauthorized limit overrides meets its documented acceptance criteria.",
-        "source": "catalog",
-        "automation_candidate": true
-      },
-      {
-        "id": "TC-014",
-        "title": "Payment creation returns the same instruction for a repeated idempotency key",
-        "type": "api",
-        "priority": "P1",
-        "covers": [
-          "payment-service"
-        ],
-        "steps": [
-          "Prepare fixtures for Payment creation returns the same instruction for a repeated idempotency key.",
-          "Execute the scenario: Payment creation returns the same instruction for a repeated idempotency key.",
-          "Check the documented outcome for Payment creation returns the same instruction for a repeated idempotency key."
-        ],
-        "expected": "Payment creation returns the same instruction for a repeated idempotency key meets its documented acceptance criteria.",
-        "source": "catalog",
-        "automation_candidate": true
-      },
-      {
-        "id": "TC-018",
-        "title": "Card status update rejects an expired step-up proof",
-        "type": "api",
-        "priority": "P1",
-        "covers": [
-          "card-service"
-        ],
-        "steps": [
-          "Prepare fixtures for Card status update rejects an expired step-up proof.",
-          "Execute the scenario: Card status update rejects an expired step-up proof.",
-          "Check the documented outcome for Card status update rejects an expired step-up proof."
-        ],
-        "expected": "Card status update rejects an expired step-up proof meets its documented acceptance criteria.",
-        "source": "catalog",
-        "automation_candidate": true
-      },
-      {
-        "id": "TC-020",
-        "title": "CRM contact update enforces optimistic version checks",
-        "type": "api",
-        "priority": "P1",
-        "covers": [
-          "crm"
-        ],
-        "steps": [
-          "Prepare fixtures for CRM contact update enforces optimistic version checks.",
-          "Execute the scenario: CRM contact update enforces optimistic version checks.",
-          "Check the documented outcome for CRM contact update enforces optimistic version checks."
-        ],
-        "expected": "CRM contact update enforces optimistic version checks meets its documented acceptance criteria.",
-        "source": "catalog",
-        "automation_candidate": true
-      },
-      {
-        "id": "TC-022",
-        "title": "Token introspection rejects expired and revoked sessions",
-        "type": "api",
-        "priority": "P1",
-        "covers": [
-          "authentication-service"
-        ],
-        "steps": [
-          "Prepare fixtures for Token introspection rejects expired and revoked sessions.",
-          "Execute the scenario: Token introspection rejects expired and revoked sessions.",
-          "Check the documented outcome for Token introspection rejects expired and revoked sessions."
-        ],
-        "expected": "Token introspection rejects expired and revoked sessions meets its documented acceptance criteria.",
-        "source": "catalog",
-        "automation_candidate": true
-      },
-      {
-        "id": "TC-024",
-        "title": "Notification submission rejects an unsupported delivery channel",
-        "type": "api",
-        "priority": "P1",
-        "covers": [
-          "notification-service"
-        ],
-        "steps": [
-          "Prepare fixtures for Notification submission rejects an unsupported delivery channel.",
-          "Execute the scenario: Notification submission rejects an unsupported delivery channel.",
-          "Check the documented outcome for Notification submission rejects an unsupported delivery channel."
-        ],
-        "expected": "Notification submission rejects an unsupported delivery channel meets its documented acceptance criteria.",
-        "source": "catalog",
-        "automation_candidate": true
-      },
-      {
-        "id": "TC-026",
-        "title": "Gateway card status route enforces the required authorization scope",
-        "type": "api",
-        "priority": "P1",
-        "covers": [
-          "api-gateway"
-        ],
-        "steps": [
-          "Prepare fixtures for Gateway card status route enforces the required authorization scope.",
-          "Execute the scenario: Gateway card status route enforces the required authorization scope.",
-          "Check the documented outcome for Gateway card status route enforces the required authorization scope."
-        ],
-        "expected": "Gateway card status route enforces the required authorization scope meets its documented acceptance criteria.",
         "source": "catalog",
         "automation_candidate": true
       },
@@ -1413,255 +1216,204 @@
         "automation_candidate": true
       },
       {
-        "id": "TC-011",
-        "title": "Account daily limits distinguish premium and standard eligibility",
+        "id": "TC-029",
+        "title": "Customer profile persistence preserves optional preferred name fields",
         "type": "functional",
         "priority": "P1",
+        "covers": [
+          "customer-db"
+        ],
+        "steps": [
+          "Prepare fixtures for Customer profile persistence preserves optional preferred name fields.",
+          "Execute the scenario: Customer profile persistence preserves optional preferred name fields.",
+          "Check the documented outcome for Customer profile persistence preserves optional preferred name fields."
+        ],
+        "expected": "Customer profile persistence preserves optional preferred name fields meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-045",
+        "title": "Preferred name and verified secondary email propagate to CRM and notifications",
+        "type": "integration",
+        "priority": "P1",
+        "covers": [
+          "crm",
+          "customer-db",
+          "customer-service",
+          "notification-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Preferred name and verified secondary email propagate to CRM and notifications.",
+          "Execute the scenario: Preferred name and verified secondary email propagate to CRM and notifications.",
+          "Check the documented outcome for Preferred name and verified secondary email propagate to CRM and notifications."
+        ],
+        "expected": "Preferred name and verified secondary email propagate to CRM and notifications meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-053",
+        "title": "Customer profile and CRM contact access prevent cross-customer disclosure",
+        "type": "security",
+        "priority": "P1",
+        "covers": [
+          "crm",
+          "customer-db",
+          "customer-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Customer profile and CRM contact access prevent cross-customer disclosure.",
+          "Execute the scenario: Customer profile and CRM contact access prevent cross-customer disclosure.",
+          "Check the documented outcome for Customer profile and CRM contact access prevent cross-customer disclosure."
+        ],
+        "expected": "Customer profile and CRM contact access prevent cross-customer disclosure meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-012",
+        "title": "Account limits endpoint rejects unauthorized limit overrides",
+        "type": "api",
+        "priority": "P2",
         "covers": [
           "account-service"
         ],
         "steps": [
-          "Prepare fixtures for Account daily limits distinguish premium and standard eligibility.",
-          "Execute the scenario: Account daily limits distinguish premium and standard eligibility.",
-          "Check the documented outcome for Account daily limits distinguish premium and standard eligibility."
+          "Prepare fixtures for Account limits endpoint rejects unauthorized limit overrides.",
+          "Execute the scenario: Account limits endpoint rejects unauthorized limit overrides.",
+          "Check the documented outcome for Account limits endpoint rejects unauthorized limit overrides."
         ],
-        "expected": "Account daily limits distinguish premium and standard eligibility meets its documented acceptance criteria.",
+        "expected": "Account limits endpoint rejects unauthorized limit overrides meets its documented acceptance criteria.",
         "source": "catalog",
         "automation_candidate": true
       },
       {
-        "id": "TC-013",
-        "title": "Payments reject amounts exceeding the remaining daily account limit",
-        "type": "functional",
-        "priority": "P1",
+        "id": "TC-014",
+        "title": "Payment creation returns the same instruction for a repeated idempotency key",
+        "type": "api",
+        "priority": "P2",
         "covers": [
           "payment-service"
         ],
         "steps": [
-          "Prepare fixtures for Payments reject amounts exceeding the remaining daily account limit.",
-          "Execute the scenario: Payments reject amounts exceeding the remaining daily account limit.",
-          "Check the documented outcome for Payments reject amounts exceeding the remaining daily account limit."
+          "Prepare fixtures for Payment creation returns the same instruction for a repeated idempotency key.",
+          "Execute the scenario: Payment creation returns the same instruction for a repeated idempotency key.",
+          "Check the documented outcome for Payment creation returns the same instruction for a repeated idempotency key."
         ],
-        "expected": "Payments reject amounts exceeding the remaining daily account limit meets its documented acceptance criteria.",
-        "source": "catalog",
-        "automation_candidate": true
-      },
-      {
-        "id": "TC-017",
-        "title": "Card freeze and unfreeze preserve the original cardholder linkage",
-        "type": "functional",
-        "priority": "P1",
-        "covers": [
-          "card-service"
-        ],
-        "steps": [
-          "Prepare fixtures for Card freeze and unfreeze preserve the original cardholder linkage.",
-          "Execute the scenario: Card freeze and unfreeze preserve the original cardholder linkage.",
-          "Check the documented outcome for Card freeze and unfreeze preserve the original cardholder linkage."
-        ],
-        "expected": "Card freeze and unfreeze preserve the original cardholder linkage meets its documented acceptance criteria.",
-        "source": "catalog",
-        "automation_candidate": true
-      },
-      {
-        "id": "TC-019",
-        "title": "CRM contact synchronization retains verified address preferences",
-        "type": "functional",
-        "priority": "P1",
-        "covers": [
-          "crm"
-        ],
-        "steps": [
-          "Prepare fixtures for CRM contact synchronization retains verified address preferences.",
-          "Execute the scenario: CRM contact synchronization retains verified address preferences.",
-          "Check the documented outcome for CRM contact synchronization retains verified address preferences."
-        ],
-        "expected": "CRM contact synchronization retains verified address preferences meets its documented acceptance criteria.",
-        "source": "catalog",
-        "automation_candidate": true
-      },
-      {
-        "id": "TC-021",
-        "title": "Biometric login verifies a device-bound challenge before issuing a token",
-        "type": "functional",
-        "priority": "P1",
-        "covers": [
-          "authentication-service"
-        ],
-        "steps": [
-          "Prepare fixtures for Biometric login verifies a device-bound challenge before issuing a token.",
-          "Execute the scenario: Biometric login verifies a device-bound challenge before issuing a token.",
-          "Check the documented outcome for Biometric login verifies a device-bound challenge before issuing a token."
-        ],
-        "expected": "Biometric login verifies a device-bound challenge before issuing a token meets its documented acceptance criteria.",
+        "expected": "Payment creation returns the same instruction for a repeated idempotency key meets its documented acceptance criteria.",
         "source": "catalog",
         "automation_candidate": true
       },
       {
         "id": "GEN-1",
-        "title": "Setting secondary email with verification and consent creates audit event recording consent evidence",
-        "type": "functional",
+        "title": "Security: Consent withdrawal immediately stops secondary email notifications and records audit evidence",
+        "type": "security",
         "priority": "P1",
         "covers": [
           "audit-db",
+          "customer-db",
           "customer-service",
           "notification-service"
         ],
         "steps": [
-          "1. Authenticate a test customer via /auth/token.",
-          "2. PATCH /customers/{id}/profile with {\"preferred_name\":\"Johnny\",\"secondary_email\":\"johnny@example.com\",\"verification_pending\":true,\"consent\":true}.",
-          "3. Simulate email verification by calling POST /customers/{id}/emails/verification with a valid test token.",
-          "4. Wait for eventual consistency.",
-          "5. Query audit-db for events where customer_id = {id} and event_type = \"secondary_email_consent\".",
-          "6. Verify that exactly one such event exists with consent=true and timestamp within the test window."
+          "Set a preferred name and secondary email for a customer, complete email verification, and capture explicit consent for service notifications.",
+          "Confirm notification-service delivers a service notification to the verified secondary email.",
+          "Withdraw consent for secondary email notifications through customer-service.",
+          "Attempt to trigger a service notification to the secondary email.",
+          "Query audit-db for consent withdrawal events associated with the customer."
         ],
-        "expected": "Audit DB contains a consent evidence event recording the secondary email consent.",
+        "expected": "notification-service does not use the secondary email after consent withdrawal; the consent withdrawal is recorded in audit-db; legal name and primary email behaviour remain unchanged.",
         "source": "generated",
         "automation_candidate": false
       },
       {
         "id": "GEN-2",
-        "title": "Verified secondary email influences fraud engine risk score when consented",
-        "type": "functional",
+        "title": "Compliance: GDPR erasure removes preferred name and secondary email while retaining consent evidence",
+        "type": "integration",
         "priority": "P1",
         "covers": [
-          "customer-service",
-          "fraud-engine",
-          "notification-service"
+          "audit-db",
+          "crm",
+          "customer-db",
+          "customer-service"
         ],
         "steps": [
-          "1. Create a customer with no secondary email.",
-          "2. Perform a small payment transaction via POST /payments.",
-          "3. Call the fraud screening endpoint to obtain a baseline risk score.",
-          "4. Add a secondary email via PATCH profile with verification_pending false, consent false.",
-          "5. Verify the email via the verification endpoint.",
-          "6. Set consent true via PATCH profile.",
-          "7. Repeat the same payment transaction.",
-          "8. Obtain the fraud risk score after the transaction.",
-          "9. Verify that the risk score differs from the baseline (e.g., decreased by at least 5 points) due to the additional verified contact."
+          "Create a customer profile with a preferred name and a verified secondary email, and record explicit consent for notifications.",
+          "Submit a GDPR erasure request for the customer through customer-service.",
+          "Verify customer-db no longer stores the preferred name or secondary email for the customer.",
+          "Verify the CRM contact projection no longer includes the preferred name or secondary email.",
+          "Verify audit-db retains the consent evidence for GDPR review."
         ],
-        "expected": "Fraud engine risk score updates reflecting the verified secondary email.",
+        "expected": "Preferred name and secondary email are erased from customer-db and CRM; consent evidence remains in audit-db; legal name and primary email erasure behaviour is unchanged.",
         "source": "generated",
         "automation_candidate": false
       },
       {
         "id": "GEN-3",
-        "title": "Loan service uses preferred name in email notifications when secondary email verified and consented",
-        "type": "functional",
+        "title": "Technical: Backward-compatible schema change accepts blank optional fields and keeps primary email sync intact",
+        "type": "integration",
         "priority": "P1",
         "covers": [
-          "customer-service",
-          "loan-service",
-          "notification-service"
+          "crm",
+          "customer-db",
+          "customer-service"
         ],
         "steps": [
-          "1. Set preferred name \"Liz\" and a verified, consented secondary email via PATCH and verification endpoints.",
-          "2. Submit a loan application via POST /loans/applications.",
-          "3. Upon approval (simulate or trigger), the notification-service sends an email to the secondary email.",
-          "4. Intercept the email (test harness) and verify the body contains a greeting \"Dear Liz\" and the secondary email address."
+          "Apply the backward-compatible customer-db schema change enabling preferred name and secondary email fields.",
+          "Update a customer profile with a blank preferred name and a blank secondary email through customer-service.",
+          "Synchronise the contact projection to CRM.",
+          "Retrieve the customer profile from customer-db and the contact record from CRM."
         ],
-        "expected": "Loan service communication uses the preferred name and is sent to the verified secondary email.",
+        "expected": "Blank preferred name and secondary email are stored without error; primary email and legal name remain unchanged in customer-db and CRM; existing profiles without the new fields remain readable.",
         "source": "generated",
         "automation_candidate": false
       },
       {
         "id": "GEN-4",
-        "title": "Mobile banking app displays preferred name in user profile after update",
-        "type": "functional",
+        "title": "Operational: Profile field addition does not degrade card-service or loan-service availability",
+        "type": "integration",
         "priority": "P1",
         "covers": [
+          "audit-db",
+          "card-service",
           "customer-service",
-          "mobile-banking"
+          "loan-service"
         ],
         "steps": [
-          "1. Authenticate user and PATCH /customers/{id}/profile with {\"preferred_name\":\"Alex\"}.",
-          "2. Launch the mobile banking app and navigate to the Profile screen.",
-          "3. Observe the displayed name field."
+          "Record baseline latency and error rates for card-service endpoints GET /cards/{id} and PATCH /cards/{id}/status, and loan-service endpoints GET /loans/{id} and POST /loans/applications.",
+          "Update a customer profile with a preferred name and secondary email through customer-service, triggering CRM and notification synchronization.",
+          "Exercise the card-service and loan-service endpoints again.",
+          "Query audit-db for the customer profile change event."
         ],
-        "expected": "Mobile banking shows the preferred name ``Alex`` while the legal name remains unchanged in the backend.",
+        "expected": "Card-service and loan-service endpoints respond within baseline latency and error rates; no card or loan behaviour changes; audit-db records the profile change without altering financial event records.",
         "source": "generated",
         "automation_candidate": false
       },
       {
         "id": "GEN-5",
-        "title": "Web banking portal shows preferred name in account overview after profile update",
-        "type": "functional",
+        "title": "Security: Audit database enforces immutability and authorized access for consent evidence records",
+        "type": "security",
         "priority": "P1",
         "covers": [
-          "customer-service",
-          "web-banking"
-        ],
-        "steps": [
-          "1. Authenticate user and PATCH /customers/{id}/profile with {\"preferred_name\":\"Alex\"}.",
-          "2. Log into the web banking portal and go to the Account Overview or Profile page.",
-          "3. Observe the displayed name."
-        ],
-        "expected": "Web banking shows the preferred name ``Alex``.",
-        "source": "generated",
-        "automation_candidate": false
-      },
-      {
-        "id": "GEN-6",
-        "title": "ATM transaction receipt includes preferred name when available",
-        "type": "functional",
-        "priority": "P1",
-        "covers": [
-          "atm",
+          "audit-db",
           "customer-service"
         ],
         "steps": [
-          "1. Set preferred name via PATCH /customers/{id}/profile.",
-          "2. Perform an ATM withdrawal of an allowed amount (simulate via ATM API or test harness).",
-          "3. Retrieve the printed receipt (or capture receipt data).",
-          "4. Verify the receipt includes a greeting with the preferred name."
+          "Record explicit consent for secondary email notifications through customer-service.",
+          "Attempt to modify the consent evidence record directly in audit-db using a privileged database session.",
+          "Attempt to read the consent evidence using an unauthorized service account.",
+          "Query audit-db for access control events related to the consent evidence record."
         ],
-        "expected": "ATM receipt shows the preferred name in the customer greeting.",
-        "source": "generated",
-        "automation_candidate": false
-      },
-      {
-        "id": "GEN-7",
-        "title": "Branch portal staff view shows preferred name alongside legal name",
-        "type": "functional",
-        "priority": "P1",
-        "covers": [
-          "branch-portal",
-          "customer-service"
-        ],
-        "steps": [
-          "1. Teller logs into the branch portal.",
-          "2. Search for the customer by ID.",
-          "3. Open the customer details view.",
-          "4. Verify that the preferred name is displayed alongside the legal name."
-        ],
-        "expected": "Branch portal displays the preferred name.",
-        "source": "generated",
-        "automation_candidate": false
-      },
-      {
-        "id": "GEN-8",
-        "title": "Generated customer statement includes preferred name in address block",
-        "type": "functional",
-        "priority": "P1",
-        "covers": [
-          "customer-service",
-          "document-service"
-        ],
-        "steps": [
-          "1. Set preferred name via PATCH /customers/{id}/profile.",
-          "2. Trigger statement generation (e.g., invoke the internal statement job or wait for the scheduled run).",
-          "3. Obtain the generated PDF statement from document-service or storage.",
-          "4. Extract the address block and verify it contains the preferred name."
-        ],
-        "expected": "Statement PDF includes the preferred name in the customer address block.",
+        "expected": "Modification of consent evidence is rejected; unauthorized read is denied; consent evidence remains unchanged and available for authorized GDPR review; access control events are recorded.",
         "source": "generated",
         "automation_candidate": false
       }
     ],
-    "coverage_estimate": 0.8947368421052632,
-    "effort_hours": 13.2,
-    "automation_candidates": 15,
-    "summary": "Selected 15 catalog tests and 8 new tests, covering 17 of 19 impacted nodes (89%); estimated effort is 13.2 hours."
+    "coverage_estimate": 1.0,
+    "effort_hours": 8.366666666666667,
+    "automation_candidates": 8,
+    "summary": "Selected 8 catalog tests and 5 new tests, covering 9 of 9 impacted nodes (100%); estimated effort is 8.4 hours."
   },
   "compliance": {
     "frameworks": [
@@ -1673,40 +1425,35 @@
         "score": 55,
         "findings": [
           {
-            "text": "The change adds preferred_name and secondary_email fields to the customer profile system of record, expanding the personal data held in customer-service and customer-db. Exposure to be assessed against purpose limitation, data minimization, retention and erasure expectations for the new fields.",
+            "text": "New optional profile fields (preferred name, secondary email) are held in customer-service and persisted in customer-db, with a synchronised contact projection to crm; this creates exposure around data minimisation, purpose limitation, accuracy and retention that warrants privacy review before the fields are populated in production.",
             "node_ids": [
               "customer-service",
-              "customer-db"
-            ]
-          },
-          {
-            "text": "Verification and consent flags used by notification-service introduce a new processing purpose for secondary email contact data, and consent evidence handling needs to be confirmed before the field is used for notifications.",
-            "node_ids": [
-              "notification-service",
+              "customer-db",
               "crm"
             ]
           },
           {
-            "text": "Synchronizing the new fields into the CRM contact projection extends the population of records in scope for access, correction, erasure and consent-withdrawal handling downstream of the system of record.",
+            "text": "Use of the secondary email by notification-service as a delivery destination exposes consent validity, verified-destination and stop-on-withdrawal handling; checks should confirm the channel cannot be used without completed verification and explicit consent, and that withdrawal suppresses further sends.",
             "node_ids": [
+              "notification-service",
               "crm",
-              "customer-db"
+              "customer-service"
             ]
           },
           {
-            "text": "Profile reads traverse api-gateway and authentication-service, so fields returned by existing profile paths should be confirmed as appropriately scoped for each calling channel and service.",
+            "text": "Because access, correction and erasure controls are stated to extend to the new fields, procedures covering customer-db and customer-service need review, and consent evidence recorded in audit-db needs confirmation for completeness and traceability.",
             "node_ids": [
-              "api-gateway",
-              "authentication-service",
-              "customer-service"
+              "customer-db",
+              "customer-service",
+              "audit-db"
             ]
           }
         ],
         "recommendations": [
-          "Confirm lawful basis, stated purpose, retention and erasure handling for preferred_name and secondary_email across customer-service, customer-db, crm and notification-service.",
-          "Verify consent capture, evidence retention and withdrawal propagation before notification-service is permitted to use the secondary email, including preferences surfacing through crm.",
-          "Review profile read paths through api-gateway and authentication-service to confirm the new fields are scoped, minimized or masked appropriately for each caller.",
-          "Confirm subject access, correction and erasure flows cover the new fields and that audit-db logging for profile changes is consistent with existing retention controls."
+          "Review data minimisation, purpose limitation, retention and accuracy treatment for the preferred name and secondary email across customer-service, customer-db and crm.",
+          "Verify consent capture, the completed-verification gate and stop-on-withdrawal propagation for the secondary email destination in notification-service.",
+          "Confirm data subject access, correction and erasure procedures cover both new fields in customer-service and customer-db, with supporting evidence in audit-db.",
+          "Confirm the CRM contact projection keeps primary email and legal name behaviour unchanged, and that blank-value handling is documented for crm and customer-service."
         ]
       },
       {
@@ -1717,32 +1464,32 @@
         "score": 75,
         "findings": [
           {
-            "text": "The change does not touch card data directly, but card-service shares customer-db, api-gateway and authentication-service with the profile flow, so the exposure is whether new profile fields can enter card-data request or response paths.",
+            "text": "The change is described as not touching card data, yet card-service and customer-db form part of the impacted component set; exposure should be assessed to confirm the new profile fields cannot capture, store or transmit cardholder data.",
             "node_ids": [
               "card-service",
-              "api-gateway",
+              "customer-db",
+              "customer-service"
+            ]
+          },
+          {
+            "text": "card-service maintains tokenized card records and cardholder linkage that reference customer profile identifiers, so the customer-db schema change requires checks that cardholder linkage and masking controls remain intact.",
+            "node_ids": [
+              "card-service",
               "customer-db"
             ]
           },
           {
-            "text": "Identity and gateway paths carry both card and profile traffic; ignored or widened token scope, masking or step-up behavior on these shared components would be the exposure area requiring check.",
+            "text": "Secondary email delivery through notification-service should be checked to confirm no card or cardholder data can be included in notification content or destination handling.",
             "node_ids": [
-              "authentication-service",
-              "api-gateway"
-            ]
-          },
-          {
-            "text": "New profile change events will be written alongside cardholder-related access records in audit-db, so integrity, append-only behavior and retention consistency require confirmation.",
-            "node_ids": [
-              "audit-db",
-              "customer-db"
+              "notification-service",
+              "card-service"
             ]
           }
         ],
         "recommendations": [
-          "Confirm no cardholder data fields or card-service payloads are extended by the profile change, and verify masking remains enforced in card-service and api-gateway responses.",
-          "Verify authentication-service token scopes and step-up checks still gate card status and replacement actions after the change.",
-          "Review audit-db capture to confirm cardholder-data access records remain complete and unchanged in scope alongside new profile events."
+          "Confirm that the preferred name and secondary email fields in customer-service and customer-db do not hold cardholder data and remain outside card-data flows.",
+          "Verify access restrictions, tokenization and masking controls in card-service are unaffected by the customer profile and schema changes.",
+          "Check notification-service destination and content controls to confirm card data is not exposed through secondary email delivery."
         ]
       },
       {
@@ -1753,32 +1500,33 @@
         "score": 75,
         "findings": [
           {
-            "text": "Financial data is not directly touched, but customer-db and audit-db are shared with account-service and payment-service flows; the exposure is whether schema changes affect keys, joins or audit queries relied on for financial reporting.",
+            "text": "Although financial data is not directly touched, customer profile changes feed downstream services that post financial entries, so interfaces into account-service, payment-service and loan-service carry exposure to change management, reconciliation and audit trail completeness.",
             "node_ids": [
-              "customer-db",
-              "audit-db",
               "account-service",
-              "payment-service"
-            ]
-          },
-          {
-            "text": "Audit-db is an append-only store with integrity and retention controls, so new profile change events should be confirmed as not affecting the immutability or queryability of financial audit records.",
-            "node_ids": [
+              "payment-service",
+              "loan-service",
               "audit-db"
             ]
           },
           {
-            "text": "A database schema change to a tier1 record store is subject to change-management evidence expectations, including approval, testing and rollback documentation.",
+            "text": "audit-db is in the impacted set; recording of profile, consent and notification changes needs confirmation for immutability, completeness and retention.",
+            "node_ids": [
+              "audit-db",
+              "customer-db"
+            ]
+          },
+          {
+            "text": "The backward-compatible schema change in customer-db requires checks that dependent reporting and audit queries continue to produce complete and consistent records.",
             "node_ids": [
               "customer-db",
-              "customer-service"
+              "audit-db"
             ]
           }
         ],
         "recommendations": [
-          "Verify the customer-db schema change remains backward-compatible with account-service, payment-service, loan-service and reporting reads and does not alter financial reconciliation joins.",
-          "Confirm change-management approval, testing and rollback evidence is recorded for the customer-service and customer-db changes.",
-          "Review audit-db to confirm new profile change events are appended without altering the integrity or completeness of financial audit queries."
+          "Verify change-management approval and impact documentation for interfaces between the customer profile change and account-service, payment-service and loan-service.",
+          "Confirm audit-db records profile, consent and notification events with immutability, completeness and retention controls.",
+          "Check that the customer-db schema change and dependent audit queries preserve consistent, complete financial and audit reporting."
         ]
       },
       {
@@ -1789,34 +1537,31 @@
         "score": 85,
         "findings": [
           {
-            "text": "The change modifies highly critical tier1 core components that act as the customer profile system of record, so service-owner approval and rollback planning for customer-service and customer-db require confirmation.",
+            "text": "Directly changed components include tier1 services with elevated criticality — customer-service and customer-db — creating exposure around service-owner approval, rollback readiness and operational change evidence.",
             "node_ids": [
               "customer-service",
               "customer-db"
             ]
           },
           {
-            "text": "Behavior changes in notification-service and synchronized CRM contact projection cross team ownership boundaries, exposing interface review and coordination expectations between Customer Platform and downstream consumers.",
+            "text": "crm and notification-service consume the updated contact projection, so integration behaviour, monitoring and alerting need confirmation for the changed data flow.",
             "node_ids": [
-              "notification-service",
-              "crm"
+              "crm",
+              "notification-service"
             ]
           },
           {
-            "text": "Multiple dependents read from customer-db, including account-service, loan-service, card-service and authentication-service, so schema or projection changes carry regression exposure for those consumers.",
+            "text": "The customer-db schema change requires migration, backward-compatibility and rollback evidence, and audit-db should trace the change.",
             "node_ids": [
-              "account-service",
-              "loan-service",
-              "card-service",
-              "authentication-service"
+              "customer-db",
+              "audit-db"
             ]
           }
         ],
         "recommendations": [
-          "Obtain service-owner approval and record the rollback plan for customer-service and customer-db before release.",
-          "Verify interface and behavior review with crm and notification-service owners, covering verification and consent handling for the secondary email.",
-          "Confirm regression, authorization and monitoring evidence for customer-db dependents including account-service, loan-service, card-service and authentication-service.",
-          "Record release evidence and operational monitoring expectations for the affected customer-platform components."
+          "Obtain service-owner approval and record a rollback plan for customer-service and customer-db.",
+          "Verify integration tests, monitoring and operational readiness for crm and notification-service against the updated contact projection.",
+          "Confirm migration, backward-compatibility and rollback evidence for the customer-db schema change, with change records in audit-db."
         ]
       }
     ],
@@ -1824,90 +1569,57 @@
     "summary": "4 of 4 frameworks apply; the minimum compliance score is 55/100. 1 applicable framework(s) have high risk."
   },
   "release": {
-    "confidence": 53,
+    "confidence": 58,
     "decision": "GO_WITH_CONDITIONS",
     "triggered_rules": [
-      "GO_WITH_CONDITIONS: highest risk is 63 (>= 60)",
+      "GO_WITH_CONDITIONS: highest risk is 61 (>= 60)",
       "GO_WITH_CONDITIONS: GDPR risk is high",
       "GO_WITH_CONDITIONS: PCI DSS risk is medium",
       "GO_WITH_CONDITIONS: SOX risk is medium"
     ],
     "conditions": [
       "Run the P1 api tests on customer-service before release (TC-010: Customer profile patch rejects malformed secondary email addresses)",
-      "Run the P1 api tests on account-service before release (TC-012: Account limits endpoint rejects unauthorized limit overrides)",
-      "Run the P1 api tests on payment-service before release (TC-014: Payment creation returns the same instruction for a repeated idempotency key)",
-      "Run the P1 api tests on card-service before release (TC-018: Card status update rejects an expired step-up proof)",
-      "Run the P1 api tests on crm before release (TC-020: CRM contact update enforces optimistic version checks)",
-      "Run the P1 api tests on authentication-service before release (TC-022: Token introspection rejects expired and revoked sessions)",
-      "Run the P1 api tests on notification-service before release (TC-024: Notification submission rejects an unsupported delivery channel)",
-      "Run the P1 api tests on api-gateway before release (TC-026: Gateway card status route enforces the required authorization scope)",
       "Run the P1 api tests on customer-db before release (TC-030: Customer store adapter rejects stale profile versions)",
       "Run the P1 functional tests on customer-service before release (TC-009: Customer preferred name round-trips without changing the legal name)",
-      "Run the P1 functional tests on account-service before release (TC-011: Account daily limits distinguish premium and standard eligibility)",
-      "Run the P1 functional tests on payment-service before release (TC-013: Payments reject amounts exceeding the remaining daily account limit)",
-      "Run the P1 functional tests on card-service before release (TC-017: Card freeze and unfreeze preserve the original cardholder linkage)",
-      "Run the P1 functional tests on crm before release (TC-019: CRM contact synchronization retains verified address preferences)",
-      "Run the P1 functional tests on authentication-service before release (TC-021: Biometric login verifies a device-bound challenge before issuing a token)",
-      "Run the P1 functional tests on audit-db, customer-service, notification-service before release (GEN-1: Setting secondary email with verification and consent creates audit event recording consent evidence)",
-      "Run the P1 functional tests on customer-service, fraud-engine, notification-service before release (GEN-2: Verified secondary email influences fraud engine risk score when consented)",
-      "Run the P1 functional tests on customer-service, loan-service, notification-service before release (GEN-3: Loan service uses preferred name in email notifications when secondary email verified and consented)",
-      "Run the P1 functional tests on customer-service, mobile-banking before release (GEN-4: Mobile banking app displays preferred name in user profile after update)",
-      "Run the P1 functional tests on customer-service, web-banking before release (GEN-5: Web banking portal shows preferred name in account overview after profile update)",
-      "Run the P1 functional tests on atm, customer-service before release (GEN-6: ATM transaction receipt includes preferred name when available)",
-      "Run the P1 functional tests on branch-portal, customer-service before release (GEN-7: Branch portal staff view shows preferred name alongside legal name)",
-      "Run the P1 functional tests on customer-service, document-service before release (GEN-8: Generated customer statement includes preferred name in address block)",
-      "Confirm lawful basis, stated purpose, retention and erasure handling for preferred_name and secondary_email across customer-service, customer-db, crm and notification-service.",
-      "Verify consent capture, evidence retention and withdrawal propagation before notification-service is permitted to use the secondary email, including preferences surfacing through crm.",
-      "Review profile read paths through api-gateway and authentication-service to confirm the new fields are scoped, minimized or masked appropriately for each caller.",
-      "Confirm subject access, correction and erasure flows cover the new fields and that audit-db logging for profile changes is consistent with existing retention controls.",
-      "Confirm no cardholder data fields or card-service payloads are extended by the profile change, and verify masking remains enforced in card-service and api-gateway responses.",
-      "Verify authentication-service token scopes and step-up checks still gate card status and replacement actions after the change.",
-      "Review audit-db capture to confirm cardholder-data access records remain complete and unchanged in scope alongside new profile events.",
-      "Verify the customer-db schema change remains backward-compatible with account-service, payment-service, loan-service and reporting reads and does not alter financial reconciliation joins.",
-      "Confirm change-management approval, testing and rollback evidence is recorded for the customer-service and customer-db changes.",
-      "Review audit-db to confirm new profile change events are appended without altering the integrity or completeness of financial audit queries."
+      "Run the P1 functional tests on customer-db before release (TC-029: Customer profile persistence preserves optional preferred name fields)",
+      "Run the P1 integration tests on crm, customer-db, customer-service, notification-service before release (TC-045: Preferred name and verified secondary email propagate to CRM and notifications)",
+      "Run the P1 security tests on crm, customer-db, customer-service before release (TC-053: Customer profile and CRM contact access prevent cross-customer disclosure)",
+      "Run the P1 security tests on audit-db, customer-db, customer-service, notification-service before release (GEN-1: Security: Consent withdrawal immediately stops secondary email notifications and records audit evidence)",
+      "Run the P1 integration tests on audit-db, crm, customer-db, customer-service before release (GEN-2: Compliance: GDPR erasure removes preferred name and secondary email while retaining consent evidence)",
+      "Run the P1 integration tests on crm, customer-db, customer-service before release (GEN-3: Technical: Backward-compatible schema change accepts blank optional fields and keeps primary email sync intact)",
+      "Run the P1 integration tests on audit-db, card-service, customer-service, loan-service before release (GEN-4: Operational: Profile field addition does not degrade card-service or loan-service availability)",
+      "Run the P1 security tests on audit-db, customer-service before release (GEN-5: Security: Audit database enforces immutability and authorized access for consent evidence records)",
+      "Review data minimisation, purpose limitation, retention and accuracy treatment for the preferred name and secondary email across customer-service, customer-db and crm.",
+      "Verify consent capture, the completed-verification gate and stop-on-withdrawal propagation for the secondary email destination in notification-service.",
+      "Confirm data subject access, correction and erasure procedures cover both new fields in customer-service and customer-db, with supporting evidence in audit-db.",
+      "Confirm the CRM contact projection keeps primary email and legal name behaviour unchanged, and that blank-value handling is documented for crm and customer-service.",
+      "Confirm that the preferred name and secondary email fields in customer-service and customer-db do not hold cardholder data and remain outside card-data flows.",
+      "Verify access restrictions, tokenization and masking controls in card-service are unaffected by the customer profile and schema changes.",
+      "Check notification-service destination and content controls to confirm card data is not exposed through secondary email delivery.",
+      "Verify change-management approval and impact documentation for interfaces between the customer profile change and account-service, payment-service and loan-service.",
+      "Confirm audit-db records profile, consent and notification events with immutability, completeness and retention controls.",
+      "Check that the customer-db schema change and dependent audit queries preserve consistent, complete financial and audit reporting."
     ],
     "complexity": "high",
     "rollback_plan": [
-      "Notify stakeholders and owners that rollback is commencing and share the rollback status.",
-      "Activate enhanced monitoring and alerting for all affected services to detect issues during rollback.",
-      "Begin rollback in reverse deployment order: channels-mobile – stop mobile-banking, revert to previous version, run health checks.",
-      "Rollback channels-access – stop atm, branch-portal, and web-banking, revert each to previous version, run health checks.",
-      "Rollback identity – stop api-gateway and authentication-service, revert to previous version, run health checks.",
-      "Rollback documents – stop document-service, revert to previous version, run health checks.",
-      "Rollback data-platform – stop audit-db and reporting-service, revert application code, execute the rehearsed database migration rollback for data-platform, verify database consistency and run data reconciliation checks.",
-      "Rollback customer-platform – stop crm, customer-db, customer-service, and notification-service, revert application code, execute the rehearsed database migration rollback for customer-platform, verify database consistency and run data reconciliation checks (including verification and consent flags).",
-      "Rollback core-payments – stop fraud-engine, payment-service, and risk-engine, revert to previous version, run health checks.",
-      "Rollback core-banking – stop account-service, card-service, and loan-service, revert to previous version, run health checks.",
-      "After each group rollback, confirm monitoring returns to baseline and that all services are healthy.",
-      "Validate that all data is consistent and that any temporary changes have been fully reverted.",
-      "Notify stakeholders and owners of rollback completion, conduct a post‑mortem review, and update run‑books."
+      "In reverse deployment order, roll back core-payments, then core-banking, then customer-platform, and finally data-platform, coordinating each group with its owner.",
+      "For customer-platform and data-platform schema changes, restore from verified backups, execute the rehearsed DB migration rollback, and reconcile data before resuming service.",
+      "Disable configured feature flags, monitor rollback health across all deployment groups, and notify the release owner and stakeholders of status and next steps."
     ],
     "deployment_notes": [
-      "Confirm that all pre‑deployment conditions (test suite pass, security review, feature‑flag readiness) are satisfied before proceeding.",
-      "Notify stakeholders and owners of the upcoming deployment, share the deployment and rollback plans, and establish communication channels.",
-      "Ensure verified backups of the customer-platform and data-platform databases are taken and validated.",
-      "Run the rehearsed, backward‑compatible database migration for customer-platform and data-platform in a staging environment to confirm validity.",
-      "Deploy core-banking services (account-service, card-service, loan-service) – update to the new version, run health checks and verify dependency connections.",
-      "Deploy core-payments services (fraud-engine, payment-service, risk-engine) – update to the new version, run health checks and verify dependency connections.",
-      "Deploy customer-platform services (crm, customer-db, customer-service, notification-service) – update to the new version, apply the database migration if not already applied, enable verification and consent logic for the new fields, run health checks and verify dependency connections.",
-      "Deploy data-platform services (audit-db, reporting-service) – update to the new version, apply any required database schema changes, run health checks and verify dependency connections.",
-      "Deploy documents service (document-service) – update to the new version, run health checks and verify dependency connections.",
-      "Deploy identity services (api-gateway, authentication-service) – update to the new version, run health checks and verify dependency connections.",
-      "Deploy channels-access services (atm, branch-portal, web-banking) – update to the new version, run health checks and verify dependency connections.",
-      "Deploy channels-mobile service (mobile-banking) – update to the new version, run health checks and verify dependency connections.",
-      "After each group deployment, monitor key metrics, logs, and traces; specifically verify that notification-service checks verification and consent before using the secondary email for notifications.",
-      "Confirm with owners and stakeholders that the deployment succeeded, update run‑books, and communicate completion."
+      "Confirm all GO_WITH_CONDITIONS conditions are completed and approved by the release owner before any production rollout.",
+      "Deploy in order: data-platform, customer-platform, core-banking, core-payments, applying backward-compatible customer-platform and data-platform DB migrations before dependent services and keeping configured feature flags off.",
+      "Validate every deployment group and service, monitor customer-service/customer-db/crm/notification-service plus dependencies, and send owner/stakeholder communications."
     ]
   },
   "providers_used": {
-    "requirement": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "requirement": "tokenharbor:deepseek-v4.1-flash:free",
     "dependency": "deterministic",
     "scoring": "deterministic",
-    "testing": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "testing": "tokenharbor:deepseek-v4.1-flash:free",
     "compliance": "tokenharbor:deepseek-v4.1-flash:free",
-    "release": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
+    "release": "tokenharbor:deepseek-v4.1-flash:free"
   },
-  "duration_ms": 197711,
-  "created_at": "2026-10-06T20:15:35.317830Z"
+  "duration_ms": 63,
+  "created_at": "2026-10-07T15:32:50.035103Z"
 }
