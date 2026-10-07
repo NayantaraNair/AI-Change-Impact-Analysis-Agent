@@ -22,7 +22,7 @@ export function NavRail() {
         const active = pathname === href || pathname.startsWith(`${href}/`);
         return (
           <Tooltip key={href}>
-            <TooltipTrigger render={<Link href={href} aria-label={label} aria-current={active ? "page" : undefined} className={cn("flex size-10 items-center justify-center rounded-md text-muted hover:bg-surface-raised hover:text-azure", active && "bg-surface-raised text-azure")} />}>
+            <TooltipTrigger render={<Link href={href} aria-label={label} aria-current={active ? "page" : undefined} className={cn("flex size-10 items-center justify-center rounded-md text-muted hover:bg-surface-raised hover:text-chalk", active && "bg-surface-raised text-chalk")} />}>
               <Icon size={20} aria-hidden="true" />
             </TooltipTrigger>
             <TooltipContent side="right">{label}</TooltipContent>
@@ -31,14 +31,14 @@ export function NavRail() {
       })}
       <div className="mt-auto flex flex-col items-center gap-2">
         <Tooltip>
-          <TooltipTrigger render={<Button id="debug-toggle" variant="ghost" size="icon-lg" aria-label={debugOpen ? "Close debug pane" : "Open debug pane"} aria-expanded={debugOpen} onClick={() => setDebugOpen((open) => !open)} className={cn("relative text-muted hover:text-signal", debugOpen && "bg-surface-raised text-signal")} />}>
+          <TooltipTrigger render={<Button id="debug-toggle" variant="ghost" size="icon-lg" aria-label={debugOpen ? "Close debug pane" : "Open debug pane"} aria-expanded={debugOpen} onClick={() => setDebugOpen((open) => !open)} className={cn("relative text-muted hover:text-chalk", debugOpen && "bg-surface-raised text-chalk")} />}>
             <Bug size={20} aria-hidden="true" />
-            {run?.status === "running" && <span aria-hidden="true" className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-signal" />}
+            {run?.status === "running" && <span aria-hidden="true" className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-model" />}
           </TooltipTrigger>
           <TooltipContent side="right">Debug: run steps, model calls and setup</TooltipContent>
         </Tooltip>
         <Tooltip>
-          <TooltipTrigger render={<Button id="copilot-toggle" variant="ghost" size="icon-lg" aria-label={copilotOpen ? "Close copilot" : "Open copilot"} aria-expanded={copilotOpen} aria-controls={copilotOpen ? "copilot-drawer" : undefined} onClick={toggleCopilot} className={cn("text-muted hover:text-azure", copilotOpen && "bg-surface-raised text-azure")} />}>
+          <TooltipTrigger render={<Button id="copilot-toggle" variant="ghost" size="icon-lg" aria-label={copilotOpen ? "Close copilot" : "Open copilot"} aria-expanded={copilotOpen} aria-controls={copilotOpen ? "copilot-drawer" : undefined} onClick={toggleCopilot} className={cn("text-muted hover:text-chalk", copilotOpen && "bg-surface-raised text-chalk")} />}>
             <Bot size={20} aria-hidden="true" />
           </TooltipTrigger>
           <TooltipContent side="right">Copilot</TooltipContent>

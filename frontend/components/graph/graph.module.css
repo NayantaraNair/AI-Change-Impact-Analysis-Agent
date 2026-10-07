@@ -26,7 +26,7 @@
 .search { position: relative; width: min(280px, 60%); }
 .searchIcon { position: absolute; top: 9px; left: 10px; z-index: 1; color: var(--muted); pointer-events: none; }
 .searchInput { height: 34px; padding-left: 34px; padding-right: 28px; border-radius: 4px; background: var(--canvas); font-size: 13px; }
-.searchInput:focus-visible { outline: 2px solid var(--azure); outline-offset: 2px; }
+.searchInput:focus-visible { outline: 2px solid var(--chalk); outline-offset: 2px; }
 .clearSearch, .closeButton {
   display: inline-flex;
   align-items: center;
@@ -38,7 +38,7 @@
   cursor: pointer;
 }
 .clearSearch { position: absolute; right: 3px; top: 3px; }
-.clearSearch:hover, .closeButton:hover { background: var(--surface-raised); color: var(--azure); }
+.clearSearch:hover, .closeButton:hover { background: var(--surface-raised); color: var(--chalk); }
 .searchResults {
   position: absolute;
   top: 42px;
@@ -55,11 +55,11 @@
   font-size: 13px;
 }
 .searchResults li { display: flex; justify-content: space-between; gap: 12px; padding: 8px; border-radius: 2px; cursor: pointer; }
-.searchResults li:hover, .activeResult { background: var(--surface); outline: 1px solid var(--azure); outline-offset: -1px; }
+.searchResults li:hover, .activeResult { background: var(--surface); outline: 1px solid var(--chalk); outline-offset: -1px; }
 .resultMeta { flex-shrink: 0; color: var(--muted); font-size: 12px; }
 .searchResults .noResults { color: var(--muted); cursor: default; }
 .toggle { display: flex; align-items: center; gap: 8px; white-space: nowrap; color: var(--text); font-size: 13px; cursor: pointer; }
-.toggle input { width: 14px; height: 14px; accent-color: var(--azure); cursor: pointer; }
+.toggle input { width: 14px; height: 14px; accent-color: var(--chalk); cursor: pointer; }
 .flowArea { position: relative; flex: 1; min-height: 0; }
 .emptyState { display: flex; align-items: center; justify-content: center; height: 100%; margin: 0; padding: 24px; color: var(--muted); font-size: 15px; text-align: center; }
 .legend { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: 12px; }
@@ -96,8 +96,8 @@
 .node[data-severity="medium"] { --node-color: var(--impact-med); }
 .node[data-severity="high"] { --node-color: var(--impact-high); }
 .node[data-direct="true"] { border-width: 2px; }
-.node[data-selected="true"] { outline: 2px solid var(--azure); outline-offset: 3px; }
-.node:focus-visible { outline: 2px solid var(--azure); outline-offset: 4px; }
+.node[data-selected="true"] { outline: 2px solid var(--chalk); outline-offset: 3px; }
+.node:focus-visible { outline: 2px solid var(--chalk); outline-offset: 4px; }
 .node[data-type="channel"] { border-radius: 36px; padding-left: 14px; padding-right: 14px; }
 .node[data-type="database"] { padding-top: 17px; padding-bottom: 12px; border-radius: 50% / 12%; }
 .node[data-type="database"]::before { content: ""; position: absolute; inset: 1px 1px auto; height: 10px; border-bottom: 1px solid var(--node-color); border-radius: 50%; pointer-events: none; }
@@ -125,7 +125,7 @@
   --xy-controls-button-background-color: var(--surface);
   --xy-controls-button-background-color-hover: var(--surface-raised);
   --xy-controls-button-color: var(--text);
-  --xy-controls-button-color-hover: var(--azure);
+  --xy-controls-button-color-hover: var(--chalk);
   --xy-controls-button-border-color: var(--line);
   --xy-controls-box-shadow: none;
   background: var(--canvas);
@@ -133,7 +133,7 @@
 .graph :global(.react-flow__controls) { overflow: hidden; border: 1px solid var(--line); border-radius: 4px; box-shadow: none; }
 .graph :global(.react-flow__controls-button) { width: 30px; height: 30px; }
 .graph :global(.react-flow__controls-button:last-child) { border-bottom: 0; }
-.graph :global(.react-flow__controls-button:focus-visible) { position: relative; z-index: 1; outline: 2px solid var(--azure); outline-offset: -3px; }
+.graph :global(.react-flow__controls-button:focus-visible) { position: relative; z-index: 1; outline: 2px solid var(--chalk); outline-offset: -3px; }
 .graph :global(.react-flow__edge-path) { stroke-linecap: round; }
 .graph :global(.react-flow__viewport-portal) { z-index: -1; pointer-events: none; }
 

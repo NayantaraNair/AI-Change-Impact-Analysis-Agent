@@ -15,7 +15,7 @@ import type { DebugInfo, Run } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const statusTone: Record<Run["status"], string> = {
-  running: "text-signal", succeeded: "text-text", failed: "text-impact-high",
+  running: "text-model", succeeded: "text-text", failed: "text-impact-high",
 };
 
 /** Everything behind the current page: the run, every model call, the log and the setup. */

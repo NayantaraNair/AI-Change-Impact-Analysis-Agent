@@ -17,7 +17,7 @@ function RunFacts({ run }: { run: Run | null }) {
     <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-meta text-muted tabular-nums">
       <span>{fixture ? "Saved demo result, no model calls" : `Ran in ${formatElapsed(run.elapsed_ms)}`}</span>
       {!fixture && <span>{calls} model call{calls === 1 ? "" : "s"}{failed ? `, ${failed} fell through to the next provider` : ""}</span>}
-      <button type="button" onClick={() => setDebugOpen(true)} className="inline-flex items-center gap-1 rounded text-signal hover:underline"><Bug aria-hidden="true" className="size-3.5" />Debug details</button>
+      <button type="button" onClick={() => setDebugOpen(true)} className="inline-flex items-center gap-1 rounded text-model hover:underline"><Bug aria-hidden="true" className="size-3.5" />Debug details</button>
     </span>
   );
 }
@@ -60,7 +60,7 @@ export function SprintProvenance({ analysis, run }: { analysis: SprintAnalysis; 
   }
   const fixture = run?.stages.every((stage) => stage.source === "fixture") ?? false;
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-line py-3">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line py-3">
       <span className="flex items-center gap-1.5 text-meta font-medium text-muted">Models behind this sprint <InfoTip label="sources">{explain.sources} Dependency mapping and scoring are always plain code.</InfoTip></span>
       <ul className="flex flex-wrap items-center gap-x-3 gap-y-2">
         {[...counts].sort((a, b) => b[1] - a[1]).map(([label, stages]) => {

@@ -144,7 +144,7 @@ export function SprintAnalysisPage() {
         </div>
       </header>
       <details className="rounded-md border border-line bg-surface px-4 py-3">
-        <summary className="w-fit cursor-pointer text-dense font-medium text-azure">Paste stories</summary>
+        <summary className="w-fit cursor-pointer text-dense font-medium link-ui">Paste stories</summary>
         <form onSubmit={submit} className="mt-3 space-y-3" aria-label="Custom sprint input">
           <label htmlFor="sprint-stories" className="block text-dense">Stories</label>
           <p id="sprint-input-help" className="text-meta text-muted">Paste a JSON array with id, title, description, type and acceptance_criteria, or one story per line: ID | title | description. Type defaults to story; acceptance criteria default to an empty list.</p>

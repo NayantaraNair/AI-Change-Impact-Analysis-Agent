@@ -6,49 +6,53 @@
 
 :root {
   color-scheme: dark;
-  --canvas: #131A23;
-  --surface: #1A2330;
-  --surface-raised: #212C3B;
-  --line: #2B3646;
-  --text: #E4EAF2;
-  --muted: #8B97A9;
-  --azure: #3A96DD;
-  --impact-low: #4FB3A9;
-  --impact-med: #E2A74B;
-  --impact-high: #E5654E;
-  --signal: #3A96DD;
-  --warn: #E2A74B;
+  /* Colour is evidence: risk hues mean risk, violet means a model wrote it,
+     chalk means you can act on it. Everything else is graphite. */
+  --canvas: #18171D;
+  --surface: #201F27;
+  --surface-raised: #2A2933;
+  --line: #383645;
+  --line-strong: #4A4859;
+  --text: #EEECF3;
+  --muted: #9E9AAD;
+  --chalk: #F4F2F8;
+  --model: #B49BFF;
+  --model-deep: #8B6CF0;
+  --impact-low: #3CC4A3;
+  --impact-med: #F2B544;
+  --impact-high: #FF6A55;
+  --warn: #F2B544;
   --background: var(--canvas);
   --foreground: var(--text);
   --card: var(--surface);
   --card-foreground: var(--text);
   --popover: var(--surface-raised);
   --popover-foreground: var(--text);
-  --primary: var(--azure);
+  --primary: var(--chalk);
   --primary-foreground: var(--canvas);
   --secondary: var(--surface-raised);
   --secondary-foreground: var(--text);
   --muted-foreground: var(--muted);
   --accent: var(--surface-raised);
-  --accent-foreground: var(--azure);
+  --accent-foreground: var(--chalk);
   --destructive: var(--impact-high);
   --border: var(--line);
   --input: var(--line);
-  --ring: var(--azure);
+  --ring: var(--chalk);
   --chart-1: var(--impact-low);
   --chart-2: var(--impact-med);
   --chart-3: var(--impact-high);
-  --chart-4: var(--azure);
+  --chart-4: var(--model);
   --chart-5: var(--muted);
   --sidebar: var(--surface);
   --sidebar-foreground: var(--text);
-  --sidebar-primary: var(--azure);
+  --sidebar-primary: var(--chalk);
   --sidebar-primary-foreground: var(--canvas);
   --sidebar-accent: var(--surface-raised);
-  --sidebar-accent-foreground: var(--azure);
+  --sidebar-accent-foreground: var(--chalk);
   --sidebar-border: var(--line);
-  --sidebar-ring: var(--azure);
-  --radius: 0.375rem;
+  --sidebar-ring: var(--chalk);
+  --radius: 0.5rem;
 }
 
 @theme inline {
@@ -58,11 +62,13 @@
   --color-line: var(--line);
   --color-text: var(--text);
   --color-muted: var(--muted);
-  --color-azure: var(--azure);
+  --color-chalk: var(--chalk);
+  --color-model: var(--model);
+  --color-model-deep: var(--model-deep);
+  --color-line-strong: var(--line-strong);
   --color-impact-low: var(--impact-low);
   --color-impact-med: var(--impact-med);
   --color-impact-high: var(--impact-high);
-  --color-signal: var(--signal);
   --color-warn: var(--warn);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -94,8 +100,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-sans: var(--font-instrument-sans), sans-serif;
-  --font-heading: var(--font-instrument-sans), sans-serif;
+  --font-sans: var(--font-mona-sans), sans-serif;
+  --font-heading: var(--font-mona-sans), sans-serif;
   --text-xs: 0.75rem;
   --text-sm: 0.8125rem;
   --text-base: 0.9375rem;
@@ -107,21 +113,48 @@
   --text-body: 0.9375rem;
   --text-section: 1.125rem;
   --text-title: 1.5rem;
-  --text-hero: 2.5rem;
+  --text-hero: 3rem;
   --radius-sm: 0.25rem;
   --radius-md: var(--radius);
   --radius-lg: var(--radius);
-  --radius-xl: 0.5rem;
+  --radius-xl: 0.75rem;
 }
 
 @layer base {
   * { @apply border-line; }
   html { @apply font-sans; font-variant-numeric: tabular-nums; }
-  body { @apply bg-canvas text-text text-body; margin: 0; line-height: 1.5; }
-  h1 { @apply text-title font-semibold; }
-  h2, h3 { @apply text-section font-semibold; }
-  :focus-visible { outline: 2px solid var(--azure); outline-offset: 2px; }
-  ::selection { background: var(--azure); color: var(--canvas); }
+  body { @apply bg-canvas text-text text-body; margin: 0; line-height: 1.55; }
+  h1 { @apply text-title font-semibold; font-stretch: 112%; letter-spacing: -0.01em; }
+  h2, h3 { @apply text-section font-semibold; letter-spacing: -0.005em; }
+  :focus-visible { outline: 2px solid var(--chalk); outline-offset: 2px; }
+  ::selection { background: var(--model-deep); color: var(--chalk); }
+}
+
+/* Scores read like instrument readouts: condensed, heavy, tabular. */
+@utility numeral {
+  font-stretch: 75%;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+/* Anything clickable that is text: chalk with a quiet underline. */
+@utility link-ui {
+  color: var(--chalk);
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in srgb, var(--chalk) 30%, transparent);
+  text-underline-offset: 4px;
+  transition: text-decoration-color 150ms;
+  &:hover { text-decoration-color: var(--chalk); }
+}
+
+/* Hairline-divided readout rows that wrap instead of scrolling sideways. */
+@utility readouts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+  overflow: hidden;
+  & > * { border-left: 1px solid var(--line); margin-left: -1px; padding: 0.25rem 1.25rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

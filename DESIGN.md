@@ -2,8 +2,15 @@
 
 ## Direction
 
-The team's brief asked for **"Microsoft Fabric + Azure inspired, dark mode"**, so keep that. Within it, avoid the generic AI-dashboard look. Specifically, **do not use:**
-- a grid of identical rounded KPI cards with the same soft shadow
+Dark graphite, modern and quiet, with one rule above all: **colour is evidence.**
+
+- The risk scale (jade, saffron, coral) only ever means risk level.
+- Violet only ever means "a language model wrote this, or is working on it now". It marks model provenance, live model activity and the copilot's citations, which puts the project's core idea ("the model reads; code scores") into the colour system.
+- Chalk (near-white) marks everything you can act on: primary buttons, links, focus, selection. There is no blue anywhere.
+- Everything else is graphite, so the chrome never competes with the evidence.
+
+Avoid the generic AI-dashboard look. **Do not use:**
+- a grid of identical rounded KPI cards with the same soft shadow (readouts are hairline-divided rows)
 - gradient washes used as decoration
 - ALL-CAPS tracked-out labels above headings
 - monospace fonts for small data labels
@@ -12,7 +19,7 @@ The team's brief asked for **"Microsoft Fabric + Azure inspired, dark mode"**, s
 - hover animation on every card
 - near-black `#0B0B0B` / `#111` backgrounds
 - accenting a single word in a heading with a different colour or italics
-- `01 / 02 / 03` numbering on content that isn't a sequence
+- `01 / 02 / 03` numbering on content that isn't a sequence (pipeline steps are a sequence)
 
 ## The one memorable element: the blast-radius graph
 
@@ -25,30 +32,32 @@ The team's brief asked for **"Microsoft Fabric + Azure inspired, dark mode"**, s
 
 This is where the boldness goes. Everything else is quiet, dense and disciplined.
 
-## Colour tokens (define them as CSS variables and wire them into Tailwind and the shadcn theme)
+## Colour tokens (CSS variables in `frontend/app/globals.css`, wired into Tailwind and the shadcn theme)
 
 | Token | Hex | Use |
 |---|---|---|
-| `canvas` | `#131A23` | page background (slate blue, not near-black) |
-| `surface` | `#1A2330` | panels, drawer, table header |
-| `surface-raised` | `#212C3B` | popovers, selected rows |
-| `line` | `#2B3646` | borders, unimpacted edges and nodes |
-| `text` | `#E4EAF2` | primary text |
-| `muted` | `#8B97A9` | secondary text |
-| `azure` | `#3A96DD` | interactive elements only: buttons, links, focus ring, selection |
-| `impact-low` | `#4FB3A9` | low risk / GO |
-| `impact-med` | `#E2A74B` | medium risk / GO_WITH_CONDITIONS |
-| `impact-high` | `#E5654E` | high risk / NO_GO |
+| `canvas` | `#18171D` | page background (graphite) |
+| `surface` | `#201F27` | panels, drawers, table headers |
+| `surface-raised` | `#2A2933` | popovers, selected rows |
+| `line` / `line-strong` | `#383645` / `#4A4859` | borders, unimpacted edges and nodes; hover borders |
+| `text` | `#EEECF3` | primary text |
+| `muted` | `#9E9AAD` | secondary text |
+| `chalk` | `#F4F2F8` | interactive only: primary buttons, links (`link-ui`), focus ring, selection |
+| `model` | `#B49BFF` | model provenance and live model activity only |
+| `impact-low` | `#3CC4A3` | low risk / GO |
+| `impact-med` | `#F2B544` | medium risk / GO_WITH_CONDITIONS (also `warn` for fallbacks) |
+| `impact-high` | `#FF6A55` | high risk / NO_GO |
 
-**The impact colours always mean risk level and are never used for decoration.** Azure always means "you can interact with this". Charts use the impact scale for risk and azure or muted for everything else. Check contrast of text on these backgrounds (WCAG AA).
+Check contrast of text on these backgrounds (WCAG AA).
 
 ## Type
 
-- **One family: Instrument Sans** (`next/font/google`), with `font-variant-numeric: tabular-nums` on every number.
-- **Scale:** 12 (meta), 13 (table and dense UI), 15 (body), 18 (section titles), 24 (page titles), 40 (hero numbers in the stat strip).
-- **Weights:** 400 for body, 500 for UI labels, 600 for titles and numbers.
+- **One family: Mona Sans** (`next/font/google`, with its width axis), and `tabular-nums` on every number.
+- **Width carries the personality:** scores and readouts use the `numeral` utility (75% width, bold), like instrument readouts; page titles are set at 112% width; body text is normal width.
+- **Scale:** 12 (meta), 13 (table and dense UI), 15 (body), 18 (section titles), 24 (page titles), 48 (readout numerals).
+- **Weights:** 400 for body, 500 for UI labels, 600 for titles, 700 for numerals.
 - Sentence case everywhere. Labels sit next to their values, not as eyebrows above headings.
-- **Scores are shown as large numbers in type,** coloured by level. Don't use gauges or donut charts for single scores.
+- **Scores are shown as large numerals,** coloured by level. Don't use gauges or donut charts for single scores.
 
 ## Layout
 
@@ -72,7 +81,9 @@ This is where the boldness goes. Everything else is quiet, dense and disciplined
 └──┴────────────────────────────────────────────────┴───────────────┘
 ```
 
-- The **stat strip** is a single row of number+label pairs separated by thin vertical rules. It is **not** a grid of cards.
+- The **stat strip** is a row of number+label readouts separated by hairline rules that wraps on narrow screens (the `readouts` utility). It is **not** a grid of cards.
+- Every result shows **how it was produced** (model, code, cache, saved result or fallback) and every derived number has an info tooltip explaining the rule behind it.
+- While an analysis runs, the **live progress** view replaces the results: each pipeline step, the model working on it against its timeout, and every fallback with its reason. A **debug slide-over** (nav rail and header) shows the full run.
 - **Risk tab:** a Recharts radar chart of the 6 dimensions, plus, for each dimension, a horizontal **stacked factor-contribution bar** (each segment is one factor's points, labelled "+25 customer data"). Clicking a segment highlights its nodes in the graph. The explanation text sits under each bar.
 - **Tests tab:** a dense table with columns priority badge, title, type, covers, source (catalog/generated), automation. Filter chips for P1/P2/P3 and for type. The coverage estimate and effort hours go at the top.
 - **Compliance tab:** one row per framework, showing applicable or not, risk level, score, and expandable findings and recommendations.
@@ -99,9 +110,9 @@ Conflicts: table (story A, story B, shared component, kind, risk,
 
 ## Motion and quality
 
-- **Exactly one orchestrated moment:** the impact-path animation when the graph loads. Elsewhere, motion only responds to the user (drawer open, tab switch, row expand), at 150–200 ms.
+- **Exactly one orchestrated moment:** the impact-path animation when the graph loads. (Live progress indicators move because work is happening, not for decoration.) Elsewhere, motion only responds to the user (drawer open, tab switch, row expand), at 150–200 ms.
 - **Respect `prefers-reduced-motion`:** no edge animation, instant transitions.
-- Visible keyboard focus everywhere (a 2 px azure ring). All controls reachable by keyboard.
+- Visible keyboard focus everywhere (a 2 px chalk ring). All controls reachable by keyboard.
 - Designed for desktop at ≥ 1280 px and usable down to 1024 px. Below that, the details panel stacks under the graph.
 - **Empty states give direction:** "Paste a story and select Analyze to see its blast radius." **Errors say what happened and what to do:** "Couldn't reach the analysis server at :8000. Start the backend or set NEXT_PUBLIC_MOCK=1."
 - **Copy:** plain verbs, sentence case, buttons say what they do ("Analyze story", "Analyze sprint", "Export report"), and the vocabulary stays consistent ("blast radius", "impact path", "factor").

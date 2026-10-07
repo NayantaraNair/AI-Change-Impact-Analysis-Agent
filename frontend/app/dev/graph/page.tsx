@@ -36,8 +36,8 @@ function GraphPreview({ analysis }: { analysis: StoryAnalysis }) {
         {node && <NodeDetailsPanel node={node} component={component} factors={factors} onClose={() => setSelectedId(null)} />}
       </div>
       <section className="mt-6 border-t border-line pt-4" aria-label="Factor highlighting preview">
-        <div className="mb-3 flex items-center gap-4"><h2>Risk factors</h2><span className="text-meta text-muted">Select a factor to highlight its components</span>{activeFactor && <button type="button" className="ml-auto flex items-center gap-1.5 text-dense text-azure" onClick={() => setFactorId(null)}><RotateCcw size={14} aria-hidden="true" />Clear highlight</button>}</div>
-        <div className="flex flex-wrap gap-2">{allFactors.map((factor) => <button key={factor.id} type="button" aria-pressed={factor.id === factorId} onClick={() => setFactorId((current) => current === factor.id ? null : factor.id)} className={`rounded border px-3 py-2 text-dense ${factor.id === factorId ? "border-azure bg-surface-raised text-text" : "border-line bg-surface text-muted hover:text-text"}`}><span className="mr-2 text-text">{factor.points >= 0 ? "+" : ""}{factor.points}</span>{factor.label}</button>)}</div>
+        <div className="mb-3 flex items-center gap-4"><h2>Risk factors</h2><span className="text-meta text-muted">Select a factor to highlight its components</span>{activeFactor && <button type="button" className="ml-auto flex items-center gap-1.5 text-dense text-chalk" onClick={() => setFactorId(null)}><RotateCcw size={14} aria-hidden="true" />Clear highlight</button>}</div>
+        <div className="flex flex-wrap gap-2">{allFactors.map((factor) => <button key={factor.id} type="button" aria-pressed={factor.id === factorId} onClick={() => setFactorId((current) => current === factor.id ? null : factor.id)} className={`rounded border px-3 py-2 text-dense ${factor.id === factorId ? "border-chalk bg-surface-raised text-text" : "border-line bg-surface text-muted hover:text-text"}`}><span className="mr-2 text-text">{factor.points >= 0 ? "+" : ""}{factor.points}</span>{factor.label}</button>)}</div>
       </section>
     </div>
   );
@@ -64,6 +64,6 @@ export default function GraphPreviewPage() {
   }, [attempt]);
 
   if (state.status === "loading") return <p role="status" className="py-12 text-muted">Loading blast radius fixture…</p>;
-  if (state.status === "error") return <div role="alert" className="border border-line bg-surface p-6"><h1>Graph fixture unavailable</h1><p className="mt-2 text-muted">Couldn’t load the graph fixture. Restore public/fixtures/story-ST-107.json and try again.</p><button type="button" className="mt-4 rounded border border-azure px-3 py-2 text-azure" onClick={() => { setState({ status: "loading" }); setAttempt((value) => value + 1); }}>Try again</button></div>;
+  if (state.status === "error") return <div role="alert" className="border border-line bg-surface p-6"><h1>Graph fixture unavailable</h1><p className="mt-2 text-muted">Couldn’t load the graph fixture. Restore public/fixtures/story-ST-107.json and try again.</p><button type="button" className="mt-4 rounded border border-chalk px-3 py-2 text-chalk" onClick={() => { setState({ status: "loading" }); setAttempt((value) => value + 1); }}>Try again</button></div>;
   return <GraphPreview analysis={state.analysis} />;
 }

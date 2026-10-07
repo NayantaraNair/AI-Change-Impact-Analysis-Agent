@@ -19,7 +19,7 @@ export function RunProgress({ run, title }: { run: Run | null; title: string }) 
   if (!run) {
     return (
       <section aria-label="Analysis progress" className="rounded-lg border border-line bg-surface p-5">
-        <p role="status" className="flex items-center gap-2 text-body text-muted"><Loader2 aria-hidden="true" className="size-4 animate-spin text-signal" />{title}: starting…</p>
+        <p role="status" className="flex items-center gap-2 text-body text-muted"><Loader2 aria-hidden="true" className="size-4 animate-spin text-model" />{title}: starting…</p>
       </section>
     );
   }
@@ -30,7 +30,7 @@ export function RunProgress({ run, title }: { run: Run | null; title: string }) 
     <section aria-label="Analysis progress" aria-busy={run.status === "running"} className="space-y-5 rounded-lg border border-line bg-surface p-5">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="flex items-center gap-2"><Activity aria-hidden="true" className="size-4 text-signal" />{title}</h2>
+          <h2 className="flex items-center gap-2"><Activity aria-hidden="true" className="size-4 text-model" />{title}</h2>
           <p className="mt-1 text-dense text-muted tabular-nums">
             {formatElapsed(run.elapsed_ms)} elapsed · {done} of {total} steps done · {run.attempts.filter((a) => a.outcome !== "skipped").length} model calls
           </p>
@@ -38,7 +38,7 @@ export function RunProgress({ run, title }: { run: Run | null; title: string }) 
         <Button type="button" variant="outline" size="sm" onClick={() => setDebugOpen(true)}><Bug aria-hidden="true" className="size-4" />Debug details</Button>
       </header>
       <div className="h-1 w-full overflow-hidden rounded-full bg-line" role="progressbar" aria-label="Steps done" aria-valuemin={0} aria-valuemax={total} aria-valuenow={done}>
-        <div className="h-full rounded-full bg-signal transition-[width] duration-500" style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
+        <div className="h-full rounded-full bg-model transition-[width] duration-500" style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
       </div>
       <NowPanel run={run} active={active} running={running.map((stage) => stage.label + (stage.story_id && run.kind === "sprint" ? ` (${stage.story_id})` : ""))} />
       {run.kind === "sprint" ? <SprintMatrix run={run} /> : <StoryTimeline run={run} />}
@@ -62,7 +62,7 @@ function NowPanel({ run, active, running }: { run: Run; active: ReturnType<typeo
                   <span className="text-muted">: waiting on </span>{providerName(attempt.provider)} <span className="text-muted">{attempt.model} ({attempt.tier} tier)</span>
                   <span className="float-right tabular-nums text-muted">{formatElapsed(attempt.elapsed_ms)} of {attempt.timeout_s} s limit</span>
                 </p>
-                <div className="h-0.5 w-full rounded-full bg-line"><div className={cn("h-full rounded-full", share > 75 ? "bg-warn" : "bg-signal")} style={{ width: `${share}%` }} /></div>
+                <div className="h-0.5 w-full rounded-full bg-line"><div className={cn("h-full rounded-full", share > 75 ? "bg-warn" : "bg-model")} style={{ width: `${share}%` }} /></div>
               </li>
             );
           })}

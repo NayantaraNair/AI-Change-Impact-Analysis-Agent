@@ -80,7 +80,7 @@ function Conversation({ context }: { context: AnalysisContext }) {
             <p className="text-muted">Ask a question about this analysis.</p>
             <div className="flex flex-wrap gap-2" aria-label="Starter questions">
               {COPILOT_STARTER_QUESTIONS.map((question, index) => (
-                <Button key={question} variant="outline" size="sm" className="h-auto whitespace-normal border-line bg-surface text-left text-dense text-azure"
+                <Button key={question} variant="outline" size="sm" className="h-auto whitespace-normal border-line bg-surface text-left text-dense text-text hover:border-line-strong"
                   onClick={() => void send(question, index)}>
                   {question}
                 </Button>
@@ -96,13 +96,13 @@ function Conversation({ context }: { context: AnalysisContext }) {
                 <p className="whitespace-pre-wrap break-words">{message.content}</p>
               ) : (
                 <>
-                  <div className="break-words [overflow-wrap:anywhere] [&_p]:my-2 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-4 [&_li]:my-1 [&_strong]:font-semibold [&_h1]:my-2 [&_h1]:text-body [&_h2]:my-2 [&_h2]:text-body [&_h3]:my-2 [&_h3]:text-body [&_code]:rounded-sm [&_code]:bg-surface-raised [&_code]:px-1 [&_code]:font-sans [&_pre]:overflow-x-auto [&_pre]:whitespace-pre-wrap [&_blockquote]:border-l-2 [&_blockquote]:border-line [&_blockquote]:pl-3 [&_a]:text-azure [&_a]:underline">
+                  <div className="break-words [overflow-wrap:anywhere] [&_p]:my-2 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-4 [&_li]:my-1 [&_strong]:font-semibold [&_h1]:my-2 [&_h1]:text-body [&_h2]:my-2 [&_h2]:text-body [&_h3]:my-2 [&_h3]:text-body [&_code]:rounded-sm [&_code]:bg-surface-raised [&_code]:px-1 [&_code]:font-sans [&_pre]:overflow-x-auto [&_pre]:whitespace-pre-wrap [&_blockquote]:border-l-2 [&_blockquote]:border-line [&_blockquote]:pl-3 [&_a]:text-chalk [&_a]:underline">
                     <ReactMarkdown skipHtml components={{ img: () => null }}>{message.content}</ReactMarkdown>
                   </div>
                   {message.citedNodes.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Cited components">
                       {message.citedNodes.slice(0, 8).map((id) => (
-                        <Button key={id} variant="outline" size="xs" className="border-line bg-surface text-meta text-azure"
+                        <Button key={id} variant="outline" size="xs" className="border-model/40 bg-surface text-meta text-model hover:bg-model/10"
                           aria-label={`Highlight ${id} in the graph`} onClick={() => setHighlight([id])}>
                           {id}
                         </Button>

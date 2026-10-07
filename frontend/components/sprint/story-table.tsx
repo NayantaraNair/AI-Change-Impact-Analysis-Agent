@@ -25,7 +25,7 @@ export function StoryTable({ stories }: { stories: StoryAnalysis[] }) {
                 if (!(event.target as HTMLElement).closest("a")) router.push(href);
               }}>
                 <td className="whitespace-nowrap px-3 py-3 text-muted">{story.id}</td>
-                <td className="px-3 py-3"><Link className="text-azure hover:underline" href={href}>{story.title}</Link></td>
+                <td className="px-3 py-3"><Link className="link-ui" href={href}>{story.title}</Link></td>
                 <td className="px-3 py-3">{highest ? <><span className={`font-semibold tabular-nums ${severityClass[highest.level]}`}>{formatNumber(highest.score)}</span><span className="ml-2 text-meta text-muted">{dimensionLabel[highest.name]}</span></> : <span className="text-muted">Not reported</span>}</td>
                 <td className="px-3 py-3"><Badge variant="outline" className={`rounded border-current/40 ${decisionClass[release.decision]}`}>{decisionLabel[release.decision]}</Badge></td>
                 <td className="px-3 py-3 tabular-nums">{graph.nodes.filter((node) => node.hop !== null).length}</td>

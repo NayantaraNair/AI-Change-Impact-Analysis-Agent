@@ -17,8 +17,8 @@ export function ReleaseTab({ release }: { release: ReleaseAssessment }) {
   return (
     <section aria-label="Release assessment" className="space-y-6 py-5">
       <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
-        <h2 className={`flex items-center gap-2 text-hero font-semibold ${decisionClass[release.decision]}`}>{decisionLabel[release.decision]}<InfoTip label="the release decision">{explain.decision}</InfoTip></h2>
-        <p><span className="text-title font-semibold tabular-nums">{formatNumber(release.confidence)}%</span><span className="ml-2 text-meta text-muted">release confidence</span> <InfoTip label="release confidence">{explain.confidence}</InfoTip></p>
+        <h2 className={`flex items-center gap-2 text-hero numeral ${decisionClass[release.decision]}`}>{decisionLabel[release.decision]}<InfoTip label="the release decision">{explain.decision}</InfoTip></h2>
+        <p><span className="text-title numeral">{formatNumber(release.confidence)}%</span><span className="ml-2 text-meta text-muted">release confidence</span> <InfoTip label="release confidence">{explain.confidence}</InfoTip></p>
         <p className="flex items-center gap-1 text-dense text-muted">Deployment complexity: {release.complexity} <InfoTip label="complexity">{explain.complexity}</InfoTip></p>
       </div>
       <div className="grid gap-6 md:grid-cols-2">
