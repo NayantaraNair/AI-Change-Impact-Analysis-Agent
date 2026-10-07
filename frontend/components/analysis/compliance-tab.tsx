@@ -3,12 +3,14 @@
 import { formatNumber, severityClass } from "@/lib/format";
 import type { ComplianceReport, GraphNode } from "@/lib/types";
 import { NodeLinks } from "./node-links";
+import { InfoTip } from "@/components/ui/info-tip";
+import { explain } from "@/lib/explain";
 
 export function ComplianceTab({ report, nodes }: { report: ComplianceReport; nodes: GraphNode[] }) {
   return (
     <section aria-label="Compliance assessments" className="space-y-4 py-5">
       <div className="flex flex-wrap items-baseline gap-4">
-        <h2>Compliance check</h2>
+        <h2 className="flex items-center gap-1.5">Compliance check <InfoTip label="compliance scoring">{explain.complianceScore}</InfoTip></h2>
         <p><span className="text-title font-semibold tabular-nums">{formatNumber(report.overall_score)}</span><span className="ml-2 text-meta text-muted">/ 100 · higher means more compliant</span></p>
       </div>
       <p className="text-body text-muted">{report.summary}</p>
@@ -16,7 +18,7 @@ export function ComplianceTab({ report, nodes }: { report: ComplianceReport; nod
         {report.frameworks.map((framework) => (
           <details key={framework.framework} className="group">
             <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_120px_100px_70px] items-center gap-4 py-4 text-dense focus-visible:rounded-md">
-              <span className="font-medium text-azure"><span aria-hidden="true" className="mr-2 inline-block transition-transform duration-150 group-open:rotate-90">›</span>{framework.framework}</span>
+              <span className="flex items-center gap-1.5 font-medium text-signal"><span aria-hidden="true" className="inline-block transition-transform duration-150 group-open:rotate-90">›</span>{framework.framework}<InfoTip label={`when ${framework.framework} applies`}>{explain.frameworks[framework.framework]}</InfoTip></span>
               <span className="text-muted">{framework.applicable ? "Applicable" : "Not applicable"}</span>
               <span className={framework.risk_level ? severityClass[framework.risk_level] : "text-muted"}>{framework.risk_level ? `${framework.risk_level[0].toUpperCase()}${framework.risk_level.slice(1)} risk` : "No risk score"}</span>
               <span className={`text-right font-semibold tabular-nums ${framework.risk_level ? severityClass[framework.risk_level] : "text-muted"}`}>{framework.score === null ? "–" : `${formatNumber(framework.score)} / 100`}</span>

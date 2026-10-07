@@ -278,3 +278,101 @@ export interface ChatResponse {
   cited_factors: string[];
   provider: string;
 }
+
+// ---------------------------------------------------------------- runs (live progress)
+
+export type RunKind = "story" | "sprint" | "chat";
+export type RunStatus = "running" | "succeeded" | "failed";
+export type StageStatus = "pending" | "running" | "done" | "failed";
+export type AttemptOutcome =
+  | "running"
+  | "ok"
+  | "timeout"
+  | "rate_limited"
+  | "http_error"
+  | "connection_error"
+  | "truncated"
+  | "invalid_json"
+  | "schema_mismatch"
+  | "empty"
+  | "skipped";
+export type StageSource = "llm" | "deterministic" | "cache" | "fixture" | "fallback";
+
+export interface LlmAttempt {
+  id: number;
+  story_id: string | null;
+  stage: string | null;
+  provider: string;
+  model: string;
+  tier: "fast" | "strong";
+  max_tokens: number;
+  timeout_s: number;
+  started_at: string;
+  elapsed_ms: number;
+  outcome: AttemptOutcome;
+  detail: string;
+  prompt_tokens: number | null;
+  completion_tokens: number | null;
+  reasoning_tokens: number | null;
+}
+
+export interface StageProgress {
+  story_id: string | null;
+  stage: string;
+  label: string;
+  status: StageStatus;
+  source: StageSource | null;
+  provider: string | null;
+  message: string;
+  started_at: string | null;
+  elapsed_ms: number | null;
+}
+
+export interface RunLogEntry {
+  at: string;
+  level: "info" | "warning" | "error";
+  story_id: string | null;
+  message: string;
+}
+
+export interface Run {
+  id: string;
+  kind: RunKind;
+  status: RunStatus;
+  title: string;
+  story_ids: string[];
+  started_at: string;
+  finished_at: string | null;
+  elapsed_ms: number;
+  stages: StageProgress[];
+  attempts: LlmAttempt[];
+  log: RunLogEntry[];
+  error: string | null;
+  story_result: StoryAnalysis | null;
+  sprint_result: SprintAnalysis | null;
+}
+
+export interface RunStarted {
+  run_id: string;
+}
+
+export interface ProviderInfo {
+  order: number;
+  name: string;
+  model: string;
+  host: string;
+  configured: boolean;
+  tool_calling_only: boolean;
+  cooling_down_s: number;
+}
+
+export interface DebugInfo {
+  llm_disabled: boolean;
+  providers: ProviderInfo[];
+  strong_tier_model: string;
+  timeout_s: number;
+  max_concurrent_calls: number;
+  max_tokens: Record<string, number>;
+  cache_enabled: boolean;
+  fixtures_available: string[];
+}

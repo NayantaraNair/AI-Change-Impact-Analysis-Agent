@@ -1,5 +1,7 @@
 import { formatNumber, severityClass } from "@/lib/format";
 import type { SprintKpis } from "@/lib/types";
+import { InfoTip } from "@/components/ui/info-tip";
+import { explain } from "@/lib/explain";
 import { healthLevel, kpiDefinitions } from "./model";
 
 export function SprintStatStrip({ kpis, previous }: { kpis: SprintKpis; previous: SprintKpis | null }) {
@@ -13,7 +15,7 @@ export function SprintStatStrip({ kpis, previous }: { kpis: SprintKpis; previous
         return (
           <div key={stat.key}>
             <div className="flex items-baseline gap-2">
-              <dt className="order-2 text-meta text-muted">{stat.label}</dt>
+              <dt className="order-2 flex items-center gap-1 text-meta text-muted">{stat.label}<InfoTip label={stat.label.toLowerCase()} side="bottom">{explain.kpis[stat.key]}</InfoTip></dt>
               <dd className={`text-hero font-semibold leading-tight tabular-nums ${positive ? severityClass[healthLevel(value)] : "text-text"}`}>
                 {formatNumber(value)}{unit && <span className="ml-1 text-body font-normal text-muted">{unit}</span>}
               </dd>

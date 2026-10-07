@@ -85,10 +85,37 @@ def samples() -> list[BaseModel]:
     request = c.SprintRequest(sprint_id=demo.sprint_id, name=demo.name, stories=[story])
     chat_request = c.ChatRequest(session_id="SESSION-1", message="Why this risk?", context_type="story", context_id=story.id)
     chat_response = c.ChatResponse(answer="The API contract changes", cited_nodes=[component.id], cited_factors=[factor.label], provider="deterministic")
+    at = datetime(2026, 10, 6, 12, 0, tzinfo=timezone.utc)
+    attempt = c.LlmAttempt(
+        id=1, story_id=story.id, stage="requirement", provider="tokenharbor", model="m:free",
+        tier="fast", max_tokens=4000, timeout_s=180, started_at=at, elapsed_ms=180000,
+        outcome="timeout", detail="Timed out after 180 s",
+    )
+    stage = c.StageProgress(
+        story_id=story.id, stage="requirement", label="Read the story", status="done",
+        source="llm", provider="openrouter:m:free", message="enhancement", started_at=at, elapsed_ms=200000,
+    )
+    entry = c.RunLogEntry(at=at, level="warning", story_id=story.id, message="Timed out")
+    run = c.Run(
+        id="abc123", kind="story", status="succeeded", title=story.title, story_ids=[story.id],
+        started_at=at, finished_at=at, elapsed_ms=200000, stages=[stage], attempts=[attempt],
+        log=[entry], story_result=analysis,
+    )
+    started = c.RunStarted(run_id=run.id)
+    provider_info = c.ProviderInfo(
+        order=1, name="tokenharbor", model="m:free", host="tokenharbor.ai", configured=True,
+        tool_calling_only=False, cooling_down_s=0,
+    )
+    debug = c.DebugInfo(
+        llm_disabled=False, providers=[provider_info], strong_tier_model="m:free", timeout_s=180,
+        max_concurrent_calls=4, max_tokens={"requirement": 4000}, cache_enabled=True,
+        fixtures_available=["sprint"],
+    )
     return [
         api, component, architecture, catalog, story, demo, facts, node, edge, graph,
         factor, dimension, risk, case, plan, finding, framework, compliance, release,
         analysis, conflict, kpis, sprint, request, chat_request, chat_response,
+        attempt, stage, entry, run, started, provider_info, debug,
     ]
 
 

@@ -207,7 +207,7 @@ def extracted_payload():
 async def test_mocked_llm_prompt_validation_filtering_and_provenance(monkeypatch, arch):
     item = story("Increase allowance", description="Apply an approved change.", criteria=["Check the allowance."])
 
-    async def complete(system, user, schema, *, tier):
+    async def complete(system, user, schema, *, tier, max_tokens):
         assert system.startswith("You are a banking solutions analyst. Extract facts only; never estimate risk.")
         for component in arch.components:
             assert f"{component.id}: {component.name} — {component.description}" in system

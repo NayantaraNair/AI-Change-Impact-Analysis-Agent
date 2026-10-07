@@ -1,12 +1,11 @@
 "use client";
 
-import type { FunctionComponent, ReactNode } from "react";
+import type { FunctionComponent } from "react";
 import { CopilotPanel } from "@/components/copilot/copilot-panel";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { useAppContext } from "./app-context";
 
-// Accept the shell's original placeholder slot while supplying the actual panel here.
-export const CopilotDrawer: FunctionComponent<{ children?: ReactNode }> = () => {
+export const CopilotDrawer: FunctionComponent = () => {
   const { copilotOpen, setCopilotOpen } = useAppContext();
   return (
     <Sheet open={copilotOpen} onOpenChange={setCopilotOpen} triggerId="copilot-toggle">

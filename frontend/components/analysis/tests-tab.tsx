@@ -6,6 +6,8 @@ import { formatHours, formatNumber, formatPercent } from "@/lib/format";
 import type { GraphNode, TestCase, TestPlan } from "@/lib/types";
 import { filterTests } from "./model";
 import { NodeLinks } from "./node-links";
+import { InfoTip } from "@/components/ui/info-tip";
+import { explain } from "@/lib/explain";
 
 const priorities: TestCase["priority"][] = ["P1", "P2", "P3"];
 const types: TestCase["type"][] = ["functional", "api", "integration", "regression", "security"];
@@ -25,9 +27,9 @@ export function TestsTab({ plan, nodes }: { plan: TestPlan; nodes: GraphNode[] }
     <section aria-label="Test plan" className="space-y-4 py-5">
       <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
         <h2>Test plan</h2>
-        <p><span className="font-semibold tabular-nums">{formatPercent(plan.coverage_estimate)}</span> <span className="text-meta text-muted">coverage estimate</span></p>
-        <p><span className="font-semibold tabular-nums">{formatHours(plan.effort_hours)}</span> <span className="text-meta text-muted">effort</span></p>
-        <p><span className="font-semibold tabular-nums">{formatNumber(plan.automation_candidates)}</span> <span className="text-meta text-muted">automation candidates</span></p>
+        <p className="flex items-baseline gap-1"><span className="font-semibold tabular-nums">{formatPercent(plan.coverage_estimate)}</span> <span className="text-meta text-muted">coverage estimate</span><InfoTip label="coverage">{explain.coverage}</InfoTip></p>
+        <p className="flex items-baseline gap-1"><span className="font-semibold tabular-nums">{formatHours(plan.effort_hours)}</span> <span className="text-meta text-muted">effort</span><InfoTip label="effort">{explain.effort}</InfoTip></p>
+        <p className="flex items-baseline gap-1"><span className="font-semibold tabular-nums">{formatNumber(plan.automation_candidates)}</span> <span className="text-meta text-muted">automation candidates</span><InfoTip label="automation candidates">{explain.automation}</InfoTip></p>
       </div>
       <p className="text-body text-muted">{plan.summary}</p>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
@@ -44,7 +46,7 @@ export function TestsTab({ plan, nodes }: { plan: TestPlan; nodes: GraphNode[] }
       <p role="status" className="text-meta text-muted">{tests.length} of {plan.tests.length} tests · Select a title to see steps and expected results.</p>
       <div className="overflow-x-auto rounded-md border border-line">
         <table className="w-full min-w-[760px] text-left text-dense">
-          <thead className="bg-surface text-muted"><tr>{["Priority", "Title", "Type", "Covers", "Source", "Automation"].map((label) => <th key={label} scope="col" className="px-3 py-2 font-medium">{label}</th>)}</tr></thead>
+          <thead className="bg-surface text-muted"><tr>{["Priority", "Title", "Type", "Covers", "Source", "Automation"].map((label) => <th key={label} scope="col" className="px-3 py-2 font-medium"><span className="inline-flex items-center gap-1">{label}{label === "Priority" && <InfoTip label="priority">{explain.priority}</InfoTip>}{label === "Source" && <InfoTip label="test source">{explain.testSource}</InfoTip>}{label === "Automation" && <InfoTip label="automation">{explain.automation}</InfoTip>}</span></th>)}</tr></thead>
           <tbody>
             {tests.map((test) => (
               <tr key={test.id} className="border-t border-line align-top">

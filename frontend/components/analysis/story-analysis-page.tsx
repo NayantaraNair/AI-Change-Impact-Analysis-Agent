@@ -3,32 +3,35 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/components/shell/app-context";
-import { analyzeStory, ApiError, getDemoSprint, getReport } from "@/lib/api";
-import type { Component, StoryAnalysis, StoryInput } from "@/lib/types";
+import { ApiError, getDemoSprint, getReport, runStory, type TrackedResult } from "@/lib/api";
+import type { Component, Run, StoryAnalysis, StoryInput } from "@/lib/types";
+import { RunProgress } from "@/components/run/run-progress";
 import { fetchArchitecture } from "./architecture";
 import { demoExamples } from "./examples";
 import { emptyStory, formFromStory, storyFromForm } from "./model";
 import { AnalysisResults } from "./analysis-results";
-import { StageProgress } from "./stage-progress";
 import { StoryForm } from "./story-form";
 
 type RequestKind = "story" | "report";
+type Task = (onProgress: (run: Run) => void) => Promise<TrackedResult<StoryAnalysis>>;
 const connectionError = "Couldn't reach the analysis server at :8000. Start the backend or set NEXT_PUBLIC_MOCK=1.";
 
 export function StoryAnalysisPage({ reportId }: { reportId: string | null }) {
-  const { setCurrentAnalysis, setCurrentContext, setHighlight } = useAppContext();
+  const { setCurrentAnalysis, setCurrentContext, setHighlight, setRun } = useAppContext();
   const [form, setForm] = useState(emptyStory);
   const [examples, setExamples] = useState<StoryInput[]>([]);
   const [examplesLoading, setExamplesLoading] = useState(true);
   const [examplesError, setExamplesError] = useState(false);
   const [components, setComponents] = useState<Component[]>([]);
   const [analysis, setAnalysis] = useState<StoryAnalysis | null>(null);
+  const [progress, setProgress] = useState<Run | null>(null);
+  const [pending, setPending] = useState<StoryInput | null>(null);
   const [loading, setLoading] = useState<RequestKind | null>(reportId ? "report" : null);
   const [error, setError] = useState<string | null>(null);
   const [sampleMismatch, setSampleMismatch] = useState(false);
   const active = useRef(true);
   const sequence = useRef(0);
-  const lastRequest = useRef<{ task: () => Promise<StoryAnalysis>; kind: RequestKind; story?: StoryInput } | null>(null);
+  const lastRequest = useRef<{ task: Task; kind: RequestKind; story?: StoryInput } | null>(null);
 
   const loadExamples = useCallback(async () => {
     setExamplesLoading(true);
@@ -43,10 +46,13 @@ export function StoryAnalysisPage({ reportId }: { reportId: string | null }) {
     }
   }, []);
 
-  const run = useCallback(async (task: () => Promise<StoryAnalysis>, kind: RequestKind, story?: StoryInput) => {
+  const run = useCallback(async (task: Task, kind: RequestKind, story?: StoryInput) => {
     const request = ++sequence.current;
     lastRequest.current = { task, kind, story };
     setLoading(kind);
+    setPending(story ?? null);
+    setProgress(null);
+    setRun(null);
     setError(null);
     setAnalysis(null);
     setSampleMismatch(false);
@@ -54,8 +60,13 @@ export function StoryAnalysisPage({ reportId }: { reportId: string | null }) {
     setCurrentAnalysis(null);
     setCurrentContext(null);
     try {
-      const result = await task();
+      const { result, run: finished } = await task((update) => {
+        if (!active.current || request !== sequence.current) return;
+        setProgress(update);
+        setRun(update);
+      });
       if (!active.current || request !== sequence.current) return;
+      setRun(finished);
       setAnalysis(result);
       setCurrentAnalysis(result);
       setCurrentContext({ type: "story", id: result.story.id });
@@ -68,7 +79,7 @@ export function StoryAnalysisPage({ reportId }: { reportId: string | null }) {
     } finally {
       if (active.current && request === sequence.current) setLoading(null);
     }
-  }, [reportId, setCurrentAnalysis, setCurrentContext, setHighlight]);
+  }, [reportId, setCurrentAnalysis, setCurrentContext, setHighlight, setRun]);
 
   useEffect(() => {
     active.current = true;
@@ -83,7 +94,7 @@ export function StoryAnalysisPage({ reportId }: { reportId: string | null }) {
       void fetchArchitecture(controller.signal).then((items) => {
         if (active.current && !controller.signal.aborted) setComponents(items);
       });
-      if (reportId) void run(() => getReport(reportId), "report");
+      if (reportId) void run(async () => ({ result: await getReport(reportId), run: null }), "report");
     });
     return () => {
       active.current = false;
@@ -100,7 +111,12 @@ export function StoryAnalysisPage({ reportId }: { reportId: string | null }) {
     if (loading || !form.title.trim() || !form.description.trim()) return;
     const story = storyFromForm(form, `ST-${crypto.randomUUID()}`);
     setForm(formFromStory(story));
-    void run(() => analyzeStory(story), "story", story);
+    void run((onProgress) => runStory(story, { onProgress }), "story", story);
+  }
+
+  function rerunLive(story: StoryInput) {
+    if (loading) return;
+    void run((onProgress) => runStory(story, { refresh: true, onProgress }), "story", story);
   }
 
   function retry() {
@@ -114,10 +130,10 @@ export function StoryAnalysisPage({ reportId }: { reportId: string | null }) {
         onExample={(story) => { setForm(formFromStory(story)); setError(null); }}
         examplesLoading={examplesLoading} examplesError={examplesError} onRetryExamples={() => void loadExamples()} busy={Boolean(loading)} />
       {error && <div role="alert" className="mb-4 flex flex-wrap items-center gap-3 rounded-md border border-impact-high/40 bg-surface p-4"><p className="flex-1 text-body">{error}</p><Button type="button" variant="outline" onClick={retry}>Try again</Button></div>}
-      {loading ? <StageProgress key={loading} report={loading === "report"} /> : analysis ? (
+      {loading === "report" ? <p role="status" className="border-y border-line py-4 text-muted">Loading saved analysis…</p> : loading ? <RunProgress run={progress} title={`Analyzing ${pending?.id ?? "story"}`} /> : analysis ? (
         <>
           {sampleMismatch && <p role="status" className="mb-4 border-l-2 border-azure bg-surface px-4 py-3 text-dense text-muted">Showing the available sample report for {analysis.story.id}: {analysis.story.title}. Start the backend to analyze the requested story.</p>}
-          <AnalysisResults key={`${analysis.story.id}-${analysis.created_at}`} analysis={analysis} components={components} />
+          <AnalysisResults key={`${analysis.story.id}-${analysis.created_at}`} analysis={analysis} components={components} run={progress?.story_result?.story.id === analysis.story.id ? progress : null} onRerunLive={() => rerunLive(analysis.story)} />
         </>
       ) : !error && <div className="flex min-h-[380px] items-center justify-center border-y border-line bg-surface/40"><p className="text-body text-muted">Paste a story and select Analyze to see its blast radius.</p></div>}
     </div>

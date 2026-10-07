@@ -5,7 +5,11 @@ import { BlastRadiusGraph, NodeDetailsPanel } from "@/components/graph";
 import { useAppContext } from "@/components/shell/app-context";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Component, StoryAnalysis } from "@/lib/types";
+import { InfoTip } from "@/components/ui/info-tip";
+import { StoryProvenance } from "@/components/run/provenance";
+import { explain } from "@/lib/explain";
+import type { Component, Run, StoryAnalysis } from "@/lib/types";
+import { RotateCw } from "lucide-react";
 import { ComplianceTab } from "./compliance-tab";
 import { factorsForNode } from "./model";
 import { ReleaseTab } from "./release-tab";
@@ -14,19 +18,26 @@ import { StatStrip } from "./stat-strip";
 import { SummaryTab } from "./summary-tab";
 import { TestsTab } from "./tests-tab";
 
-export function AnalysisResults({ analysis, components }: { analysis: StoryAnalysis; components: Component[] }) {
+export function AnalysisResults({ analysis, components, run, onRerunLive }: { analysis: StoryAnalysis; components: Component[]; run: Run | null; onRerunLive: () => void }) {
   const { highlight, setHighlight } = useAppContext();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selectedNode = analysis.graph.nodes.find((node) => node.id === selectedId);
   const component = components.find((item) => item.id === selectedId);
   return (
     <section aria-label={`Analysis for ${analysis.story.id}`}>
-      <p className="mb-3 text-dense text-muted">Report: {analysis.story.id} · {analysis.story.title}</p>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-dense text-muted">Report: {analysis.story.id} · {analysis.story.title}</p>
+        <span className="flex items-center gap-1.5">
+          <Button type="button" variant="outline" size="sm" onClick={onRerunLive}><RotateCw aria-hidden="true" />Re-run live</Button>
+          <InfoTip label="re-run live">Runs the whole pipeline again, ignoring saved demo results and the stage cache, so you can watch every step and model call. Takes 1–3 minutes on the free models.</InfoTip>
+        </span>
+      </div>
       <StatStrip analysis={analysis} />
+      <StoryProvenance analysis={analysis} run={run} />
       <div className={`grid min-w-0 ${selectedNode ? "min-[1024px]:grid-cols-[minmax(0,1fr)_360px]" : "grid-cols-1"}`}>
         <section aria-label="Blast radius" className="min-w-0 border-b border-line">
           <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 py-3">
-            <div className="flex flex-wrap items-baseline gap-3"><h2>Blast radius</h2><p className="text-meta text-muted">Select a node for details. Factors below highlight the impact path.</p></div>
+            <div className="flex flex-wrap items-baseline gap-3"><h2 className="flex items-center gap-1.5">Blast radius <InfoTip label="the blast radius">{explain.blastRadius}</InfoTip></h2><p className="text-meta text-muted">Select a node for details. Factors below highlight the impact path.</p></div>
             {highlight.length > 0 && <Button type="button" variant="outline" onClick={() => setHighlight([])}>Clear highlight ({highlight.length})</Button>}
           </div>
           <p className="sr-only" role="status" aria-live="polite">{highlight.length ? `Highlighted nodes: ${highlight.join(", ")}` : "Showing all graph nodes"}</p>

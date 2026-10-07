@@ -209,7 +209,7 @@ async def plan_tests(
                     "Do not compute scores, priorities, effort or coverage."
                 ),
                 user=json.dumps(prompt), schema=_GeneratedTests,
-                tier="strong", max_tokens=6000,
+                tier="strong", max_tokens=llm.MAX_TOKENS["testing"],
             )
             generated = _GeneratedTests.model_validate(result.model_dump()).tests
         except llm.NoLLM:

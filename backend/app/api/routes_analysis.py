@@ -4,7 +4,7 @@ import asyncio
 
 from fastapi import APIRouter, HTTPException
 
-from app import db, pipeline
+from app import db, pipeline, runs
 from app.api.fixtures import story_fixture
 from app.architecture import get_architecture, load_demo_sprint
 from app.contracts import Architecture, DemoSprint, ImpactGraph, StoryAnalysis, StoryInput
@@ -12,14 +12,19 @@ from app.contracts import Architecture, DemoSprint, ImpactGraph, StoryAnalysis, 
 router = APIRouter()
 
 
-@router.post("/analyze", response_model=StoryAnalysis)
-async def analyze(story: StoryInput, refresh: bool = False) -> StoryAnalysis:
+async def execute(story: StoryInput, refresh: bool) -> StoryAnalysis:
     fixture = None if refresh else story_fixture(story)
     if fixture is not None:
+        runs.serve_fixture()
         # SQLite work belongs off the event loop, including the fixture path.
         await asyncio.to_thread(db.save_analysis, fixture)
         return fixture
     return await pipeline.analyze_story(story, refresh=refresh)
+
+
+@router.post("/analyze", response_model=StoryAnalysis)
+async def analyze(story: StoryInput, refresh: bool = False) -> StoryAnalysis:
+    return await execute(story, refresh)
 
 
 @router.get("/architecture", response_model=Architecture)
