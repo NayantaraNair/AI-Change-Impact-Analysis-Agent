@@ -7,6 +7,8 @@ import { useAppContext } from "@/components/shell/app-context";
 import { formatNumber, severityClass } from "@/lib/format";
 import type { RiskFactor, RiskReport, Severity } from "@/lib/types";
 import { dimensionLabel, factorWidth, restoreHighlight, sameNodes } from "./model";
+import { InfoTip } from "@/components/ui/info-tip";
+import { explain } from "@/lib/explain";
 
 const factorColor: Record<Severity, string> = {
   low: "bg-impact-low", medium: "bg-impact-med", high: "bg-impact-high",
@@ -53,7 +55,7 @@ export function RiskTab({ risk }: { risk: RiskReport }) {
   return (
     <section aria-label="Risk breakdown" className="grid gap-6 py-5 min-[1280px]:grid-cols-[300px_minmax(0,1fr)]">
       <div>
-        <h2>Risk profile</h2>
+        <h2 className="flex items-center gap-1.5">Risk profile <InfoTip label="risk scoring">{explain.riskProfile}</InfoTip></h2>
         <p className="mt-1 text-meta text-muted">Six dimensions on a 0–100 scale</p>
         <div className="h-[280px] w-full min-w-0" role="img" aria-label={risk.dimensions.map((d) => `${dimensionLabel[d.name]} ${d.score} out of 100`).join(", ")}>
           <ResponsiveContainer width="100%" height="100%" minWidth={0}>
@@ -75,7 +77,7 @@ export function RiskTab({ risk }: { risk: RiskReport }) {
         {risk.dimensions.map((dimension) => (
           <div key={dimension.name} className="space-y-2">
             <div className="flex items-baseline gap-2">
-              <h3 className="text-body font-medium">{dimensionLabel[dimension.name]}</h3>
+              <h3 className="flex items-center gap-1.5 text-body font-medium">{dimensionLabel[dimension.name]}<InfoTip label={`${dimensionLabel[dimension.name]} risk`}>{explain.dimensions[dimension.name]}</InfoTip></h3>
               <span className={`text-title font-semibold tabular-nums ${severityClass[dimension.level]}`}>{formatNumber(dimension.score)}</span>
               <span className="text-meta text-muted">/ 100 · {dimension.level} risk</span>
             </div>
@@ -94,7 +96,7 @@ export function RiskTab({ risk }: { risk: RiskReport }) {
                         onClick={() => toggle(key, factor)} style={{ width: factorWidth(factor.points) }}
                         className={`relative min-w-0 shrink-0 border-r border-canvas/40 px-2 py-1.5 text-left text-meta font-medium transition-opacity duration-150 hover:opacity-85 focus-visible:z-10 focus-visible:-outline-offset-2 ${baseline ? "bg-line text-text" : `${factorColor[dimension.level]} text-canvas`} ${selected ? "ring-2 ring-azure ring-inset" : ""}`} />
                     }><span className="block truncate">{label}</span></TooltipTrigger>
-                    <TooltipContent>{label} · {noNodes ? "No cited nodes" : factor.node_ids.join(", ")}</TooltipContent>
+                    <TooltipContent className="max-w-sm">{label} · {baseline ? explain.baseline : noNodes ? "No cited nodes" : `Caused by ${factor.node_ids.join(", ")}`}</TooltipContent>
                   </Tooltip>
                 );
               })}

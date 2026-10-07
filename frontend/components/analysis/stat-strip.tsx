@@ -1,32 +1,42 @@
+import type { ReactNode } from "react";
+import { InfoTip } from "@/components/ui/info-tip";
 import type { StoryAnalysis } from "@/lib/types";
+import { explain } from "@/lib/explain";
 import { decisionClass, decisionLabel, formatNumber, formatPercent, severityClass } from "@/lib/format";
 import { dimensionLabel } from "./model";
+
+function Stat({ label, tip, detail, children, className = "" }: { label: string; tip: string; detail?: string; children: ReactNode; className?: string }) {
+  return (
+    <div className={className}>
+      <dt className="order-2 flex items-start gap-1 text-meta text-muted">
+        <span>{label}{detail && <span className="block">{detail}</span>}</span>
+        <InfoTip label={label.toLowerCase()} side="bottom">{tip}</InfoTip>
+      </dt>
+      {children}
+    </div>
+  );
+}
 
 export function StatStrip({ analysis }: { analysis: StoryAnalysis }) {
   const { release, risk, graph, tests } = analysis;
   const highest = risk.dimensions.find((dimension) => dimension.name === risk.highest);
   return (
     <dl aria-label="Analysis statistics" className="flex items-center overflow-x-auto border-y border-line py-5 [&>div]:flex [&>div]:items-baseline [&>div]:gap-2 [&>div]:shrink-0 [&>div]:px-3 [&>div]:first:pl-0 [&>div]:not-first:border-l [&>div]:border-line">
-      <div className="max-w-full">
-        <dt className="order-2 text-meta text-muted">Decision</dt>
+      <Stat label="Decision" tip={explain.decision} className="max-w-full">
         <dd className={`text-hero leading-tight font-semibold tabular-nums ${decisionClass[release.decision]}`}>{decisionLabel[release.decision]}</dd>
-      </div>
-      <div>
-        <dt className="order-2 text-meta text-muted">Confidence</dt>
+      </Stat>
+      <Stat label="Confidence" tip={explain.confidence}>
         <dd className="text-hero leading-tight font-semibold tabular-nums">{formatNumber(release.confidence)}%</dd>
-      </div>
-      <div>
-        <dt className="order-2 text-meta text-muted">Highest risk<span className="block">{dimensionLabel[risk.highest] ?? risk.highest}</span></dt>
+      </Stat>
+      <Stat label="Highest risk" detail={dimensionLabel[risk.highest] ?? risk.highest} tip={explain.highestRisk}>
         <dd className={`text-hero leading-tight font-semibold tabular-nums ${highest ? severityClass[highest.level] : "text-muted"}`}>{highest ? formatNumber(highest.score) : "–"}</dd>
-      </div>
-      <div>
-        <dt className="order-2 text-meta text-muted">Impacted services</dt>
+      </Stat>
+      <Stat label="Impacted services" tip={explain.impacted}>
         <dd className="text-hero leading-tight font-semibold tabular-nums">{formatNumber(graph.impacted_services.length)}</dd>
-      </div>
-      <div>
-        <dt className="order-2 text-meta text-muted">Coverage</dt>
+      </Stat>
+      <Stat label="Coverage" tip={explain.coverage}>
         <dd className="text-hero leading-tight font-semibold tabular-nums">{formatPercent(tests.coverage_estimate)}</dd>
-      </div>
+      </Stat>
     </dl>
   );
 }

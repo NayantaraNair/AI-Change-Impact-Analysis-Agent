@@ -16,6 +16,8 @@
   --impact-low: #4FB3A9;
   --impact-med: #E2A74B;
   --impact-high: #E5654E;
+  --signal: #3A96DD;
+  --warn: #E2A74B;
   --background: var(--canvas);
   --foreground: var(--text);
   --card: var(--surface);
@@ -60,6 +62,8 @@
   --color-impact-low: var(--impact-low);
   --color-impact-med: var(--impact-med);
   --color-impact-high: var(--impact-high);
+  --color-signal: var(--signal);
+  --color-warn: var(--warn);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

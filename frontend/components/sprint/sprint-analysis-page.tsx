@@ -6,8 +6,13 @@ import { factorsForNode } from "@/components/analysis/model";
 import { useAppContext } from "@/components/shell/app-context";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { analyzeSprint, getDemoSprint } from "@/lib/api";
-import type { Conflict, SprintAnalysis, SprintKpis, SprintRequest } from "@/lib/types";
+import { getDemoSprint, runSprint } from "@/lib/api";
+import { explain } from "@/lib/explain";
+import type { Conflict, Run, SprintAnalysis, SprintKpis, SprintRequest } from "@/lib/types";
+import { RunProgress } from "@/components/run/run-progress";
+import { SprintProvenance } from "@/components/run/provenance";
+import { InfoTip } from "@/components/ui/info-tip";
+import { RotateCw } from "lucide-react";
 import { ConflictTable } from "./conflict-table";
 import { DEMO_SPRINT_ID, getSavedSprint } from "./data";
 import { conflictHighlights, parseStories, rememberRun } from "./model";
@@ -16,7 +21,9 @@ import { SprintStatStrip } from "./stat-strip";
 import { StoryTable } from "./story-table";
 
 export function SprintAnalysisPage() {
-  const { highlight, setHighlight, setCurrentContext, setCurrentAnalysis } = useAppContext();
+  const { highlight, setHighlight, setCurrentContext, setCurrentAnalysis, setRun } = useAppContext();
+  const [progress, setProgress] = useState<Run | null>(null);
+  const [running, setRunning] = useState(false);
   const [analysis, setAnalysis] = useState<SprintAnalysis | null>(null);
   const [previous, setPrevious] = useState<SprintKpis | null>(null);
   const [loading, setLoading] = useState<string | null>("Loading saved sprint…");
@@ -62,19 +69,32 @@ export function SprintAnalysisPage() {
     return () => { controller.abort(); operations.current++; };
   }, [accept, setCurrentAnalysis, setCurrentContext, setHighlight]);
 
-  async function run(request: SprintRequest) {
+  async function run(request: SprintRequest, refresh = false) {
     const token = ++operation.current;
     lastRequest.current = request;
     setError(null);
     setInputError(null);
-    setLoading(`Analyzing ${request.stories?.length ?? demoCount} stories in parallel…`);
+    setProgress(null);
+    setRun(null);
+    setRunning(true);
+    setLoading(`Analyzing ${request.stories?.length ?? demoCount} stories in parallel`);
     try {
-      const result = await analyzeSprint(request);
-      if (operation.current === token) accept(result, true);
+      const { result, run: finished } = await runSprint(request, {
+        refresh,
+        onProgress: (update) => {
+          if (operation.current !== token) return;
+          setProgress(update);
+          setRun(update);
+        },
+      });
+      if (operation.current !== token) return;
+      setRun(finished);
+      setProgress(finished);
+      accept(result, true);
     } catch (reason) {
       if (operation.current === token) setError(reason instanceof Error ? reason.message : "Couldn't analyze the sprint. Check the backend and try again.");
     } finally {
-      if (operation.current === token) setLoading(null);
+      if (operation.current === token) { setLoading(null); setRunning(false); }
     }
   }
 
@@ -117,7 +137,11 @@ export function SprintAnalysisPage() {
     <div className="min-w-0 space-y-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div><h1>Sprint analysis</h1>{analysis && <p className="mt-1 text-dense text-muted">{analysis.name} · {analysis.sprint_id}</p>}</div>
-        <Button type="button" disabled={Boolean(loading)} onClick={() => void run({ sprint_id: DEMO_SPRINT_ID })}>Analyze demo sprint</Button>
+        <div className="flex flex-wrap items-center gap-2">
+          {analysis && <Button type="button" variant="outline" disabled={Boolean(loading)} onClick={() => void run(lastRequest.current ?? { sprint_id: DEMO_SPRINT_ID }, true)}><RotateCw aria-hidden="true" />Re-run live</Button>}
+          {analysis && <InfoTip label="re-run live">Runs every story through the pipeline again, ignoring saved demo results and the stage cache, so you can watch each step and model call. Takes a few minutes on the free models.</InfoTip>}
+          <Button type="button" disabled={Boolean(loading)} onClick={() => void run({ sprint_id: DEMO_SPRINT_ID })}>Analyze demo sprint</Button>
+        </div>
       </header>
       <details className="rounded-md border border-line bg-surface px-4 py-3">
         <summary className="w-fit cursor-pointer text-dense font-medium text-azure">Paste stories</summary>
@@ -130,16 +154,17 @@ export function SprintAnalysisPage() {
         </form>
       </details>
       {error && <div role="alert" className="flex flex-wrap items-center gap-3 rounded-md border border-impact-high/40 bg-surface p-4"><p className="flex-1 text-body">{error}</p><Button type="button" variant="outline" disabled={Boolean(loading)} onClick={() => void retry()}>Try again</Button></div>}
-      {loading && <p role="status" aria-live="polite" className="border-y border-line py-6 text-body text-muted">{loading}</p>}
+      {loading && (running ? <RunProgress run={progress} title={loading} /> : <p role="status" aria-live="polite" className="border-y border-line py-6 text-body text-muted">{loading}</p>)}
       {analysis ? <section aria-label="Sprint results" aria-busy={Boolean(loading)} className="space-y-5">
         <SprintStatStrip kpis={analysis.kpis} previous={previous} />
+        <SprintProvenance analysis={analysis} run={progress?.sprint_result ? progress : null} />
         <p className="text-body text-muted">{analysis.summary}</p>
         <div className="grid min-w-0 gap-6 border-b border-line pb-5 min-[1024px]:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
           <StoryTable stories={analysis.stories} />
           <RiskByStoryChart stories={analysis.stories} />
         </div>
         <section aria-labelledby="sprint-conflicts-heading" className="space-y-3">
-          <h2 id="sprint-conflicts-heading">Conflicts</h2>
+          <h2 id="sprint-conflicts-heading" className="flex items-center gap-1.5">Conflicts <InfoTip label="conflict detection">{explain.conflicts}</InfoTip></h2>
           <p className="text-meta text-muted">Select a conflict to highlight its shared component and both stories&apos; direct changes.</p>
           <ConflictTable analysis={analysis} selectedId={selectedConflictId} onSelect={selectConflict} />
         </section>
