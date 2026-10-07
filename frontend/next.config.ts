@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  experimental: { proxyTimeout: 300_000 },
+  experimental: { proxyTimeout: 900_000 },
   async rewrites() {
     return [{
       source: "/api/:path*",

@@ -43,8 +43,9 @@ class Provider:
 TOKENHARBOR_FAST_MODEL = os.getenv("TOKENHARBOR_FAST_MODEL", "deepseek-v4.1-flash:free")
 TOKENHARBOR_STRONG_MODEL = os.getenv("TOKENHARBOR_STRONG_MODEL", "deepseek-v4.1-flash:free")
 
-# Free-tier models can take 30-60 s for long structured answers.
-LLM_TIMEOUT_S = float(os.getenv("LLM_TIMEOUT_S", "60"))
+# Free-tier reasoning models run at ~85 tokens/s, so a 6000-token structured
+# answer needs 70 s or more before any queueing on the provider side.
+LLM_TIMEOUT_S = float(os.getenv("LLM_TIMEOUT_S", "180"))
 
 PROVIDERS = (
     Provider("tokenharbor", "https://tokenharbor.ai/v1", TOKENHARBOR_FAST_MODEL),
@@ -202,9 +203,9 @@ async def _complete_provider(
                     ):
                         tool_mode = retried_tool = True
                         continue
-                    transient = (
-                        status is not None and 500 <= status < 600
-                    ) or isinstance(exc, (APITimeoutError, TimeoutError))
+                    # A timed-out provider is likely to be slow again: move on
+                    # rather than spend another full timeout on it.
+                    transient = status is not None and 500 <= status < 600
                     if transient and not retried_transient:
                         retried_transient = True
                         continue

@@ -70,8 +70,8 @@ async function storyFixture(id: string): Promise<StoryAnalysis> {
   }
 }
 
-// A live sprint runs many LLM calls; free-tier providers can be slow.
-const LLM_TIMEOUT_MS = 300_000;
+// A live sprint runs many LLM calls, each allowed up to 180 s per provider.
+const LLM_TIMEOUT_MS = 900_000;
 
 const post = (body: unknown): RequestInit => ({
   method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),

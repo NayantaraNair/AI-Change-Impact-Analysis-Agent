@@ -148,15 +148,10 @@ async def test_openrouter_quota_cools_all_models(mock_chain, monkeypatch):
     assert len(mock_chain.calls) == 1
 
 
-@pytest.mark.parametrize("error_kind", ["5xx", "sdk_timeout", "deadline"])
 @pytest.mark.parametrize("retry_succeeds", [True, False])
-async def test_transient_retries_same_provider_once(mock_chain, error_kind, retry_succeeds):
+async def test_5xx_retries_same_provider_once(mock_chain, retry_succeeds):
     first, second = llm.PROVIDERS[:2]
-    error = {
-        "5xx": http_error(503),
-        "sdk_timeout": APITimeoutError(request=httpx.Request("POST", "https://mock.invalid")),
-        "deadline": TimeoutError(),
-    }[error_kind]
+    error = http_error(503)
     mock_chain.outcomes[first.model].extend([error, response() if retry_succeeds else error])
     if not retry_succeeds:
         mock_chain.outcomes[second.model].append(response())
@@ -165,6 +160,18 @@ async def test_transient_retries_same_provider_once(mock_chain, error_kind, retr
     assert len(mock_chain.calls) == (2 if retry_succeeds else 3)
     assert mock_chain.clients[0]["max_retries"] == 0
     assert mock_chain.clients[0]["timeout"] == llm.LLM_TIMEOUT_S
+
+
+@pytest.mark.parametrize("error_kind", ["sdk_timeout", "deadline"])
+async def test_timeout_moves_to_next_provider_without_retry(mock_chain, error_kind):
+    first, second = llm.PROVIDERS[:2]
+    mock_chain.outcomes[first.model].append({
+        "sdk_timeout": APITimeoutError(request=httpx.Request("POST", "https://mock.invalid")),
+        "deadline": TimeoutError(),
+    }[error_kind])
+    mock_chain.outcomes[second.model].append(response())
+    assert (await extract())[1] == second.label
+    assert [call["model"] for call in mock_chain.calls] == [first.model, second.model]
 
 
 async def test_connection_error_does_not_retry(mock_chain):
