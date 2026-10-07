@@ -25,7 +25,7 @@ export function Header() {
       </span>
       <Button type="button" variant="ghost" size="sm" className="ml-auto text-muted hover:text-text" onClick={() => setDebugOpen(true)}>
         {running && <span aria-hidden="true" className="size-1.5 rounded-full bg-model" />}
-        <Bug aria-hidden="true" />Debug{running ? " · run in progress" : ""}
+        <Bug aria-hidden="true" />Details{running ? " (running)" : ""}
       </Button>
     </header>
   );

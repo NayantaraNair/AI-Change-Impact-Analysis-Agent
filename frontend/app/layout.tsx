@@ -12,7 +12,7 @@ const monaSans = Mona_Sans({
 
 export const metadata: Metadata = {
   title: "Change Impact Copilot",
-  description: "Understand the blast radius, risk, and release readiness of banking changes.",
+  description: "See what a story, epic or sprint backlog affects before you plan the sprint.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

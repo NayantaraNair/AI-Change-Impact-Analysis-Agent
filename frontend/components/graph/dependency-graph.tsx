@@ -5,14 +5,14 @@ import { Controls, ReactFlow, ReactFlowProvider, useNodesInitialized, useReactFl
 import { CircleDot, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import type { GraphEdge, GraphNode, ImpactGraph } from "@/lib/types";
-import { searchNodes, toFlowElements, type ImpactFlowEdge, type ImpactFlowNode } from "./graph-model";
+import { hopLabel, searchNodes, toFlowElements, type ImpactFlowEdge, type ImpactFlowNode } from "./graph-model";
 import { impactNodeTypes } from "./impact-nodes";
 import { impactEdgeTypes } from "./impact-edge";
 import { HopRings } from "./hop-rings";
 import "@xyflow/react/dist/style.css";
 import styles from "./graph.module.css";
 
-export interface BlastRadiusGraphProps {
+export interface DependencyGraphProps {
   graph: ImpactGraph;
   highlight?: string[];
   selectedId?: string | null;
@@ -29,10 +29,11 @@ function subscribeMotion(callback: () => void) {
 }
 const getMotion = () => window.matchMedia(motionQuery).matches;
 const getServerMotion = () => true;
-const defaultFitOptions = { padding: 0.08, minZoom: 0.2, maxZoom: 1.15 };
+const defaultFitOptions = { padding: 0.03, minZoom: 0.2, maxZoom: 1.15 };
 
-function GraphCanvas({ graph, highlight, selectedId, onNodeSelect, conflictEdges }: BlastRadiusGraphProps) {
-  const [showUnimpacted, setShowUnimpacted] = useState(true);
+function GraphCanvas({ graph, highlight, selectedId, onNodeSelect, conflictEdges }: DependencyGraphProps) {
+  // Start with only what the change affects: the clearest picture for planning.
+  const [showUnimpacted, setShowUnimpacted] = useState(false);
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchIndex, setSearchIndex] = useState(0);
@@ -134,7 +135,7 @@ function GraphCanvas({ graph, highlight, selectedId, onNodeSelect, conflictEdges
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => focusNode(node)}
                 >
-                  <span>{node.label}</span><span className={styles.resultMeta}>{node.hop === null ? "Unimpacted" : `Hop ${node.hop}`}</span>
+                  <span>{node.label}</span><span className={styles.resultMeta}>{hopLabel(node.hop)}</span>
                 </li>
               )) : <li role="presentation" className={styles.noResults}>No components match. Try another name.</li>}
             </ul>
@@ -145,7 +146,7 @@ function GraphCanvas({ graph, highlight, selectedId, onNodeSelect, conflictEdges
             setShowUnimpacted(event.target.checked);
             if (!event.target.checked && graph.nodes.some((node) => node.id === selection && node.hop === null)) select(null);
           }} />
-          Show unimpacted
+          Show all components
         </label>
       </div>
       <div className={styles.flowArea}>
@@ -170,31 +171,31 @@ function GraphCanvas({ graph, highlight, selectedId, onNodeSelect, conflictEdges
             maxZoom={2}
             colorMode="dark"
             proOptions={{ hideAttribution: true }}
-            aria-label="Blast radius dependency graph"
+            aria-label="Dependency graph"
           >
             <HopRings nodes={graph.nodes} showUnimpacted={showUnimpacted} />
             <Controls showInteractive={false} position="bottom-left" fitViewOptions={fitOptions} />
           </ReactFlow>
-        ) : <p className={styles.emptyState}>Paste a story and select Analyze to see its blast radius.</p>}
+        ) : <p className={styles.emptyState}>Analyze a story to see what it affects.</p>}
       </div>
       <div className={styles.legend} aria-label="Graph legend">
-        <span>Severity</span>
+        <span>Impact</span>
         <span><i className={styles.lowSwatch} />Low</span>
         <span><i className={styles.mediumSwatch} />Medium</span>
         <span><i className={styles.highSwatch} />High</span>
-        <span className={styles.ringLegend}><CircleDot size={14} aria-hidden="true" />Hop rings</span>
-        <span className={styles.legendHint}>Select a component for details</span>
+        <span className={styles.ringLegend}><CircleDot size={14} aria-hidden="true" />Centre: changed. Each ring: one step further away.</span>
+        <span className={styles.legendHint}>Click a component for details</span>
       </div>
     </>
   );
 }
 
-export function BlastRadiusGraph(props: BlastRadiusGraphProps) {
+export function DependencyGraph(props: DependencyGraphProps) {
   // A new analysis restarts the single load animation and fits its supplied positions.
   // Selection, search, highlights and visibility do not remount the graph.
   const graphKey = JSON.stringify([props.graph.nodes, props.graph.edges, props.conflictEdges]);
   return (
-    <section className={styles.graph} style={{ height: props.height ?? "clamp(560px, 68vh, 760px)" }} aria-label="Blast radius">
+    <section className={styles.graph} style={{ height: props.height ?? "clamp(560px, 68vh, 760px)" }} aria-label="Dependency graph">
       <ReactFlowProvider key={graphKey}><GraphCanvas {...props} /></ReactFlowProvider>
     </section>
   );

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { InfoTip } from "@/components/ui/info-tip";
 import type { StoryAnalysis } from "@/lib/types";
 import { explain } from "@/lib/explain";
-import { decisionClass, decisionLabel, formatNumber, formatPercent, severityClass } from "@/lib/format";
+import { decisionClass, decisionLabel, formatNumber, severityClass } from "@/lib/format";
 import { dimensionLabel } from "./model";
 
 function Stat({ label, tip, detail, children, className = "" }: { label: string; tip: string; detail?: string; children: ReactNode; className?: string }) {
@@ -18,7 +18,7 @@ function Stat({ label, tip, detail, children, className = "" }: { label: string;
 }
 
 export function StatStrip({ analysis }: { analysis: StoryAnalysis }) {
-  const { release, risk, graph, tests } = analysis;
+  const { release, risk } = analysis;
   const highest = risk.dimensions.find((dimension) => dimension.name === risk.highest);
   return (
     <div className="border-y border-line py-5">
@@ -29,14 +29,8 @@ export function StatStrip({ analysis }: { analysis: StoryAnalysis }) {
       <Stat label="Confidence" tip={explain.confidence}>
         <dd className="text-hero numeral">{formatNumber(release.confidence)}%</dd>
       </Stat>
-      <Stat label="Highest risk" detail={dimensionLabel[risk.highest] ?? risk.highest} tip={explain.highestRisk}>
+      <Stat label="Highest risk" detail={`${dimensionLabel[risk.highest] ?? risk.highest}${highest ? `, ${highest.level}` : ""}`} tip={explain.highestRisk}>
         <dd className={`text-hero numeral ${highest ? severityClass[highest.level] : "text-muted"}`}>{highest ? formatNumber(highest.score) : "–"}</dd>
-      </Stat>
-      <Stat label="Impacted services" tip={explain.impacted}>
-        <dd className="text-hero numeral">{formatNumber(graph.impacted_services.length)}</dd>
-      </Stat>
-      <Stat label="Coverage" tip={explain.coverage}>
-        <dd className="text-hero numeral">{formatPercent(tests.coverage_estimate)}</dd>
       </Stat>
     </dl>
     </div>

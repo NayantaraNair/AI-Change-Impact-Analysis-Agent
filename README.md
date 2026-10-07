@@ -1,8 +1,8 @@
 # Change Impact Copilot
 
-From change request to blast radius, risk, tests and a release decision — in under a minute.
+Attach a story, epic or sprint backlog. See what it affects, how risky it is and whether it can ship, before you plan the sprint.
 
-![Story analysis for ST-107: the blast radius of a card freeze feature](docs/story.png)
+![Impact analysis for ST-107: a card freeze feature](docs/story.png)
 
 ## The problem
 
@@ -10,10 +10,10 @@ When a change request lands, developers, leads, testers and business analysts sp
 
 ## What it does
 
-Paste a Jira-style story, epic or change request and get:
+Attach or paste a Jira-style story, epic or backlog (JSON, CSV, Markdown or text) and get a short impact summary first, then the detail:
 
 - **Requirement analysis**: business and technical summary, domain, affected capabilities and services.
-- **Blast radius**: the services, APIs, databases and downstream systems the change reaches, drawn as concentric rings by hop distance.
+- **Dependency graph**: what the change touches and how far it spreads. Changed services sit in the centre; each ring is one step further away.
 - **Risk in six dimensions** (security, compliance, technical, operational, performance, delivery), each 0–100 with the factors that produced it.
 - **Test plan**: existing tests picked from a catalog plus generated tests for the gaps, prioritised P1–P3, with coverage and effort.
 - **Compliance**: GDPR, PCI DSS, SOX and internal governance, each with findings, a score and recommendations.
@@ -57,7 +57,7 @@ Every point in a score is a named factor tied to the components that caused it. 
 | customer data | +20 | authentication-service, api-gateway, account-service |
 | external API contract | +15 | api-gateway, authentication-service, card-service |
 | critical identity path | +10 | authentication-service, api-gateway |
-| blast radius size | +10 | nodes within two hops |
+| dependency reach | +10 | nodes within two steps |
 | **Security risk** | **100 (clamped)** | |
 
 The release agent then applies ordered rules (`NO_GO` if any dimension ≥ 85; `NO_GO` if a framework is high risk and the change touches card data or authentication; …) and records each rule that fired. ST-107 comes out `NO_GO` with 15% confidence, and the UI shows exactly why. Clicking a factor highlights its components in the graph.
@@ -144,7 +144,7 @@ data/
   fixtures/             saved results for keyless mode
 frontend/
   app/story, app/sprint pages
-  components/graph      blast-radius graph (React Flow)
+  components/graph      dependency graph (React Flow)
   components/analysis   story tabs, stat strip, factor bars
   components/copilot    copilot drawer
   components/run        live progress and provenance

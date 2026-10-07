@@ -104,8 +104,8 @@
 .node[data-type="analytics"] { border-radius: 12px 4px 12px 4px; }
 .nodeIcon { grid-column: 1; grid-row: 2; color: var(--node-color); }
 .nodeText { display: contents; }
-.nodeLabel { grid-column: 1 / -1; grid-row: 1; display: block; overflow-wrap: anywhere; font-size: 13px; font-weight: 500; }
-.nodeMeta { grid-column: 2; grid-row: 2; display: block; color: var(--muted); font-size: 12px; }
+.nodeLabel { grid-column: 1 / -1; grid-row: 1; display: block; overflow-wrap: anywhere; font-size: 16px; line-height: 19px; font-weight: 600; }
+.nodeMeta { grid-column: 2; grid-row: 2; display: block; color: var(--muted); font-size: 13px; }
 .nodeFrame .handle { width: 1px; height: 1px; min-width: 1px; min-height: 1px; opacity: 0; pointer-events: none; border: 0; }
 
 .rings { position: absolute; z-index: -1; overflow: visible; pointer-events: none; }

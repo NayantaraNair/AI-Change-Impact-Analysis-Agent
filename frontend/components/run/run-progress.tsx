@@ -11,7 +11,7 @@ import {
   activeAttempts, attemptsFor, findStage, formatElapsed, shortStageLabel, SPRINT_STAGE_ORDER,
   stageCounts, stageExplain, STORY_STAGE_ORDER,
 } from "./model";
-import { AttemptLine, SourceBadge, StageIcon } from "./parts";
+import { SourceBadge, StageIcon } from "./parts";
 
 /** Live, step-by-step view of a run, so a slow model never leaves a blank wait. */
 export function RunProgress({ run, title }: { run: Run | null; title: string }) {
@@ -32,17 +32,16 @@ export function RunProgress({ run, title }: { run: Run | null; title: string }) 
         <div className="min-w-0">
           <h2 className="flex items-center gap-2"><Activity aria-hidden="true" className="size-4 text-model" />{title}</h2>
           <p className="mt-1 text-dense text-muted tabular-nums">
-            {formatElapsed(run.elapsed_ms)} elapsed · {done} of {total} steps done · {run.attempts.filter((a) => a.outcome !== "skipped").length} model calls
+            {formatElapsed(run.elapsed_ms)} · {done} of {total} steps done
           </p>
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={() => setDebugOpen(true)}><Bug aria-hidden="true" className="size-4" />Debug details</Button>
+        <Button type="button" variant="outline" size="sm" onClick={() => setDebugOpen(true)}><Bug aria-hidden="true" className="size-4" />Details</Button>
       </header>
       <div className="h-1 w-full overflow-hidden rounded-full bg-line" role="progressbar" aria-label="Steps done" aria-valuemin={0} aria-valuemax={total} aria-valuenow={done}>
         <div className="h-full rounded-full bg-model transition-[width] duration-500" style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
       </div>
       <NowPanel run={run} active={active} running={running.map((stage) => stage.label + (stage.story_id && run.kind === "sprint" ? ` (${stage.story_id})` : ""))} />
       {run.kind === "sprint" ? <SprintMatrix run={run} /> : <StoryTimeline run={run} />}
-      <ActivityFeed run={run} />
     </section>
   );
 }
@@ -50,7 +49,7 @@ export function RunProgress({ run, title }: { run: Run | null; title: string }) 
 function NowPanel({ run, active, running }: { run: Run; active: ReturnType<typeof activeAttempts>; running: string[] }) {
   return (
     <div role="status" aria-live="polite" className="rounded-md border border-line bg-canvas/60 px-4 py-3">
-      <p className="flex items-center gap-1.5 text-meta font-medium text-muted">Happening now <InfoTip label="model fallback">{explain.chain}</InfoTip></p>
+      <p className="flex items-center gap-1.5 text-meta font-medium text-muted">Now <InfoTip label="AI providers">{explain.chain}</InfoTip></p>
       {active.length ? (
         <ul className="mt-2 space-y-2">
           {active.slice(0, 4).map((attempt) => {
@@ -59,8 +58,8 @@ function NowPanel({ run, active, running }: { run: Run; active: ReturnType<typeo
               <li key={attempt.id} className="space-y-1">
                 <p className="text-dense">
                   <span className="font-medium">{shortStageLabel[attempt.stage ?? ""] ?? attempt.stage}{run.kind === "sprint" && attempt.story_id ? ` · ${attempt.story_id}` : ""}</span>
-                  <span className="text-muted">: waiting on </span>{providerName(attempt.provider)} <span className="text-muted">{attempt.model} ({attempt.tier} tier)</span>
-                  <span className="float-right tabular-nums text-muted">{formatElapsed(attempt.elapsed_ms)} of {attempt.timeout_s} s limit</span>
+                  <span className="text-muted">: waiting on AI, </span>{providerName(attempt.provider)} <span className="text-muted">{attempt.model}</span>
+                  <span className="float-right tabular-nums text-muted">{formatElapsed(attempt.elapsed_ms)} / {attempt.timeout_s} s</span>
                 </p>
                 <div className="h-0.5 w-full rounded-full bg-line"><div className={cn("h-full rounded-full", share > 75 ? "bg-warn" : "bg-model")} style={{ width: `${share}%` }} /></div>
               </li>
@@ -69,7 +68,7 @@ function NowPanel({ run, active, running }: { run: Run; active: ReturnType<typeo
           {active.length > 4 && <li className="text-meta text-muted">+{active.length - 4} more calls in flight</li>}
         </ul>
       ) : (
-        <p className="mt-1 text-dense">{running.length ? `${running.slice(0, 3).join(", ")}${running.length > 3 ? ` and ${running.length - 3} more` : ""}` : run.status === "running" ? "Waiting for a free model slot (at most 4 calls run at once)…" : "Finished"}</p>
+        <p className="mt-1 text-dense">{running.length ? `${running.slice(0, 3).join(", ")}${running.length > 3 ? ` and ${running.length - 3} more` : ""}` : run.status === "running" ? "Queued for a free AI slot…" : "Finished"}</p>
       )}
     </div>
   );
@@ -93,7 +92,7 @@ function StoryTimeline({ run }: { run: Run }) {
                 <SourceBadge stage={stage} />
               </p>
               {stage.message && <p className="mt-0.5 text-meta text-muted">{stage.message}</p>}
-              {attempts.length > 0 && <ul className="mt-2 space-y-1.5 border-l border-line pl-3">{attempts.map((attempt) => <AttemptLine key={attempt.id} attempt={attempt} />)}</ul>}
+              {attempts.some((attempt) => attempt.outcome !== "ok" && attempt.outcome !== "running" && attempt.outcome !== "skipped") && <p className="mt-0.5 text-meta text-warn">Switched AI provider {attempts.filter((attempt) => attempt.outcome !== "ok" && attempt.outcome !== "running" && attempt.outcome !== "skipped").length}× ({attempts.filter((attempt) => attempt.outcome !== "ok" && attempt.outcome !== "running" && attempt.outcome !== "skipped").map((attempt) => attempt.detail.split(";")[0].toLowerCase()).join(", ")})</p>}
             </div>
             <span className="text-meta tabular-nums text-muted">{stage.status === "pending" ? "" : formatElapsed(stage.elapsed_ms)}</span>
           </li>
@@ -163,24 +162,6 @@ function SprintMatrix({ run }: { run: Run }) {
           );
         })}
       </ol>
-    </div>
-  );
-}
-
-function ActivityFeed({ run }: { run: Run }) {
-  const entries = run.log.slice(-6).reverse();
-  if (!entries.length) return null;
-  return (
-    <div>
-      <h3 className="text-meta font-medium text-muted">Recent activity</h3>
-      <ul className="mt-2 space-y-1 text-meta">
-        {entries.map((entry, index) => (
-          <li key={`${entry.at}-${index}`} className={cn("flex gap-2", entry.level === "warning" ? "text-warn" : entry.level === "error" ? "text-impact-high" : "text-muted")}>
-            <span className="shrink-0 tabular-nums">{new Date(entry.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</span>
-            <span className="min-w-0">{entry.story_id && run.kind === "sprint" ? `${entry.story_id} · ` : ""}{entry.message}</span>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

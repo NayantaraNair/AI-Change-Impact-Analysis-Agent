@@ -12,10 +12,7 @@ export function HopRings({ nodes, showUnimpacted }: { nodes: GraphNode[]; showUn
     <ViewportPortal>
       <svg className={styles.rings} style={{ left: -extent, top: -extent }} width={extent * 2} height={extent * 2} viewBox={`${-extent} ${-extent} ${extent * 2} ${extent * 2}`} aria-hidden="true">
         {rings.map(({ hop, radius }) => (
-          <g key={hop ?? "unimpacted"}>
-            <circle cx="0" cy="0" r={radius} />
-            {hop !== 0 && <text x="12" y={-radius + 20}>{hop === null ? "not impacted" : `hop ${hop}`}</text>}
-          </g>
+          <circle key={hop ?? "unimpacted"} cx="0" cy="0" r={radius} />
         ))}
       </svg>
     </ViewportPortal>
