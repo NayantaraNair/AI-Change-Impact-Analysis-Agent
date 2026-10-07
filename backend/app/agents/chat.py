@@ -244,7 +244,7 @@ async def answer(req: ChatRequest) -> ChatResponse:
             try:
                 answer_text, provider = await llm.complete_text(
                     _SYSTEM_PROMPT + _compress_context(analysis), req.message,
-                    history=[dict(turn) for turn in session.history], max_tokens=800,
+                    history=[dict(turn) for turn in session.history], max_tokens=llm.MAX_TOKENS["chat"],
                 )
             except llm.NoLLM:
                 answer_text = _template(req.message, analysis)

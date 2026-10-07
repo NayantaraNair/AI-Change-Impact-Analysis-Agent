@@ -312,3 +312,106 @@ class ChatResponse(BaseModel):
     cited_nodes: list[ServiceId]
     cited_factors: list[str]
     provider: str
+
+
+# ---------------------------------------------------------------- runs (live progress)
+
+RunKind = Literal["story", "sprint", "chat"]
+RunStatus = Literal["running", "succeeded", "failed"]
+StageStatus = Literal["pending", "running", "done", "failed"]
+AttemptOutcome = Literal[
+    "running",  # the call is still in flight
+    "ok",
+    "timeout",
+    "rate_limited",  # 429 or 402: provider cools down for 60 s
+    "http_error",
+    "connection_error",
+    "truncated",  # the model hit max_tokens before finishing its JSON
+    "invalid_json",
+    "schema_mismatch",
+    "empty",
+    "skipped",  # no key, or cooling down after a rate limit
+]
+
+
+class LlmAttempt(BaseModel):
+    """One call to one provider; a stage may need several before one succeeds."""
+
+    id: int
+    story_id: str | None
+    stage: str | None
+    provider: str
+    model: str
+    tier: Literal["fast", "strong"]
+    max_tokens: int
+    timeout_s: float
+    started_at: datetime
+    elapsed_ms: int
+    outcome: AttemptOutcome
+    detail: str  # human-readable reason, e.g. "Timed out after 180 s"
+    prompt_tokens: int | None = None
+    completion_tokens: int | None = None
+    reasoning_tokens: int | None = None
+
+
+class StageProgress(BaseModel):
+    story_id: str | None  # None for sprint-wide stages
+    stage: str
+    label: str
+    status: StageStatus
+    # "llm" (a model wrote it), "deterministic" (pure code), "cache", "fixture",
+    # or "fallback" (template text because every model failed or none is configured)
+    source: Literal["llm", "deterministic", "cache", "fixture", "fallback"] | None = None
+    provider: str | None = None  # provider label when source is "llm"
+    message: str = ""
+    started_at: datetime | None = None
+    elapsed_ms: int | None = None
+
+
+class RunLogEntry(BaseModel):
+    at: datetime
+    level: Literal["info", "warning", "error"]
+    story_id: str | None = None
+    message: str
+
+
+class Run(BaseModel):
+    id: str
+    kind: RunKind
+    status: RunStatus
+    title: str
+    story_ids: list[str]
+    started_at: datetime
+    finished_at: datetime | None = None
+    elapsed_ms: int
+    stages: list[StageProgress]
+    attempts: list[LlmAttempt]
+    log: list[RunLogEntry]
+    error: str | None = None
+    story_result: StoryAnalysis | None = None
+    sprint_result: SprintAnalysis | None = None
+
+
+class RunStarted(BaseModel):
+    run_id: str
+
+
+class ProviderInfo(BaseModel):
+    order: int
+    name: str
+    model: str
+    host: str
+    configured: bool
+    tool_calling_only: bool
+    cooling_down_s: int  # seconds left before a rate-limited provider is retried
+
+
+class DebugInfo(BaseModel):
+    llm_disabled: bool
+    providers: list[ProviderInfo]
+    strong_tier_model: str
+    timeout_s: float
+    max_concurrent_calls: int
+    max_tokens: dict[str, int]  # stage -> output token cap
+    cache_enabled: bool
+    fixtures_available: list[str]

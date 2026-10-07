@@ -156,7 +156,9 @@ async def analyze_requirement(story: StoryInput, arch: Architecture) -> Requirem
     criteria = "\n".join(f"- {criterion}" for criterion in story.acceptance_criteria) or "None supplied."
     user = f"Title: {story.title}\nDescription: {story.description}\nAcceptance criteria:\n{criteria}"
     try:
-        extracted, provider = await llm.complete_structured(system, user, _ExtractedFacts, tier="fast")
+        extracted, provider = await llm.complete_structured(
+            system, user, _ExtractedFacts, tier="fast", max_tokens=llm.MAX_TOKENS["requirement"],
+        )
     except llm.NoLLM:
         return _fallback(story, arch)
 

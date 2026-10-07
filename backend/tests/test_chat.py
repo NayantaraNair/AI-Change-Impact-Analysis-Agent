@@ -203,7 +203,7 @@ async def test_llm_uses_compressed_context_and_extracts_citations(analysis, monk
     assert all(len(dimension["top_factors"]) <= 3 for dimension in context["risk"]["dimensions"])
     assert "nodes" not in context["impact"]
     assert "acceptance_criteria" not in context
-    assert (user, history, tokens) == ("An open question", [], 800)
+    assert (user, history, tokens) == ("An open question", [], llm.MAX_TOKENS["chat"])
 
 
 async def test_sprint_prompt_includes_conflicts_and_decisions(sprint, monkeypatch):

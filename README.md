@@ -20,6 +20,7 @@ Paste a Jira-style story, epic or change request and get:
 - **Release decision**: GO / GO_WITH_CONDITIONS / NO_GO with the rules that fired, a confidence score, a rollback plan and deployment notes.
 - **Sprint simulator**: all stories analysed in parallel, with conflict detection (two stories changing the same service, database, API or deployment group) and a sprint health score.
 - **Copilot**: a side drawer that answers questions about the current analysis and cites the components it talks about.
+- **Live progress and a debug pane**: every analysis runs as a tracked job. The page shows each step as it happens, which model is working on it and for how long, and every fallback with its reason (timed out, rate limited, cut off at the token limit). A slide-over debug pane on both pages shows the full run, every model call with token counts, the log, the provider chain and limits, and the raw JSON. Tooltips explain how each number is worked out.
 
 | Risk factors drive the graph | Sprint conflicts | Copilot |
 |---|---|---|
@@ -82,7 +83,7 @@ To run the live pipeline on your own stories, add one or both keys to `.env`:
 | 4 | OpenRouter | `openrouter/free` |
 | 5 | none | deterministic fallback |
 
-A provider is skipped on 401/402/403/429, 5xx, timeouts, invalid JSON or schema validation failure; one that rate-limits is cooled down for 60 s. `cd backend && uv run python ../scripts/llm_smoke.py` reports which providers answer (it never prints keys). Unchanged demo stories keep serving their saved results; edit any field (or call `POST /analyze?refresh=true`) to analyse them live.
+A provider is skipped on 401/402/403/429, 5xx, a timeout (180 s per call, since free reasoning models are slow), an answer cut off at its token cap, invalid JSON or schema validation failure; one that rate-limits is cooled down for 60 s. The debug pane shows each of these as it happens. `cd backend && uv run python ../scripts/llm_smoke.py` reports which providers answer (it never prints keys). Unchanged demo stories keep serving their saved results; edit any field (or call `POST /analyze?refresh=true`) to analyse them live.
 
 The frontend calls the backend through a same-origin `/api` proxy, so the app also works when opened from another machine (for example over Tailscale: `tailscale serve --bg 3000`).
 
@@ -98,7 +99,7 @@ cd frontend && npm install && npm run dev        # http://localhost:3000
 Checks:
 
 ```bash
-cd backend && uv run pytest -q                    # 433 tests, no network
+cd backend && uv run pytest -q                    # 446 tests, no network
 cd backend && uv run python ../scripts/validate_data.py
 cd frontend && npm run lint && npm run build
 ```
@@ -118,6 +119,10 @@ Regenerate the demo fixtures after changing scoring or data: `cd backend && uv r
 | GET | `/dependency-graph/{story_id}` | latest `ImpactGraph` for a story |
 | GET | `/architecture` | the component catalog |
 | POST | `/chat` | copilot answer with cited components and factors |
+| POST | `/runs/story`, `/runs/sprint` | start an analysis in the background and return a run ID |
+| GET | `/runs/{run_id}` | live progress: stages, every model call and fallback, the log, then the result |
+| GET | `/runs` | recent runs (kept in memory) |
+| GET | `/debug` | provider chain, timeouts, token caps and cooldowns (never keys) |
 
 Interactive docs at http://localhost:8000/docs. All request and response shapes are defined once in [`backend/app/contracts.py`](backend/app/contracts.py) and mirrored in [`frontend/lib/types.ts`](frontend/lib/types.ts).
 
@@ -130,6 +135,7 @@ backend/app/
   agents/               requirement, testing, compliance, release, chat (LLM + fallback)
   engine/               dependency graph, scoring, sprint, conflicts (no LLM)
   pipeline.py           stage orchestration and caching
+  runs.py               live run tracking: stages, model calls, log
   api/                  FastAPI routes
 data/
   architecture.json     21 components: channels, core, platform, databases, analytics
@@ -141,6 +147,8 @@ frontend/
   components/graph      blast-radius graph (React Flow)
   components/analysis   story tabs, stat strip, factor bars
   components/copilot    copilot drawer
+  components/run        live progress and provenance
+  components/debug      debug slide-over
 scripts/                data validation, LLM smoke test, fixture builder
 ```
 
