@@ -18,7 +18,7 @@ export function ConflictTable({ analysis, selectedId, onSelect }: { analysis: Sp
           }}>
             <td className="px-3 py-3 whitespace-nowrap">{conflict.story_a}</td>
             <td className="px-3 py-3 whitespace-nowrap">{conflict.story_b}</td>
-            <td className="px-3 py-3"><button type="button" className="text-left text-azure hover:underline" aria-pressed={selectedId === conflict.id} aria-label={`Highlight ${labels.get(conflict.shared_component) ?? conflict.shared_component} for ${conflict.story_a} and ${conflict.story_b}`} onClick={() => onSelect(conflict)}>{labels.get(conflict.shared_component) ?? conflict.shared_component}</button></td>
+            <td className="px-3 py-3"><button type="button" className="text-left link-ui" aria-pressed={selectedId === conflict.id} aria-label={`Highlight ${labels.get(conflict.shared_component) ?? conflict.shared_component} for ${conflict.story_a} and ${conflict.story_b}`} onClick={() => onSelect(conflict)}>{labels.get(conflict.shared_component) ?? conflict.shared_component}</button></td>
             <td className="px-3 py-3">{conflictLabels[conflict.kind]}</td>
             <td className="px-3 py-3 whitespace-nowrap"><Badge variant="outline" className={`rounded border-current/40 capitalize ${severityClass[conflict.risk]}`}>{conflict.risk}</Badge><span className={`ml-2 font-semibold tabular-nums ${severityClass[conflict.risk]}`}>{formatNumber(conflict.risk_score)}</span></td>
             <td className="w-[35%] px-3 py-3">{conflict.recommendation}</td>

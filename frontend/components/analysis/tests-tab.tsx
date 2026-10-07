@@ -21,7 +21,7 @@ export function TestsTab({ plan, nodes }: { plan: TestPlan; nodes: GraphNode[] }
   function toggle<T>(items: T[], item: T): T[] {
     return items.includes(item) ? items.filter((value) => value !== item) : [...items, item];
   }
-  const chipClass = "rounded-md border border-line px-2 py-1 text-dense text-azure transition-colors duration-150 hover:bg-surface-raised aria-pressed:border-azure aria-pressed:bg-azure/10";
+  const chipClass = "rounded-full border border-line px-2.5 py-1 text-dense text-text transition-colors duration-150 hover:border-line-strong aria-pressed:border-chalk aria-pressed:bg-chalk aria-pressed:text-canvas";
 
   return (
     <section aria-label="Test plan" className="space-y-4 py-5">
@@ -53,7 +53,7 @@ export function TestsTab({ plan, nodes }: { plan: TestPlan; nodes: GraphNode[] }
                 <td className="px-3 py-3"><span className={`rounded border px-1.5 py-0.5 text-meta font-medium ${priorityStyle[test.priority]}`}>{test.priority}</span></td>
                 <td className="w-[35%] px-3 py-3">
                   <details className="group">
-                    <summary className="cursor-pointer text-azure">{test.title}<span className="ml-2 text-meta text-muted">{test.id}</span></summary>
+                    <summary className="cursor-pointer link-ui">{test.title}<span className="ml-2 text-meta text-muted">{test.id}</span></summary>
                     <div className="mt-3 space-y-2">
                       <ol className="list-decimal space-y-1 pl-5 text-muted">{test.steps.map((step, index) => <li key={index}>{step}</li>)}</ol>
                       <p><span className="font-medium">Expected: </span>{test.expected}</p>

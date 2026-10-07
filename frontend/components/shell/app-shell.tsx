@@ -12,7 +12,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <AppProvider>
       <TooltipProvider delay={200}>
-        <a href="#main-content" className="fixed top-2 left-16 z-[60] rounded-md bg-surface px-3 py-2 text-signal sr-only focus:not-sr-only">Skip to content</a>
+        <a href="#main-content" className="fixed top-2 left-16 z-[60] rounded-md bg-surface px-3 py-2 text-chalk sr-only focus:not-sr-only">Skip to content</a>
         <NavRail />
         <div className="ml-14 flex min-h-dvh min-w-0 flex-col">
           <Header />

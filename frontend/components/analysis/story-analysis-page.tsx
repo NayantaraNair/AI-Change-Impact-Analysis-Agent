@@ -132,7 +132,7 @@ export function StoryAnalysisPage({ reportId }: { reportId: string | null }) {
       {error && <div role="alert" className="mb-4 flex flex-wrap items-center gap-3 rounded-md border border-impact-high/40 bg-surface p-4"><p className="flex-1 text-body">{error}</p><Button type="button" variant="outline" onClick={retry}>Try again</Button></div>}
       {loading === "report" ? <p role="status" className="border-y border-line py-4 text-muted">Loading saved analysis…</p> : loading ? <RunProgress run={progress} title={`Analyzing ${pending?.id ?? "story"}`} /> : analysis ? (
         <>
-          {sampleMismatch && <p role="status" className="mb-4 border-l-2 border-azure bg-surface px-4 py-3 text-dense text-muted">Showing the available sample report for {analysis.story.id}: {analysis.story.title}. Start the backend to analyze the requested story.</p>}
+          {sampleMismatch && <p role="status" className="mb-4 border-l-2 border-chalk bg-surface px-4 py-3 text-dense text-muted">Showing the available sample report for {analysis.story.id}: {analysis.story.title}. Start the backend to analyze the requested story.</p>}
           <AnalysisResults key={`${analysis.story.id}-${analysis.created_at}`} analysis={analysis} components={components} run={progress?.story_result?.story.id === analysis.story.id ? progress : null} onRerunLive={() => rerunLive(analysis.story)} />
         </>
       ) : !error && <div className="flex min-h-[380px] items-center justify-center border-y border-line bg-surface/40"><p className="text-body text-muted">Paste a story and select Analyze to see its blast radius.</p></div>}

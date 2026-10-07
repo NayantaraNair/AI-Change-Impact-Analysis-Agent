@@ -8,7 +8,7 @@ import type { LlmAttempt, StageProgress } from "@/lib/types";
 import { formatElapsed } from "./model";
 
 const sourceTone: Record<string, string> = {
-  llm: "border-signal/40 text-signal",
+  llm: "border-model/40 text-model",
   deterministic: "border-line text-muted",
   cache: "border-line text-muted",
   fixture: "border-line text-muted",
@@ -29,7 +29,7 @@ export function SourceBadge({ stage, className }: { stage: Pick<StageProgress, "
 
 export function StageIcon({ stage, className }: { stage: Pick<StageProgress, "status" | "source">; className?: string }) {
   const base = cn("size-4 shrink-0", className);
-  if (stage.status === "running") return <Loader2 aria-hidden="true" className={cn(base, "animate-spin text-signal")} />;
+  if (stage.status === "running") return <Loader2 aria-hidden="true" className={cn(base, "animate-spin text-model")} />;
   if (stage.status === "failed") return <X aria-hidden="true" className={cn(base, "text-impact-high")} />;
   if (stage.status === "done") {
     return stage.source === "fallback"
@@ -40,7 +40,7 @@ export function StageIcon({ stage, className }: { stage: Pick<StageProgress, "st
 }
 
 const outcomeTone: Record<string, string> = {
-  running: "text-signal", ok: "text-text", skipped: "text-muted",
+  running: "text-model", ok: "text-text", skipped: "text-muted",
 };
 
 export function AttemptLine({ attempt, showWhere = false }: { attempt: LlmAttempt; showWhere?: boolean }) {

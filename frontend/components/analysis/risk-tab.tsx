@@ -10,8 +10,12 @@ import { dimensionLabel, factorWidth, restoreHighlight, sameNodes } from "./mode
 import { InfoTip } from "@/components/ui/info-tip";
 import { explain } from "@/lib/explain";
 
+// Tinted segments with a solid leading edge: the bars explain the score
+// without out-shouting the blast-radius graph.
 const factorColor: Record<Severity, string> = {
-  low: "bg-impact-low", medium: "bg-impact-med", high: "bg-impact-high",
+  low: "bg-impact-low/15 text-impact-low shadow-[inset_2px_0_0_var(--impact-low)]",
+  medium: "bg-impact-med/15 text-impact-med shadow-[inset_2px_0_0_var(--impact-med)]",
+  high: "bg-impact-high/15 text-impact-high shadow-[inset_2px_0_0_var(--impact-high)]",
 };
 
 export function RiskTab({ risk }: { risk: RiskReport }) {
@@ -59,11 +63,11 @@ export function RiskTab({ risk }: { risk: RiskReport }) {
         <p className="mt-1 text-meta text-muted">Six dimensions on a 0–100 scale</p>
         <div className="h-[280px] w-full min-w-0" role="img" aria-label={risk.dimensions.map((d) => `${dimensionLabel[d.name]} ${d.score} out of 100`).join(", ")}>
           <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-            <RadarChart data={chartData} outerRadius="68%">
+            <RadarChart data={chartData} outerRadius="62%" margin={{ top: 8, right: 28, bottom: 8, left: 28 }}>
               <PolarGrid stroke="var(--line)" />
               <PolarAngleAxis dataKey="label" tick={{ fill: "var(--muted)", fontSize: 12 }} />
               <PolarRadiusAxis domain={[0, 100]} ticks={[25, 50, 75, 100]} tick={false} axisLine={false} />
-              <Radar dataKey="score" stroke="var(--azure)" strokeWidth={2} fill="var(--azure)" fillOpacity={0.12} isAnimationActive={false} />
+              <Radar dataKey="score" stroke="var(--chalk)" strokeWidth={1.5} fill="var(--chalk)" fillOpacity={0.08} isAnimationActive={false} />
             </RadarChart>
           </ResponsiveContainer>
         </div>
@@ -78,24 +82,25 @@ export function RiskTab({ risk }: { risk: RiskReport }) {
           <div key={dimension.name} className="space-y-2">
             <div className="flex items-baseline gap-2">
               <h3 className="flex items-center gap-1.5 text-body font-medium">{dimensionLabel[dimension.name]}<InfoTip label={`${dimensionLabel[dimension.name]} risk`}>{explain.dimensions[dimension.name]}</InfoTip></h3>
-              <span className={`text-title font-semibold tabular-nums ${severityClass[dimension.level]}`}>{formatNumber(dimension.score)}</span>
+              <span className={`text-title numeral ${severityClass[dimension.level]}`}>{formatNumber(dimension.score)}</span>
               <span className="text-meta text-muted">/ 100 · {dimension.level} risk</span>
             </div>
-            <div className="flex min-h-8 w-full overflow-x-auto rounded-md bg-surface-raised" aria-label={`${dimensionLabel[dimension.name]} factor contributions`}>
+            <div className="flex min-h-8 w-full overflow-x-auto rounded-md border border-line bg-surface" aria-label={`${dimensionLabel[dimension.name]} factor contributions`}>
               {dimension.factors.filter((factor) => factor.points > 0).map((factor, index) => {
                 const key = `${dimension.name}-${index}`;
                 const baseline = /\bbaseline\b/i.test(factor.label);
                 const noNodes = factor.node_ids.length === 0;
                 const selected = pinned === key && sameNodes(highlight, factor.node_ids);
                 const label = `+${factor.points} ${factor.label}`;
+                const shown = baseline ? `+${factor.points}` : label;
                 return (
                   <Tooltip key={key}>
                     <TooltipTrigger render={
                       <button type="button" aria-label={`${dimensionLabel[dimension.name]}: ${label}${noNodes ? "; no cited nodes" : ""}`} aria-pressed={selected}
                         onMouseEnter={() => show(key, factor, "mouse")} onMouseLeave={() => restore(key, "mouse")} onFocus={() => show(key, factor, "focus")} onBlur={() => restore(key, "focus")}
                         onClick={() => toggle(key, factor)} style={{ width: factorWidth(factor.points) }}
-                        className={`relative min-w-0 shrink-0 border-r border-canvas/40 px-2 py-1.5 text-left text-meta font-medium transition-opacity duration-150 hover:opacity-85 focus-visible:z-10 focus-visible:-outline-offset-2 ${baseline ? "bg-line text-text" : `${factorColor[dimension.level]} text-canvas`} ${selected ? "ring-2 ring-azure ring-inset" : ""}`} />
-                    }><span className="block truncate">{label}</span></TooltipTrigger>
+                        className={`relative min-w-0 shrink-0 border-r border-canvas px-2 py-1.5 text-left text-meta font-medium transition-opacity duration-150 hover:opacity-85 focus-visible:z-10 focus-visible:-outline-offset-2 ${baseline ? "bg-line/60 text-muted" : factorColor[dimension.level]} ${selected ? "ring-2 ring-chalk ring-inset" : ""}`} />
+                    }><span className="block truncate">{shown}</span></TooltipTrigger>
                     <TooltipContent className="max-w-sm">{label} · {baseline ? explain.baseline : noNodes ? "No cited nodes" : `Caused by ${factor.node_ids.join(", ")}`}</TooltipContent>
                   </Tooltip>
                 );

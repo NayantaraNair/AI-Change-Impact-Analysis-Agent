@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Instrument_Sans } from "next/font/google";
+import { Mona_Sans } from "next/font/google";
 import { AppShell } from "@/components/shell/app-shell";
 import "./globals.css";
 
-const instrumentSans = Instrument_Sans({
-  variable: "--font-instrument-sans",
+const monaSans = Mona_Sans({
+  variable: "--font-mona-sans",
   subsets: ["latin"],
+  axes: ["wdth"],
   display: "swap",
 });
 
@@ -18,7 +19,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${instrumentSans.variable} dark h-full antialiased`}
+      className={`${monaSans.variable} dark h-full antialiased`}
     >
       <body><AppShell>{children}</AppShell></body>
     </html>

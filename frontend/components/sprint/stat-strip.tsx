@@ -6,7 +6,8 @@ import { healthLevel, kpiDefinitions } from "./model";
 
 export function SprintStatStrip({ kpis, previous }: { kpis: SprintKpis; previous: SprintKpis | null }) {
   return (
-    <dl aria-label="Sprint statistics" className="flex items-center overflow-x-auto border-y border-line py-5 [&>div]:shrink-0 [&>div]:px-4 [&>div]:first:pl-0 [&>div]:not-first:border-l [&>div]:border-line">
+    <div className="border-y border-line py-5">
+    <dl aria-label="Sprint statistics" className="readouts -mx-5 gap-y-5">
       {kpiDefinitions.map((stat) => {
         const value = kpis[stat.key];
         const delta = previous ? Math.round((value - previous[stat.key]) * 10) / 10 : null;
@@ -16,7 +17,7 @@ export function SprintStatStrip({ kpis, previous }: { kpis: SprintKpis; previous
           <div key={stat.key}>
             <div className="flex items-baseline gap-2">
               <dt className="order-2 flex items-center gap-1 text-meta text-muted">{stat.label}<InfoTip label={stat.label.toLowerCase()} side="bottom">{explain.kpis[stat.key]}</InfoTip></dt>
-              <dd className={`text-hero font-semibold leading-tight tabular-nums ${positive ? severityClass[healthLevel(value)] : "text-text"}`}>
+              <dd className={`text-hero numeral ${positive ? severityClass[healthLevel(value)] : "text-text"}`}>
                 {formatNumber(value)}{unit && <span className="ml-1 text-body font-normal text-muted">{unit}</span>}
               </dd>
             </div>
@@ -27,5 +28,6 @@ export function SprintStatStrip({ kpis, previous }: { kpis: SprintKpis; previous
         );
       })}
     </dl>
+    </div>
   );
 }

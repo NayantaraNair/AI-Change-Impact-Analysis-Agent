@@ -12,7 +12,7 @@ export function NodeLinks({ ids, nodes }: { ids: string[]; nodes: GraphNode[] })
         <button key={id} type="button" onClick={() => setHighlight(highlight.length === 1 && highlight[0] === id ? [] : [id])}
           aria-pressed={highlight.length === 1 && highlight[0] === id}
           title={`Highlight ${id} in the graph`}
-          className="rounded border border-line px-1.5 py-0.5 text-meta text-azure transition-colors duration-150 hover:bg-surface-raised aria-pressed:border-azure">
+          className="rounded border border-line px-1.5 py-0.5 text-meta text-text transition-colors duration-150 hover:border-line-strong hover:bg-surface-raised aria-pressed:border-chalk aria-pressed:bg-chalk/10">
           {nodes.find((node) => node.id === id)?.label ?? id}
         </button>
       ))}
