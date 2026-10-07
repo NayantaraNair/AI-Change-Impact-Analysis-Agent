@@ -1,8 +1,7 @@
 "use client";
 
-import { useRef, type FormEvent } from "react";
-import { ChevronDown, Paperclip } from "lucide-react";
-import { ATTACH_ACCEPT } from "@/lib/attach";
+import type { FormEvent } from "react";
+import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,12 +19,9 @@ interface Props {
   examplesError: boolean;
   onRetryExamples: () => void;
   busy: boolean;
-  onAttach: (file: File) => void;
-  attachError: string | null;
 }
 
-export function StoryForm({ value, onChange, onSubmit, examples, onExample, examplesLoading, examplesError, onRetryExamples, busy, onAttach, attachError }: Props) {
-  const fileInput = useRef<HTMLInputElement>(null);
+export function StoryForm({ value, onChange, onSubmit, examples, onExample, examplesLoading, examplesError, onRetryExamples, busy }: Props) {
   function update(key: keyof StoryFormValue, next: string) {
     onChange({ ...value, [key]: next });
   }
@@ -35,12 +31,9 @@ export function StoryForm({ value, onChange, onSubmit, examples, onExample, exam
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1>Impact analysis</h1>
-          <p className="mt-1 text-dense text-muted">Attach or paste a story or epic. See what it affects before you plan the sprint.</p>
+          <p className="mt-1 text-dense text-muted">Paste a story or epic. See what it affects before you plan the sprint.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-        <input ref={fileInput} type="file" accept={ATTACH_ACCEPT} className="sr-only" tabIndex={-1} aria-hidden="true"
-          onChange={(event) => { const file = event.target.files?.[0]; if (file) onAttach(file); event.target.value = ""; }} />
-        <Button type="button" variant="outline" disabled={busy} onClick={() => fileInput.current?.click()}><Paperclip aria-hidden="true" />Attach file</Button>
         <DropdownMenu>
           <DropdownMenuTrigger render={<Button type="button" variant="outline" disabled={busy || examplesLoading} />}>
             {examplesLoading ? "Loading…" : "Examples"}<ChevronDown aria-hidden="true" />
@@ -57,10 +50,9 @@ export function StoryForm({ value, onChange, onSubmit, examples, onExample, exam
         </DropdownMenu>
         </div>
       </div>
-      {attachError && <p role="alert" className="text-dense text-impact-high">{attachError}</p>}
       {examplesError && <p role="status" className="text-dense text-muted">Couldn&apos;t load examples. Check the backend, then retry.</p>}
       <fieldset disabled={busy} className="grid min-w-0 gap-3 disabled:opacity-60">
-        <div className="grid gap-3 sm:grid-cols-[140px_minmax(0,1fr)_150px]">
+        <div className="grid gap-3 sm:grid-cols-[140px_minmax(0,1fr)]">
           <label className="space-y-1 text-dense font-medium">
             <span>ID <span className="text-meta font-normal text-muted">(optional)</span></span>
             <Input value={value.id} onChange={(event) => update("id", event.target.value)} placeholder="ST-107" maxLength={100} />
@@ -68,12 +60,6 @@ export function StoryForm({ value, onChange, onSubmit, examples, onExample, exam
           <label className="space-y-1 text-dense font-medium">
             <span>Title</span>
             <Input value={value.title} onChange={(event) => update("title", event.target.value)} placeholder="One line: what is changing" required maxLength={500} />
-          </label>
-          <label className="space-y-1 text-dense font-medium">
-            <span>Type</span>
-            <select value={value.type} onChange={(event) => update("type", event.target.value)} className="h-8 w-full rounded-md border border-line bg-surface px-2 text-dense">
-              <option value="story">Story</option><option value="epic">Epic</option><option value="change_request">Change request</option>
-            </select>
           </label>
         </div>
         <div className="grid gap-3 md:grid-cols-[3fr_2fr]">

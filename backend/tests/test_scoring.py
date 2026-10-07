@@ -8,6 +8,23 @@ from app.contracts import Architecture, Component, GraphNode, ImpactGraph, Requi
 from app.engine.scoring import DIMENSION_ORDER, load_scoring_config, score_risk
 
 
+@pytest.fixture(autouse=True)
+def without_contained_credit(monkeypatch):
+    """Factor arithmetic tests score without the small-change credit (tested in test_scope.py)."""
+    from app.engine import scoring
+
+    original = scoring.load_scoring_config
+
+    def load(path=None):
+        cfg = original(path)
+        cfg.pop("contained_change", None)
+        return cfg
+
+    monkeypatch.setattr(scoring, "load_scoring_config", load)
+    # Arithmetic tests use the full medium-change rules; size rules live in test_scope.py.
+    monkeypatch.setattr(scoring, "change_size", lambda facts, arch: ("medium", ""))
+
+
 def facts(**overrides) -> RequirementFacts:
     values = dict(
         business_summary="Update a banking capability",

@@ -1,10 +1,36 @@
 {
-  "answer": "High-risk stories per the sprint analysis (`kpis.high_risk_stories`): **ST-101, ST-107, ST-110, ST-112**.\n\nSupplied risk scores and release decisions (as computed):\n\n- **ST-107** — overall risk 89, highest dimension `security` 100 (high); decision **NO_GO**.\n- **ST-112** — overall risk 74, highest dimension `delivery` 77 (high); decision **NO_GO**.\n- **ST-110** — overall risk 73, highest dimension `delivery` 78 (high); decision **NO_GO**.\n- **ST-101** — overall risk 70, highest dimension `compliance` 81 (high); decision **GO_WITH_CONDITIONS**.\n\nLower-risk stories in the same sprint:\n\n- **ST-104** — overall risk 62, highest dimension `operational` 63 (medium); decision **GO_WITH_CONDITIONS**.\n- **ST-115** — overall risk 38, highest dimension `operational` 47 (medium); decision **GO**.\n\nRelated conflict context (all `deployment_collision`, risk score 100, high): C-ST-101-ST-107 on `transaction-db`, C-ST-101-ST-110 on `payment-service`, C-ST-107-ST-112 on `authentication-service`.",
+  "answer": "Risky stories, based on the supplied analysis:\n\n- **ST-107 — the flagged high-risk story.**\n  - Overall risk **85**, highest dimension **security 93 (high)**.\n  - Security factors: **card data 25** (`atm`, `card-service`, `fraud-engine`), **auth flow change 25** (`api-gateway`, `authentication-service`, `card-service`, `mobile-banking`), **external API contract 15** (same components).\n  - Other high dimensions: **delivery 87**, **compliance 75**, **operational 71**.\n  - Delivery factors: **owner coordination 32**, **medium ambiguity 30**, **direct services 20**.\n  - Release decision: **NO_GO**, triggered by security risk **93 >= 85**, delivery risk **87 >= 85**, PCI DSS high, and Internal Governance high.\n  - Also in two high-risk collisions: `account-service` with ST-101 (`risk_score 100`) and `authentication-service` with ST-112 (`risk_score 100`).\n\n- **ST-112 — notably risky, but not the flagged high-risk story.**\n  - Overall risk **64**, highest dimension **security 73 (high)**.\n  - Security factors: **auth flow change 25** (`authentication-service`, `mobile-banking`), **customer data 20** (`api-gateway`, `authentication-service`, `customer-db`, `mobile-banking`), **critical identity path 10** (`api-gateway`, `authentication-service`).\n  - Release decision: **GO_WITH_CONDITIONS**, triggered by highest risk **73 >= 60**, GDPR medium, Internal Governance medium, and the collision with ST-107 on `authentication-service`.\n\n- **ST-104 — medium risk, with a high GDPR compliance finding.**\n  - Overall risk **57**, highest dimension **compliance 61 (medium)**.\n  - Compliance factors: **pii data 20** (`crm`, `customer-db`, `customer-service`, `notification-service`), **nearby card data 12** (`card-service`), **database schema change 10** (`audit-db`, `customer-db`).\n  - GDPR framework is **high** with score **55**; decision **GO_WITH_CONDITIONS**.\n\n- **ST-101 — medium risk.**\n  - Overall risk **39**, highest dimension **operational 44 (medium)**.\n  - Factors include **service criticality 40** (`payment-service`), **downstream systems 8**, **deployment groups 6**.\n  - Decision **GO_WITH_CONDITIONS**, driven by collisions with ST-107 on `account-service` and ST-110 on `payment-service`.\n\n- **ST-110 — medium risk.**\n  - Overall risk **39**, highest dimension **compliance 50 (medium)**.\n  - Factors include **card data 30** (`fraud-engine`) and **financial data 20** (`fraud-engine`).\n  - Decision **GO_WITH_C",
   "cited_nodes": [
+    "mobile-banking",
+    "atm",
+    "customer-service",
+    "account-service",
     "payment-service",
+    "card-service",
+    "crm",
     "authentication-service",
-    "transaction-db"
+    "notification-service",
+    "api-gateway",
+    "customer-db",
+    "audit-db",
+    "fraud-engine"
   ],
-  "cited_factors": [],
+  "cited_factors": [
+    "customer data",
+    "pii data",
+    "financial data",
+    "direct services",
+    "service criticality",
+    "downstream systems",
+    "deployment groups",
+    "owner coordination",
+    "nearby card data",
+    "database schema change",
+    "card data",
+    "auth flow change",
+    "external API contract",
+    "critical identity path",
+    "medium ambiguity"
+  ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

@@ -1,14 +1,12 @@
 {
-  "answer": "Only **ST-110** has a risk assessment in this context; **ST-101** is referenced as a coordinated story but has no risk data here.\n\n**ST-110** — risk level: high\n- Overall risk score: **73** (as supplied)\n- Highest dimension: **delivery — 78 (high)**\n- Other dimensions:\n  - operational — 71 (high)\n  - compliance — 69 (medium)\n  - performance — 55 (medium)\n  - security — 53 (medium)\n  - technical — 33 (low)\n\nTop delivery risk factors (nodes: fraud-engine, payment-service, risk-engine):\n- medium ambiguity — 30\n- owner coordination — 28\n- direct services — 15\n\nRelease decision: **NO_GO**, confidence 30, including the triggered rule \"sprint deployment collision between ST-101 and ST-110 on payment-service\" and test coverage 59% (< 70%).\n\nNote: I can't rank other stories' risk — the context contains no risk entries for ST-101 or any other story.",
+  "answer": "Only one story is present in the analysis context: **ST-110**.\n\n- **ST-110 overall risk: 39**, highest dimension: **compliance**, level **medium**, score **50**.\n  - Top compliance factors: **card data** (30 pts, `fraud-engine`), **financial data** (20 pts, `fraud-engine`), **baseline** (5 pts, no node IDs).\n- Other risk dimensions are **low**:\n  - **security 34**, **technical 11**, **operational 34**, **performance 30**, **delivery 18**.\n- Release decision: **GO**, confidence **78**, triggered rule: **“GO: no blocking or conditional release rules fired”**, conditions: none.\n- Compliance summary: **3 of 4 frameworks apply; minimum compliance score 80/100; 0 applicable frameworks have high risk**.\n\nSo, based on the supplied context: **ST-110 is the only story, and it is not high-risk, but compliance is its highest-risk area at medium level.** No other stories are available to compare.",
   "cited_nodes": [
-    "payment-service",
-    "fraud-engine",
-    "risk-engine"
+    "fraud-engine"
   ],
   "cited_factors": [
-    "direct services",
-    "medium ambiguity",
-    "owner coordination"
+    "baseline",
+    "card data",
+    "financial data"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

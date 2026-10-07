@@ -1,17 +1,11 @@
 {
-  "answer": "**Release confidence = 30 (decision: NO_GO).** Per the supplied analysis, the drivers are:\n\n- **Test coverage below threshold** — triggered rule: \"NO_GO: highest risk 78 with test coverage 59% (< 70%)\". Coverage estimate is 0.588 (~59%).\n- **High residual risk** — overall risk 73; highest dimension is **delivery at 78 (high)**, itself driven by:\n  - medium ambiguity (30 pts) on fraud-engine, payment-service, risk-engine\n  - owner coordination (28 pts) across the full component set\n  - direct services (15 pts) on fraud-engine, payment-service, risk-engine\n- **Operational risk high, 71** — service criticality (40 pts, payment-service), downstream systems (20 pts), deployment groups (6 pts).\n- **Compliance exposure, medium** — PCI DSS 65, SOX 65, Internal Governance 70 (overall compliance score 65).\n- **Release collision** — \"sprint deployment collision between ST-101 and ST-110 on payment-service\" (shared payment screening path and core-payments deployment).\n- **Substantial unresolved verification work** — the conditions list many outstanding P1 api/functional tests (e.g. TC-037, TC-038, TC-040) plus eight generated integration/functional tests GEN-1…GEN-8, including GEN-5 (matching rule versions with ST-101) and GEN-7 (medium-ambiguity clarification).\n\nThe first condition is explicit: \"Increase test coverage to at least 70% and rerun the release assessment.\"",
+  "answer": "The analysis context does not say release confidence is low — it reports confidence as **78** with a **GO** decision.\n\nAs supplied by the context:\n- Release **confidence: 78**, **decision: GO**\n- Triggered rules: `GO: no blocking or conditional release rules fired`\n- Conditions: none\n- Complexity: medium\n- Overall risk: 39; highest dimension is **compliance** (50, medium), driven by factors \"card data\" (30 pts, `fraud-engine`) and \"financial data\" (20 pts, `fraud-engine`). All other dimensions are low: operational 34, security 34, performance 30, delivery 18, technical 11.\n\nIf you meant why confidence isn't higher, the context offers no explicit rationale beyond the absence of blocking/conditional rules; it does not state a cause for the 78 value.",
   "cited_nodes": [
-    "payment-service",
-    "fraud-engine",
-    "risk-engine"
+    "fraud-engine"
   ],
   "cited_factors": [
-    "direct services",
-    "service criticality",
-    "downstream systems",
-    "deployment groups",
-    "medium ambiguity",
-    "owner coordination"
+    "card data",
+    "financial data"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

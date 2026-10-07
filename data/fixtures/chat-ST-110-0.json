@@ -1,27 +1,22 @@
 {
-  "answer": "**Impacted components (as defined in the analysis):**\n\n- **Directly changed services:** fraud-engine, payment-service, risk-engine  \n- **All services impacted:** account-service, api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, customer-db, fraud-engine, loan-service, mobile-banking, notification-service, payment-service, reporting-db, risk-engine, transaction-db, web-banking  \n- **Databases impacted:** audit-db, customer-db, reporting-db, transaction-db  \n- **APIs impacted:** GET /accounts/{id}/balance, GET /accounts/{id}/limits, GET /cards/{id}, GET /internal/audit/events, GET /internal/ledger/accounts/{id}/daily-total, GET /internal/ledger/entries/{id}, GET /loans/{id}, GET /notifications/preferences/{customerId}, GET /notifications/{id}, GET /payments/limits, GET /payments/{id}, GET /risk/policies/{id}, PATCH /cards/{id}/status, PATCH /customers/{id}/profile, POST /auth/biometric/challenges, POST /auth/introspect, POST /auth/step-up, POST /auth/token, POST /cards/{id}/replacement, POST /customers/{id}/profile, POST /fraud/screenings, POST /fraud/velocity-checks, POST /internal/audit/events, POST /internal/ledger/entries, POST /loans/applications, POST /loans/{id}/disbursements, POST /notifications, POST /payments, POST /payments/{id}/cancellation, POST /risk/assessments, PUT /accounts/{id}/limits, PUT /fraud/rules/{id}, PUT /risk/policies/{id}  \n- **Downstream systems impacted:** account-service, api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, customer-db, loan-service, mobile-banking, notification-service, reporting-db, transaction-db, web-banking  \n- **Deployment groups impacted:** channels-access, channels-mobile, core-banking, core-payments, customer-platform, data-platform, identity  \n\n*(All items are taken directly from the “impact” section of the analysis.)*",
+  "answer": "**Directly changed**\n- `fraud-engine` (only directly changed component)\n\n**Services**\n- `fraud-engine`, `risk-engine`, `transaction-db`\n\n**Downstream**\n- `risk-engine`, `transaction-db`\n\n**Databases**\n- `transaction-db`\n\n**APIs**\n- `GET /internal/ledger/accounts/{id}/daily-total`\n- `GET /internal/ledger/entries/{id}`\n- `GET /risk/policies/{id}`\n- `POST /fraud/screenings`\n- `POST /fraud/velocity-checks`\n- `POST /internal/ledger/entries`\n- `POST /risk/assessments`\n- `PUT /fraud/rules/{id}`\n- `PUT /risk/policies/{id}`\n\n**Deployment groups**\n- `core-banking`, `core-payments`\n\n**Risk factor references (labels with node IDs)**\n- Blast radius size → `fraud-engine`, `risk-engine`, `transaction-db`\n- Direct services → `fraud-engine`\n- Dependency depth → `risk-engine`, `transaction-db`\n- Service criticality → `fraud-engine`\n- Downstream systems → `risk-engine`, `transaction-db`\n- Transaction path / payment business rule → `transaction-db`\n- Card data / financial data → `fraud-engine`\n- Owner coordination → `fraud-engine`, `risk-engine`, `transaction-db`",
   "cited_nodes": [
-    "mobile-banking",
-    "web-banking",
-    "atm",
-    "branch-portal",
-    "account-service",
-    "payment-service",
-    "loan-service",
-    "card-service",
-    "authentication-service",
-    "notification-service",
-    "api-gateway",
-    "customer-db",
     "transaction-db",
-    "audit-db",
-    "reporting-db",
     "fraud-engine",
     "risk-engine"
   ],
   "cited_factors": [
+    "card data",
+    "blast radius size",
+    "financial data",
+    "direct services",
+    "dependency depth",
+    "service criticality",
     "downstream systems",
-    "deployment groups"
+    "deployment groups",
+    "transaction path",
+    "payment business rule",
+    "owner coordination"
   ],
-  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
+  "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

@@ -12,6 +12,14 @@ from app.contracts import Architecture, Component, RequirementFacts
 from app.engine.dependency import build_impact_graph
 
 
+@pytest.fixture(autouse=True)
+def medium_change(monkeypatch):
+    """Rule arithmetic uses medium-change rules; small-change credits are tested in test_scope.py."""
+    from app.agents import compliance as module
+
+    monkeypatch.setattr(module, "change_size", lambda facts, arch: ("medium", ""))
+
+
 def facts(**overrides):
     values = dict(
         business_summary="Update a banking capability",
@@ -146,7 +154,7 @@ async def test_no_applicable_framework_has_fixed_order_and_empty_details(monkeyp
     )
     assert report.overall_score == 100
     assert "No compliance framework applies" in report.summary
-    assert provider == "template-fallback"
+    assert provider == "deterministic"
     for assessment in report.frameworks:
         assert not assessment.applicable
         assert assessment.reason

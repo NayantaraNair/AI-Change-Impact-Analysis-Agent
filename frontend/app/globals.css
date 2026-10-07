@@ -55,6 +55,27 @@
   --radius: 0.5rem;
 }
 
+/* Light theme: same roles, inverted ground. Chalk (interactive) becomes ink. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --canvas: #F5F4F8;
+  --surface: #FFFFFF;
+  --surface-raised: #EEECF3;
+  --line: #DDDAE5;
+  --line-strong: #BDB8CB;
+  --text: #1B1A21;
+  --muted: #625E70;
+  --chalk: #1B1A21;
+  --model: #6A4BD6;
+  --model-deep: #6A4BD6;
+  --impact-low: #13866B;
+  --impact-med: #A86A0A;
+  --impact-high: #C93A26;
+  --warn: #A86A0A;
+  --primary-foreground: #FFFFFF;
+  --sidebar-primary-foreground: #FFFFFF;
+}
+
 @theme inline {
   --color-canvas: var(--canvas);
   --color-surface: var(--surface);
@@ -127,7 +148,16 @@
   h1 { @apply text-title font-semibold; font-stretch: 112%; letter-spacing: -0.01em; }
   h2, h3 { @apply text-section font-semibold; letter-spacing: -0.005em; }
   :focus-visible { outline: 2px solid var(--chalk); outline-offset: 2px; }
-  ::selection { background: var(--model-deep); color: var(--chalk); }
+  ::selection { background: var(--model-deep); color: #FFFFFF; }
+}
+
+/* A faint grid behind the dependency graph, like a planning board. */
+@utility graph-grid {
+  background-color: var(--canvas);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--line) 45%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--line) 45%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
 /* Scores read like instrument readouts: condensed, heavy, tabular. */

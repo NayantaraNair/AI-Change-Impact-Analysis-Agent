@@ -173,7 +173,7 @@ async def test_stage_order_and_testing_compliance_concurrency(isolated, story, s
         events.append("requirement")
         return await original_requirement(*args)
 
-    def dependency(*args):
+    def dependency(*args, **scope):
         events.append("dependency")
         return original_dependency(*args)
 

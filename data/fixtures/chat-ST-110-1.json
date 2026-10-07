@@ -1,31 +1,18 @@
 {
-  "answer": "**High-risk dimensions (as computed):**\n- **Delivery — score 78 (high)**\n  - `medium ambiguity` — 30 pts: fraud-engine, payment-service, risk-engine\n  - `owner coordination` — 28 pts: account-service, api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, customer-db, fraud-engine, loan-service, mobile-banking, notification-service, payment-service, reporting-db, risk-engine, transaction-db, web-banking\n  - `direct services` — 15 pts: fraud-engine, payment-service, risk-engine\n- **Operational — score 71 (high)**\n  - `service criticality` — 40 pts: payment-service\n  - `downstream systems` — 20 pts: account-service, api-gateway, atm, audit-db, authentication-service, branch-portal, card-service, customer-db, loan-service, mobile-banking, notification-service, reporting-db, transaction-db, web-banking\n  - `deployment groups` — 6 pts (all listed components)\n\n**Overall risk:** 73, highest dimension = delivery (78).\n\n**Related supplied context:**\n- Release decision: NO_GO, confidence 30, with rule \"NO_GO: highest risk 78 with test coverage 59% (< 70%)\"; also GO_WITH_CONDITIONS rules citing the 78 score, medium PCI DSS/SOX/Internal Governance risk, and the ST-101/ST-110 sprint deployment collision on payment-service.\n- Other dimensions are medium/low: security 53, compliance 69, performance 55, technical 33.",
+  "answer": "No risk dimension is rated high in this analysis — the premise doesn't hold.\n\n**Supplied scores (not recalculated):**\n- Overall risk: **39**; highest dimension: **compliance, 50 (medium)**\n- security 34 (low), technical 11 (low), operational 34 (low), performance 30 (low), delivery 18 (low)\n- Release: decision **GO**, confidence **78**, conditions []\n\n**Why compliance is the highest (medium, 50):**\n- `card data` — 30 pts, node `fraud-engine`\n- `financial data` — 20 pts, node `fraud-engine`\n- `baseline` — 5 pts\n\n**Why security is 34 (low):**\n- `card data` — 25 pts, node `fraud-engine`\n- `baseline` — 8 pts\n- `blast radius size` — 6 pts, nodes `fraud-engine`, `risk-engine`, `transaction-db`\n\n**Operational 34 (low)** — driven by `service criticality` 36 pts (`fraud-engine`); **performance 30 (low)** — `transaction path` 20 pts and `payment business rule` 15 pts (`transaction-db`); **technical 11 (low)** and **delivery 18 (low)** are minor.\n\n**Compliance frameworks:** 3 of 4 apply, minimum score **80/100**, and **0 applicable frameworks have high risk** (PCI DSS low 80, SOX low 100, Internal Governance low 100; GDPR not applicable). PCI DSS findings centre on card-token handling/masking in the velocity path, access and audit logging on the screening/velocity/rule-update endpoints, and retention of declined-attempt data (`fraud-engine`, `transaction-db`).\n\nSo the drivers are card-data and financial-data exposure on `fraud-engine`, not a high-rated risk level.",
   "cited_nodes": [
-    "mobile-banking",
-    "web-banking",
-    "atm",
-    "branch-portal",
-    "account-service",
-    "payment-service",
-    "loan-service",
-    "card-service",
-    "authentication-service",
-    "notification-service",
-    "api-gateway",
-    "customer-db",
     "transaction-db",
-    "audit-db",
-    "reporting-db",
     "fraud-engine",
     "risk-engine"
   ],
   "cited_factors": [
-    "direct services",
+    "baseline",
+    "card data",
+    "blast radius size",
+    "financial data",
     "service criticality",
-    "downstream systems",
-    "deployment groups",
-    "medium ambiguity",
-    "owner coordination"
+    "transaction path",
+    "payment business rule"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

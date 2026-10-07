@@ -12,15 +12,15 @@
     ]
   },
   "requirement": {
-    "business_summary": "Adds card freeze/unfreeze functionality to the mobile banking app, requiring step-up authentication and exposing only masked card details via a new API gateway endpoint backed by the card service.",
-    "technical_summary": "Introduces a new REST endpoint in the API gateway that calls the card-service to update card status; each request mandates fresh step-up authentication from the authentication-service bound to device, card and action; mobile-banking UI and gateway authorization policies are updated to invoke the endpoint; responses return masked card identifiers only; card-service retains current status on auth failure or unavailability.",
-    "business_domain": "Card Services",
+    "business_summary": "Cardholders gain the ability to freeze or unfreeze their own card from the mobile app. Every card status change requires a fresh step-up authentication proof bound to the card, device and requested action, and only masked card details are exposed. Replay and cross-customer requests must be rejected, and if authentication is unavailable or proof validation fails the card status must remain unchanged. PCI DSS review, security sign-off and a rehearsed rollback are outstanding release blockers.",
+    "technical_summary": "A new API Gateway endpoint backs card freeze/unfreeze calls from Mobile Banking into Card Service. Authentication Service must supply a fresh step-up proof bound to card, device and requested action; Card Service must fail closed (leave status unchanged, deny action) when authentication is unavailable or proof validation fails. Mobile Banking and API Gateway authorization policies are updated along with the card control flow, and card control traces must carry masked identifiers only. The current prototype permits cross-device proof replay and lacks fail-closed verification evidence; no rollback rehearsal has been performed.",
+    "business_domain": "Retail Banking - Cards",
     "affected_capabilities": [
-      "card freeze/unfreeze",
-      "step-up authentication",
-      "masked card details exposure",
-      "API gateway endpoint",
-      "authorization policy update"
+      "Card freeze/unfreeze self-service controls",
+      "Step-up authentication and proof binding",
+      "Mobile banking card management",
+      "API authorization policy enforcement",
+      "PCI DSS compliance and masked trace handling"
     ],
     "affected_services": [
       "mobile-banking",
@@ -29,15 +29,15 @@
       "authentication-service"
     ],
     "change_type": "new_feature",
-    "touches_customer_data": true,
+    "touches_customer_data": false,
     "touches_card_data": true,
     "touches_financial_data": false,
     "changes_auth_flow": true,
     "changes_external_api_contract": true,
     "changes_db_schema": false,
     "ambiguity": "medium",
-    "engineering_scope": "Implement new API gateway endpoint for card freeze/unfreeze, integrate with card-service to update card status, add step-up authentication flow with authentication-service binding proof to device, card and action, update mobile-banking UI and API gateway authorization policies, ensure only masked card data is exposed, complete PCI DSS review and security sign-off, and rehearse rollback procedures.",
-    "source": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
+    "engineering_scope": "Contained change: one new API Gateway endpoint plus a Mobile Banking card control screen/flow, authorization policy updates in Mobile Banking and API Gateway, and the Card Service freeze/unfreeze handling with fail-closed behaviour. Authentication Service work is limited to issuing/validating step-up proofs bound to card, device and requested action and rejecting replay and cross-customer proofs; traces must carry masked identifiers only. No database schema change is described. Open items outside the build: PCI DSS review, security sign-off and a rehearsed rollback, which the story states are mandatory before release.",
+    "source": "tokenharbor:deepseek-v4.1-flash:free"
   },
   "graph": {
     "nodes": [
@@ -47,8 +47,8 @@
         "type": "core",
         "hop": 1,
         "severity": "high",
-        "x": -402.3,
-        "y": 268.8,
+        "x": -414.4,
+        "y": 184.5,
         "criticality": 9,
         "owner_team": "Core Banking",
         "data_classes": [
@@ -77,8 +77,8 @@
         "type": "channel",
         "hop": 1,
         "severity": "medium",
-        "x": 94.4,
-        "y": 474.5,
+        "x": 47.4,
+        "y": 451.1,
         "criticality": 7,
         "owner_team": "Assisted Channels",
         "data_classes": [
@@ -90,10 +90,10 @@
         "id": "audit-db",
         "label": "Audit Database",
         "type": "database",
-        "hop": 1,
-        "severity": "medium",
-        "x": -94.4,
-        "y": -474.5,
+        "hop": null,
+        "severity": null,
+        "x": 793.6,
+        "y": 0.0,
         "criticality": 8,
         "owner_team": "Data & Analytics",
         "data_classes": [
@@ -120,8 +120,8 @@
         "type": "channel",
         "hop": 1,
         "severity": "medium",
-        "x": -94.4,
-        "y": 474.5,
+        "x": -140.2,
+        "y": 431.4,
         "criticality": 6,
         "owner_team": "Assisted Channels",
         "data_classes": [
@@ -150,8 +150,8 @@
         "type": "core",
         "hop": 1,
         "severity": "medium",
-        "x": -474.5,
-        "y": 94.4,
+        "x": -453.6,
+        "y": 0.0,
         "criticality": 6,
         "owner_team": "Customer Platform",
         "data_classes": [
@@ -164,8 +164,8 @@
         "type": "database",
         "hop": 1,
         "severity": "high",
-        "x": 94.4,
-        "y": -474.5,
+        "x": 47.4,
+        "y": -451.1,
         "criticality": 9,
         "owner_team": "Customer Platform",
         "data_classes": [
@@ -178,8 +178,8 @@
         "type": "core",
         "hop": 1,
         "severity": "medium",
-        "x": -474.5,
-        "y": -94.4,
+        "x": -414.4,
+        "y": -184.5,
         "criticality": 8,
         "owner_team": "Customer Platform",
         "data_classes": [
@@ -192,8 +192,8 @@
         "type": "platform",
         "hop": 1,
         "severity": "low",
-        "x": 402.3,
-        "y": -268.8,
+        "x": 367.0,
+        "y": -266.6,
         "criticality": 4,
         "owner_team": "Document Operations",
         "data_classes": []
@@ -204,8 +204,8 @@
         "type": "analytics",
         "hop": 1,
         "severity": "high",
-        "x": 474.5,
-        "y": 94.4,
+        "x": 443.7,
+        "y": 94.3,
         "criticality": 9,
         "owner_team": "Payments Platform",
         "data_classes": [
@@ -219,8 +219,8 @@
         "type": "core",
         "hop": 1,
         "severity": "medium",
-        "x": -402.3,
-        "y": -268.8,
+        "x": -303.5,
+        "y": -337.1,
         "criticality": 8,
         "owner_team": "Core Banking",
         "data_classes": [
@@ -249,8 +249,8 @@
         "type": "platform",
         "hop": 1,
         "severity": "medium",
-        "x": 474.5,
-        "y": -94.4,
+        "x": 443.7,
+        "y": -94.3,
         "criticality": 6,
         "owner_team": "Customer Platform",
         "data_classes": [
@@ -263,8 +263,8 @@
         "type": "core",
         "hop": 1,
         "severity": "high",
-        "x": -268.8,
-        "y": -402.3,
+        "x": -140.2,
+        "y": -431.4,
         "criticality": 10,
         "owner_team": "Payments Platform",
         "data_classes": [
@@ -277,7 +277,7 @@
         "type": "database",
         "hop": 2,
         "severity": "low",
-        "x": 653.8,
+        "x": 623.6,
         "y": 0.0,
         "criticality": 6,
         "owner_team": "Data & Analytics",
@@ -291,8 +291,8 @@
         "type": "analytics",
         "hop": 1,
         "severity": "medium",
-        "x": 402.3,
-        "y": 268.8,
+        "x": 367.0,
+        "y": 266.6,
         "criticality": 5,
         "owner_team": "Data & Analytics",
         "data_classes": []
@@ -303,8 +303,8 @@
         "type": "analytics",
         "hop": 1,
         "severity": "medium",
-        "x": 268.8,
-        "y": 402.3,
+        "x": 226.8,
+        "y": 392.8,
         "criticality": 8,
         "owner_team": "Data & Analytics",
         "data_classes": [
@@ -317,8 +317,8 @@
         "type": "database",
         "hop": 1,
         "severity": "high",
-        "x": 268.8,
-        "y": -402.3,
+        "x": 226.8,
+        "y": -392.8,
         "criticality": 10,
         "owner_team": "Core Banking",
         "data_classes": [
@@ -331,8 +331,8 @@
         "type": "channel",
         "hop": 1,
         "severity": "medium",
-        "x": -268.8,
-        "y": 402.3,
+        "x": -303.5,
+        "y": 337.1,
         "criticality": 8,
         "owner_team": "Digital Channels",
         "data_classes": [
@@ -381,7 +381,7 @@
         "id": "api-gateway->audit-db",
         "source": "api-gateway",
         "target": "audit-db",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -458,7 +458,7 @@
         "id": "authentication-service->audit-db",
         "source": "authentication-service",
         "target": "audit-db",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -500,7 +500,7 @@
         "id": "card-service->audit-db",
         "source": "card-service",
         "target": "audit-db",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -696,7 +696,7 @@
         "id": "mobile-banking->audit-db",
         "source": "mobile-banking",
         "target": "audit-db",
-        "on_impact_path": true,
+        "on_impact_path": false,
         "conflict": false
       },
       {
@@ -844,7 +844,6 @@
       "account-service",
       "api-gateway",
       "atm",
-      "audit-db",
       "authentication-service",
       "branch-portal",
       "card-service",
@@ -864,7 +863,6 @@
       "web-banking"
     ],
     "impacted_databases": [
-      "audit-db",
       "customer-db",
       "reporting-db",
       "transaction-db"
@@ -878,7 +876,6 @@
       "GET /crm/customers/{id}/contacts",
       "GET /customers/{id}",
       "GET /documents/templates/{id}",
-      "GET /internal/audit/events",
       "GET /internal/customer-store/profiles/{id}",
       "GET /internal/ledger/accounts/{id}/daily-total",
       "GET /internal/ledger/entries/{id}",
@@ -906,7 +903,6 @@
       "POST /documents/statements/render",
       "POST /fraud/screenings",
       "POST /fraud/velocity-checks",
-      "POST /internal/audit/events",
       "POST /internal/ledger/entries",
       "POST /loans/applications",
       "POST /loans/{id}/disbursements",
@@ -928,7 +924,6 @@
     "downstream_systems": [
       "account-service",
       "atm",
-      "audit-db",
       "branch-portal",
       "crm",
       "customer-db",
@@ -959,31 +954,13 @@
     "dimensions": [
       {
         "name": "security",
-        "score": 100,
+        "score": 93,
         "level": "high",
         "factors": [
           {
             "label": "baseline",
             "points": 8,
             "node_ids": []
-          },
-          {
-            "label": "customer data",
-            "points": 20,
-            "node_ids": [
-              "account-service",
-              "api-gateway",
-              "authentication-service",
-              "branch-portal",
-              "card-service",
-              "crm",
-              "customer-db",
-              "customer-service",
-              "loan-service",
-              "mobile-banking",
-              "notification-service",
-              "web-banking"
-            ]
           },
           {
             "label": "card data",
@@ -1029,7 +1006,6 @@
               "account-service",
               "api-gateway",
               "atm",
-              "audit-db",
               "authentication-service",
               "branch-portal",
               "card-service",
@@ -1050,11 +1026,11 @@
             ]
           }
         ],
-        "explanation": "Security risk is high (100) because card data (+25) on atm, card-service, fraud-engine; auth flow change (+25) on api-gateway, authentication-service, card-service and 1 more; customer data (+20) on account-service, api-gateway, authentication-service and 9 more."
+        "explanation": "Security risk is high (93) because card data (+25) on atm, card-service, fraud-engine; auth flow change (+25) on api-gateway, authentication-service, card-service and 1 more; external API contract (+15) on api-gateway, authentication-service, card-service and 1 more."
       },
       {
         "name": "compliance",
-        "score": 81,
+        "score": 75,
         "level": "high",
         "factors": [
           {
@@ -1086,16 +1062,9 @@
               "api-gateway",
               "mobile-banking"
             ]
-          },
-          {
-            "label": "nearby audit data",
-            "points": 6,
-            "node_ids": [
-              "audit-db"
-            ]
           }
         ],
-        "explanation": "Compliance risk is high (81) because card data (+30) on card-service; pii data (+20) on api-gateway, authentication-service, card-service and 1 more; financial data (+20) on api-gateway, mobile-banking."
+        "explanation": "Compliance risk is high (75) because card data (+30) on card-service; pii data (+20) on api-gateway, authentication-service, card-service and 1 more; financial data (+20) on api-gateway, mobile-banking."
       },
       {
         "name": "technical",
@@ -1161,7 +1130,6 @@
             "node_ids": [
               "account-service",
               "atm",
-              "audit-db",
               "branch-portal",
               "crm",
               "customer-db",
@@ -1185,7 +1153,6 @@
               "account-service",
               "api-gateway",
               "atm",
-              "audit-db",
               "authentication-service",
               "branch-portal",
               "card-service",
@@ -1206,7 +1173,7 @@
             ]
           }
         ],
-        "explanation": "Operational risk is high (71) because service criticality (+40) on api-gateway, authentication-service; downstream systems (+20) on account-service, atm, audit-db and 14 more; deployment groups (+6) on account-service, api-gateway, atm and 18 more."
+        "explanation": "Operational risk is high (71) because service criticality (+40) on api-gateway, authentication-service; downstream systems (+20) on account-service, atm, branch-portal and 13 more; deployment groups (+6) on account-service, api-gateway, atm and 17 more."
       },
       {
         "name": "performance",
@@ -1275,7 +1242,6 @@
               "account-service",
               "api-gateway",
               "atm",
-              "audit-db",
               "authentication-service",
               "branch-portal",
               "card-service",
@@ -1296,11 +1262,13 @@
             ]
           }
         ],
-        "explanation": "Delivery risk is high (87) because owner coordination (+32) on account-service, api-gateway, atm and 18 more; medium ambiguity (+30) on api-gateway, authentication-service, card-service and 1 more; direct services (+20) on api-gateway, authentication-service, card-service and 1 more."
+        "explanation": "Delivery risk is high (87) because owner coordination (+32) on account-service, api-gateway, atm and 17 more; medium ambiguity (+30) on api-gateway, authentication-service, card-service and 1 more; direct services (+20) on api-gateway, authentication-service, card-service and 1 more."
       }
     ],
-    "overall": 89,
-    "highest": "security"
+    "overall": 85,
+    "highest": "security",
+    "change_size": "large",
+    "change_size_reason": "4 services change and both the login flow and a public API change"
   },
   "tests": {
     "tests": [
@@ -1561,199 +1529,158 @@
       },
       {
         "id": "GEN-1",
-        "title": "Security: Card freeze/unfreeze triggers audit event with masked card ID in audit-db",
+        "title": "Security: ATM withdrawal declined when card is frozen via mobile app",
         "type": "security",
         "priority": "P1",
         "covers": [
-          "api-gateway",
-          "audit-db",
-          "authentication-service",
-          "card-service",
-          "mobile-banking"
+          "atm"
         ],
         "steps": [
-          "Authenticate user in mobile banking app with valid device session.",
-          "Initiate step-up authentication for card freeze action (provide OTP or biometric).",
-          "Submit freeze request via mobile app to API gateway endpoint PATCH /mobile/cards/{id}/status with status frozen.",
-          "Verify step-up proof is validated by authentication-service.",
-          "Confirm card-service updates card status to frozen.",
-          "Check audit-db for an audit event corresponding to the freeze action.",
-          "Validate that audit event includes user ID, timestamp, action type, and masked card identifier (last four digits or token) but not full PAN."
+          "Enroll a test card in mobile banking.",
+          "Use the mobile app to freeze the card (requires step‑up authentication).",
+          "Attempt an ATM withdrawal with the card at an ATM terminal.",
+          "Observe the ATM response and system logs."
         ],
-        "expected": "Audit-db contains a newly created audit event with correct fields, masked card identifier present, full PAN absent.",
+        "expected": "The ATM declines the transaction (e.g., returns ‘card blocked’ or insufficient funds), the card status in Card Service remains frozen, and the audit log records the freeze attempt with only a masked card identifier.",
         "source": "generated",
         "automation_candidate": false
       },
       {
         "id": "GEN-2",
-        "title": "Compliance: Card freeze/unfreeze notification contains only masked card details via notification-service",
+        "title": "Compliance: Branch portal displays only masked card details for frozen cards",
         "type": "functional",
         "priority": "P1",
         "covers": [
-          "api-gateway",
-          "card-service",
-          "mobile-banking",
-          "notification-service"
+          "branch-portal"
         ],
         "steps": [
-          "Perform card unfreeze via mobile app with valid step-up auth.",
-          "Capture outgoing notification triggered by notification-service (e.g., via mock or log).",
-          "Inspect notification payload (SMS, push, email) for card identifier.",
-          "Ensure payload displays only masked card number (e.g., ****1234) and not full PAN.",
-          "Verify that notification includes action description (unfreeze) and timestamp."
+          "A branch agent logs into the branch portal.",
+          "The agent retrieves card details for a customer whose card was frozen via the mobile app.",
+          "The agent views the card information screen."
         ],
-        "expected": "Notification sent, contains masked card identifier only, no full PAN.",
+        "expected": "The card number shown is masked (e.g., only the last four digits are visible); no full PAN is exposed, satisfying PCI DSS masking requirements.",
         "source": "generated",
         "automation_candidate": false
       },
       {
         "id": "GEN-3",
-        "title": "Operational: Risk engine logs and scores rapid card freeze/unfreeze attempts",
-        "type": "integration",
+        "title": "Operational: CRM contact update does not trigger card freeze/unfreeze actions",
+        "type": "functional",
         "priority": "P1",
         "covers": [
-          "api-gateway",
-          "authentication-service",
-          "card-service",
-          "mobile-banking",
-          "risk-engine"
+          "crm"
         ],
         "steps": [
-          "Authenticate user and complete step-up.",
-          "Rapidly send 5 freeze/unfreeze requests within 10 seconds using valid step-up proofs each time.",
-          "For each request, ensure authentication-service validates fresh step-up proof.",
-          "After sequence, query risk-engine for risk indicators or logs related to card ID.",
-          "Confirm risk-engine records elevated velocity score or flags unusual activity.",
-          "Verify that risk-engine response stays within defined thresholds and does not cause denial of service."
+          "Create a customer profile with an active card.",
+          "Via the CRM API, update the customer’s contact information (e.g., phone number).",
+          "Query Card Service to confirm the card’s current status."
         ],
-        "expected": "Risk engine logs show increased velocity metric for the card, and risk score remains within operational limits; no system errors.",
+        "expected": "The card’s status remains unchanged (still active/unfrozen); no freeze or unfreeze operation is invoked as a side effect of the contact update.",
         "source": "generated",
         "automation_candidate": false
       },
       {
         "id": "GEN-4",
-        "title": "Delivery: Web banking UI lacks card freeze/unfreeze functionality and API returns 403",
-        "type": "functional",
+        "title": "Security: Customer service representative cannot freeze card without step-up authentication",
+        "type": "security",
         "priority": "P1",
         "covers": [
-          "api-gateway",
-          "mobile-banking",
-          "web-banking"
+          "customer-service"
         ],
         "steps": [
-          "Log into web banking portal as a customer with valid session.",
-          "Navigate to card management section.",
-          "Verify that no option to freeze/unfreeze card is present.",
-          "Attempt to directly call the mobile-specific endpoint PATCH /mobile/cards/{id}/status via web banking's API gateway (if exposed) using same auth token.",
-          "Observe response."
+          "A CSR logs into the customer service application.",
+          "The CSR attempts to invoke the card freeze action for a customer’s card without providing any step‑up proof.",
+          "Capture the HTTP response and check Card Service status."
         ],
-        "expected": "UI lacks feature; direct API call returns 403 Forbidden or 404 Not Found, indicating endpoint not permitted for web banking clients.",
+        "expected": "The request is rejected with an authentication error (e.g., 401/403), the card status in Card Service is unchanged, and the failure is logged in Authentication Service.",
         "source": "generated",
         "automation_candidate": false
       },
       {
         "id": "GEN-5",
-        "title": "Security: ATM rejects transaction when card is frozen via mobile app",
-        "type": "security",
+        "title": "Delivery: Loan disbursement proceeds successfully despite customer's card being frozen",
+        "type": "functional",
         "priority": "P1",
         "covers": [
-          "api-gateway",
-          "atm",
-          "authentication-service",
-          "card-service",
-          "mobile-banking"
+          "loan-service"
         ],
         "steps": [
-          "Freeze a card using mobile app with valid step-up authentication.",
-          "Attempt to perform a withdrawal or balance inquiry at an ATM using the same card.",
-          "ATM forwards request to authorization (via api-gateway; assumes ATM checks card status via card-service).",
-          "Observe ATM response."
+          "Ensure a customer has an approved loan and a card that has been frozen via mobile app.",
+          "Trigger the loan disbursement for that loan.",
+          "Monitor the disbursement process and the customer’s account balance."
         ],
-        "expected": "ATM declines transaction, displays error indicating card is blocked/frozen, and logs show card status fetched from card-service as frozen.",
+        "expected": "The loan disbursement succeeds and funds are credited to the account; the card remains frozen in Card Service, confirming that the disbursement flow is independent of the card freeze/unfreeze feature.",
         "source": "generated",
         "automation_candidate": false
       },
       {
         "id": "GEN-6",
-        "title": "Compliance: Branch portal API returns masked card identifier only for card status queries",
-        "type": "api",
+        "title": "Security: Notification about card status change contains only masked card identifier",
+        "type": "security",
         "priority": "P1",
         "covers": [
-          "authentication-service",
-          "branch-portal",
-          "card-service"
+          "notification-service"
         ],
         "steps": [
-          "Authenticate a branch staff member with appropriate entitlement via authentication-service.",
-          "Call branch-portal API endpoint GET /cards/{id}/status (or similar) to retrieve card status.",
-          "Examine response body.",
-          "Verify that card identifier field is masked (e.g., last four digits) and full PAN absent.",
-          "Also test with insufficient entitlement to ensure 403."
+          "Perform a card freeze operation through the mobile app with valid step‑up authentication.",
+          "Capture the notification sent to the customer (push, SMS, or email).",
+          "Inspect the notification content for card data."
         ],
-        "expected": "Successful response contains masked card identifier only; unauthorized request returns 403.",
+        "expected": "The notification includes only a masked card reference (e.g., last four digits) and does not expose the full PAN or any other sensitive card data.",
         "source": "generated",
-        "automation_candidate": true
+        "automation_candidate": false
       },
       {
         "id": "GEN-7",
-        "title": "Operational: Loan service rejects loan application when associated card is frozen",
-        "type": "integration",
+        "title": "Compliance: Reporting service outputs mask card numbers in statements after freeze/unfreeze events",
+        "type": "functional",
         "priority": "P1",
         "covers": [
-          "authentication-service",
-          "card-service",
-          "loan-service",
-          "mobile-banking"
+          "reporting-service"
         ],
         "steps": [
-          "Freeze a customer's card via mobile app with step-up auth.",
-          "Submit a loan application via loan-service API (POST /loans/applications) linking the customer and card.",
-          "Loan service internally checks card status via card-service.",
-          "Observe loan service response."
+          "Generate a monthly statement for an account that experienced a card freeze/unfreeze event during the statement period.",
+          "Export the statement in PDF or CSV format.",
+          "Search the output for any occurrence of the card number."
         ],
-        "expected": "Loan application rejected with error indicating card is frozen or unavailable; loan not created.",
+        "expected": "Any card number appearing in the statement is masked (e.g., replaced with ****1234); no full PAN is present, meeting PCI DSS compliance for reports.",
         "source": "generated",
         "automation_candidate": false
       },
       {
         "id": "GEN-8",
-        "title": "Delivery: Monthly statement generated by document-service displays masked card identifier only",
-        "type": "functional",
+        "title": "Security: Risk engine processes card freeze/unfreeze events using only masked card data",
+        "type": "security",
         "priority": "P1",
         "covers": [
-          "card-service",
-          "document-service",
-          "mobile-banking",
-          "reporting-service"
+          "risk-engine"
         ],
         "steps": [
-          "Ensure card has been frozen/unfrozen at least once during statement period.",
-          "Trigger monthly statement generation for the customer (via reporting-service job).",
-          "Document service renders statement PDF.",
-          "Extract card identifier from statement (e.g., in transaction details or card summary).",
-          "Verify identifier is masked (e.g., ****1234) and full PAN not present."
+          "Simulate a card freeze/unfreeze event in Card Service.",
+          "Feed the event into the Risk Engine for scoring.",
+          "Examine the data received by the Risk Engine (via logs or internal metrics)."
         ],
-        "expected": "Statement PDF contains masked card identifier only, complying with PCI DSS truncation rules.",
+        "expected": "The Risk Engine receives only a tokenized or masked card identifier; the full PAN is never exposed, and risk scores are computed without using raw card data.",
         "source": "generated",
         "automation_candidate": false
       }
     ],
-    "coverage_estimate": 0.8571428571428571,
+    "coverage_estimate": 0.85,
     "effort_hours": 13.2,
-    "automation_candidates": 16,
-    "summary": "Selected 15 catalog tests and 8 new tests, covering 18 of 21 impacted nodes (86%); estimated effort is 13.2 hours."
+    "automation_candidates": 15,
+    "summary": "Selected 15 catalog tests and 8 new tests, covering 17 of 20 impacted nodes (85%); estimated effort is 13.2 hours."
   },
   "compliance": {
     "frameworks": [
       {
         "framework": "GDPR",
         "applicable": true,
-        "reason": "PII-bearing components are impacted; the change touches customer data.",
-        "risk_level": "high",
-        "score": 55,
+        "reason": "PII-bearing components are impacted.",
+        "risk_level": "medium",
+        "score": 70,
         "findings": [
           {
-            "text": "The new card freeze/unfreeze capability routes customer- and account-linked requests through the mobile channel, the external gateway and an identity step-up challenge, so personal data processing exposure extends across the mobile banking surface, gateway routing layer, authentication service and card service as a result of this change.",
+            "text": "GDPR review applies because PII-bearing components are impacted.",
             "node_ids": [
               "mobile-banking",
               "api-gateway",
@@ -1762,29 +1689,18 @@
             ]
           },
           {
-            "text": "Although responses are described as returning masked card identifiers only, the device-, card- and action-bound step-up proof introduces additional authentication and device-identifying artefacts whose minimisation, purpose limitation and retention characteristics require assessment alongside existing identity data held for the authentication service and card service.",
+            "text": "Deterministic control exposure: PII impacted directly; external API contract changes.",
             "node_ids": [
+              "mobile-banking",
+              "api-gateway",
               "authentication-service",
-              "card-service",
-              "mobile-banking"
-            ]
-          },
-          {
-            "text": "Indirect exposure may reach customer profile, contact preference and notification components if card status changes trigger servicing updates or customer messaging through gateway-routed calls, warranting checks that the change does not widen the data reaching the customer service, customer database, CRM or notification service beyond their existing declared purposes.",
-            "node_ids": [
-              "customer-service",
-              "customer-db",
-              "crm",
-              "notification-service",
-              "api-gateway"
+              "card-service"
             ]
           }
         ],
         "recommendations": [
-          "Assess and document data minimisation, purpose and retention for the personal data and step-up authentication artefacts handled by mobile-banking, api-gateway, authentication-service and card-service, and confirm the records of processing reflect the new card status journey.",
-          "Verify that subject rights handling, including access and erasure propagation, continues to function for the profile and contact data held in customer-service, customer-db, crm and notification-service when card status changes are processed through api-gateway.",
-          "Confirm that masked-only responses and logging practices on api-gateway, card-service and mobile-banking prevent exposure of full identifiers in payloads, traces and error paths, and evidence the checks in the change record.",
-          "Run privacy regression checks covering the new step-up path on authentication-service and the mobile-banking card status screen before release, including failure and unavailability scenarios."
+          "Review data minimization, purpose and retention for customer data for mobile-banking, api-gateway, authentication-service, card-service.",
+          "Verify access controls and privacy regression tests for mobile-banking, api-gateway, authentication-service, card-service."
         ]
       },
       {
@@ -1795,76 +1711,54 @@
         "score": 40,
         "findings": [
           {
-            "text": "The change introduces a card status update path reachable from the mobile channel through the external gateway to the card service, so checks are required that responses and downstream handling expose only masked card identifiers and that no sensitive card data is introduced into request, response or tracing flows.",
-            "node_ids": [
-              "mobile-banking",
-              "api-gateway",
-              "card-service"
-            ]
-          },
-          {
-            "text": "Modification of the authentication flow to require fresh step-up proof bound to device, card and action raises exposure around token issuance, scope validation and privileged action authorisation, requiring review of the authentication service and gateway policy enforcement points.",
-            "node_ids": [
-              "authentication-service",
-              "api-gateway"
-            ]
-          },
-          {
-            "text": "Because the change touches card-related components, the controls around card data encryption, masking and role-based access restrictions warrant re-verification across the card service, gateway, identity layer, ATM channel and fraud screening components that interact with card activity.",
+            "text": "PCI DSS review applies because card-data components are impacted.",
             "node_ids": [
               "card-service",
               "api-gateway",
-              "authentication-service",
-              "atm",
-              "fraud-engine"
+              "mobile-banking",
+              "authentication-service"
+            ]
+          },
+          {
+            "text": "Deterministic control exposure: card data touched; external API contract changes; authentication flow changes.",
+            "node_ids": [
+              "card-service",
+              "api-gateway",
+              "mobile-banking",
+              "authentication-service"
             ]
           }
         ],
         "recommendations": [
-          "Verify card data encryption, masking and access restrictions remain effective for card-service, api-gateway, authentication-service, atm, fraud-engine and mobile-banking following the new endpoint and step-up flow.",
-          "Confirm that no sensitive authentication data is stored or logged by the new step-up path across authentication-service and api-gateway, and evidence the review of token and challenge handling.",
-          "Run card-data security testing and external API contract testing against api-gateway, card-service and mobile-banking, including rejection paths where step-up proof is absent, expired or bound to a different device or card.",
-          "Confirm monitored logging and alerting for card status changes remains in place on card-service, api-gateway and fraud-engine, and record the review evidence."
+          "Verify card-data encryption, masking and access restrictions for card-service, api-gateway, mobile-banking, authentication-service.",
+          "Run card-data security tests and review authentication and API controls for card-service, api-gateway, mobile-banking, authentication-service."
         ]
       },
       {
         "framework": "SOX",
         "applicable": true,
-        "reason": "financial-data components are impacted; audit-data components are impacted.",
-        "risk_level": "medium",
-        "score": 75,
+        "reason": "financial-data components are impacted.",
+        "risk_level": "low",
+        "score": 85,
         "findings": [
           {
-            "text": "The change is scoped as a card servicing feature rather than a financial posting change, but the new gateway-routed action and its audit capture raise exposure around whether card status events create records with financial reporting or control relevance, which should be assessed for the gateway, card service and audit store.",
+            "text": "SOX review applies because financial-data components are impacted.",
             "node_ids": [
-              "api-gateway",
-              "card-service",
-              "audit-db"
-            ]
-          },
-          {
-            "text": "Audit completeness for card freeze/unfreeze actions delivered through the mobile channel and gateway requires verification that append-only, integrity-checked events are captured for successful, failed and step-up-rejected attempts in the audit database.",
-            "node_ids": [
-              "audit-db",
               "mobile-banking",
               "api-gateway"
             ]
           },
           {
-            "text": "If the updated gateway authorization policies or status changes reach account, ledger or payment components through existing routing, additional change-management and control-owner evidence may be needed beyond the directly changed components.",
+            "text": "Deterministic control exposure: financial data touched.",
             "node_ids": [
-              "account-service",
-              "transaction-db",
-              "payment-service",
+              "mobile-banking",
               "api-gateway"
             ]
           }
         ],
         "recommendations": [
-          "Confirm with control owners whether card status changes introduced via api-gateway, card-service and mobile-banking generate financially relevant records, and document the conclusion and supporting rationale.",
-          "Verify that audit-db captures complete, immutable and attributable events for the new card status actions, including authentication failures and card-service unavailability, and retain the verification evidence.",
-          "Check that any indirect effect on account-service, transaction-db and payment-service routing is covered by change approval and testing evidence before release.",
-          "Record control-owner approval and evidence for schema, configuration or authorization policy changes applied to api-gateway, card-service and audit-db."
+          "Reconcile financial results and verify complete, immutable audit records for mobile-banking, api-gateway.",
+          "Document control-owner approval and test financial and schema changes for mobile-banking, api-banking."
         ]
       },
       {
@@ -1875,57 +1769,45 @@
         "score": 45,
         "findings": [
           {
-            "text": "The change directly modifies highly critical, tier-one components spanning the external gateway, identity provider, card platform and mobile channel, so service-owner approval, rollback planning and change-record evidence are expected for these components.",
+            "text": "Internal Governance review applies because directly changed components have criticality >= 8; the authentication flow changes.",
             "node_ids": [
+              "mobile-banking",
               "api-gateway",
               "authentication-service",
-              "card-service",
-              "mobile-banking"
+              "card-service"
             ]
           },
           {
-            "text": "Adding a new external-facing endpoint constitutes an API contract change, requiring review of versioning, documentation, consumer communication and gateway policy configuration for the gateway and mobile channel.",
+            "text": "Deterministic control exposure: direct components have criticality >= 9; authentication flow changes; external API contract changes.",
             "node_ids": [
+              "mobile-banking",
               "api-gateway",
-              "mobile-banking"
-            ]
-          },
-          {
-            "text": "The authentication flow and authorization policy changes need evidence of authorization testing and operational monitoring, including the stated fail-safe behaviour where the card service retains current status on authentication failure or unavailability.",
-            "node_ids": [
               "authentication-service",
-              "api-gateway",
               "card-service"
             ]
           }
         ],
         "recommendations": [
-          "Obtain and record service-owner approval and a rehearsed rollback plan for api-gateway, authentication-service, card-service and mobile-banking before release.",
-          "Verify authorization and negative-path tests, including step-up rejection and fail-safe retention of card status, for api-gateway, authentication-service, card-service and mobile-banking.",
-          "Confirm API contract documentation, versioning and consumer notification for the new endpoint on api-gateway affecting mobile-banking, and retain the review evidence.",
-          "Confirm operational monitoring, alerting and release evidence for the changed components is captured in the change record before deployment."
+          "Obtain service-owner change approval and record the rollback plan for mobile-banking, api-gateway, authentication-service, card-service.",
+          "Verify authorization tests, operational monitoring and release evidence for mobile-banking, api-gateway, authentication-service, card-service."
         ]
       }
     ],
     "overall_score": 40,
-    "summary": "4 of 4 frameworks apply; the minimum compliance score is 40/100. 3 applicable framework(s) have high risk."
+    "summary": "4 of 4 frameworks apply; the minimum compliance score is 40/100. 2 applicable framework(s) have high risk."
   },
   "release": {
-    "confidence": 15,
+    "confidence": 39,
     "decision": "NO_GO",
     "triggered_rules": [
-      "NO_GO: security risk is 100 (>= 85)",
+      "NO_GO: security risk is 93 (>= 85)",
       "NO_GO: delivery risk is 87 (>= 85)",
-      "NO_GO: GDPR risk is high and the change touches card data and authentication",
       "NO_GO: PCI DSS risk is high and the change touches card data and authentication",
       "NO_GO: Internal Governance risk is high and the change touches card data and authentication",
-      "GO_WITH_CONDITIONS: highest risk is 100 (>= 60)",
-      "GO_WITH_CONDITIONS: GDPR risk is high",
+      "GO_WITH_CONDITIONS: highest risk is 93 (>= 60)",
+      "GO_WITH_CONDITIONS: GDPR risk is medium",
       "GO_WITH_CONDITIONS: PCI DSS risk is high",
-      "GO_WITH_CONDITIONS: SOX risk is medium",
-      "GO_WITH_CONDITIONS: Internal Governance risk is high",
-      "GO_WITH_CONDITIONS: sprint deployment collision between ST-101 and ST-107 on transaction-db",
-      "GO_WITH_CONDITIONS: sprint deployment collision between ST-107 and ST-112 on authentication-service"
+      "GO_WITH_CONDITIONS: Internal Governance risk is high"
     ],
     "conditions": [
       "Reduce security risk below 85 and reassess release readiness",
@@ -1945,98 +1827,41 @@
       "Run the P1 functional tests on card-service before release (TC-017: Card freeze and unfreeze preserve the original cardholder linkage)",
       "Run the P1 functional tests on authentication-service before release (TC-021: Biometric login verifies a device-bound challenge before issuing a token)",
       "Run the P1 functional tests on api-gateway before release (TC-025: Gateway routes payment requests with the original correlation identifier)",
-      "Run the P1 security tests on api-gateway, audit-db, authentication-service, card-service, mobile-banking before release (GEN-1: Security: Card freeze/unfreeze triggers audit event with masked card ID in audit-db)",
-      "Run the P1 functional tests on api-gateway, card-service, mobile-banking, notification-service before release (GEN-2: Compliance: Card freeze/unfreeze notification contains only masked card details via notification-service)",
-      "Run the P1 integration tests on api-gateway, authentication-service, card-service, mobile-banking, risk-engine before release (GEN-3: Operational: Risk engine logs and scores rapid card freeze/unfreeze attempts)",
-      "Run the P1 functional tests on api-gateway, mobile-banking, web-banking before release (GEN-4: Delivery: Web banking UI lacks card freeze/unfreeze functionality and API returns 403)",
-      "Run the P1 security tests on api-gateway, atm, authentication-service, card-service, mobile-banking before release (GEN-5: Security: ATM rejects transaction when card is frozen via mobile app)",
-      "Run the P1 api tests on authentication-service, branch-portal, card-service before release (GEN-6: Compliance: Branch portal API returns masked card identifier only for card status queries)",
-      "Run the P1 integration tests on authentication-service, card-service, loan-service, mobile-banking before release (GEN-7: Operational: Loan service rejects loan application when associated card is frozen)",
-      "Run the P1 functional tests on card-service, document-service, mobile-banking, reporting-service before release (GEN-8: Delivery: Monthly statement generated by document-service displays masked card identifier only)",
-      "Assess and document data minimisation, purpose and retention for the personal data and step-up authentication artefacts handled by mobile-banking, api-gateway, authentication-service and card-service, and confirm the records of processing reflect the new card status journey.",
-      "Verify that subject rights handling, including access and erasure propagation, continues to function for the profile and contact data held in customer-service, customer-db, crm and notification-service when card status changes are processed through api-gateway.",
-      "Confirm that masked-only responses and logging practices on api-gateway, card-service and mobile-banking prevent exposure of full identifiers in payloads, traces and error paths, and evidence the checks in the change record.",
-      "Run privacy regression checks covering the new step-up path on authentication-service and the mobile-banking card status screen before release, including failure and unavailability scenarios.",
-      "Verify card data encryption, masking and access restrictions remain effective for card-service, api-gateway, authentication-service, atm, fraud-engine and mobile-banking following the new endpoint and step-up flow.",
-      "Confirm that no sensitive authentication data is stored or logged by the new step-up path across authentication-service and api-gateway, and evidence the review of token and challenge handling.",
-      "Run card-data security testing and external API contract testing against api-gateway, card-service and mobile-banking, including rejection paths where step-up proof is absent, expired or bound to a different device or card.",
-      "Confirm monitored logging and alerting for card status changes remains in place on card-service, api-gateway and fraud-engine, and record the review evidence.",
-      "Confirm with control owners whether card status changes introduced via api-gateway, card-service and mobile-banking generate financially relevant records, and document the conclusion and supporting rationale.",
-      "Verify that audit-db captures complete, immutable and attributable events for the new card status actions, including authentication failures and card-service unavailability, and retain the verification evidence.",
-      "Check that any indirect effect on account-service, transaction-db and payment-service routing is covered by change approval and testing evidence before release.",
-      "Record control-owner approval and evidence for schema, configuration or authorization policy changes applied to api-gateway, card-service and audit-db.",
-      "Obtain and record service-owner approval and a rehearsed rollback plan for api-gateway, authentication-service, card-service and mobile-banking before release.",
-      "Verify authorization and negative-path tests, including step-up rejection and fail-safe retention of card status, for api-gateway, authentication-service, card-service and mobile-banking.",
-      "Confirm API contract documentation, versioning and consumer notification for the new endpoint on api-gateway affecting mobile-banking, and retain the review evidence.",
-      "Confirm operational monitoring, alerting and release evidence for the changed components is captured in the change record before deployment.",
-      "Sequence deployment of ST-101 and ST-107 (deployment collision on transaction-db)",
-      "Sequence the releases of ST-101 and ST-107: deploy ST-107 first behind a feature flag where available and run the shared regression suite for transaction-db before ST-101.",
-      "Sequence deployment of ST-107 and ST-112 (deployment collision on authentication-service)",
-      "Sequence the releases of ST-107 and ST-112: deploy ST-112 first behind a feature flag where available and run the shared regression suite for authentication-service before ST-107."
+      "Run the P1 security tests on atm before release (GEN-1: Security: ATM withdrawal declined when card is frozen via mobile app)",
+      "Run the P1 functional tests on branch-portal before release (GEN-2: Compliance: Branch portal displays only masked card details for frozen cards)",
+      "Run the P1 functional tests on crm before release (GEN-3: Operational: CRM contact update does not trigger card freeze/unfreeze actions)",
+      "Run the P1 security tests on customer-service before release (GEN-4: Security: Customer service representative cannot freeze card without step-up authentication)",
+      "Run the P1 functional tests on loan-service before release (GEN-5: Delivery: Loan disbursement proceeds successfully despite customer's card being frozen)",
+      "Run the P1 security tests on notification-service before release (GEN-6: Security: Notification about card status change contains only masked card identifier)",
+      "Run the P1 functional tests on reporting-service before release (GEN-7: Compliance: Reporting service outputs mask card numbers in statements after freeze/unfreeze events)",
+      "Run the P1 security tests on risk-engine before release (GEN-8: Security: Risk engine processes card freeze/unfreeze events using only masked card data)",
+      "Review data minimization, purpose and retention for customer data for mobile-banking, api-gateway, authentication-service, card-service.",
+      "Verify access controls and privacy regression tests for mobile-banking, api-gateway, authentication-service, card-service.",
+      "Verify card-data encryption, masking and access restrictions for card-service, api-gateway, mobile-banking, authentication-service.",
+      "Run card-data security tests and review authentication and API controls for card-service, api-gateway, mobile-banking, authentication-service.",
+      "Obtain service-owner change approval and record the rollback plan for mobile-banking, api-gateway, authentication-service, card-service.",
+      "Verify authorization tests, operational monitoring and release evidence for mobile-banking, api-gateway, authentication-service, card-service."
     ],
     "complexity": "high",
     "rollback_plan": [
-      "Channels-mobile: Revert mobile-banking UI changes that invoke the card freeze/unfreeze endpoint; confirm step-up authentication calls are removed.",
-      "Channels-mobile: Monitor mobile-banking app logs and crash rates for 15 minutes after rollback; alert on anomalies.",
-      "Channels-mobile: Notify mobile product owner and stakeholder channel of rollback completion.",
-      "Channels-access: Roll back API gateway and authorization policy updates for atm, branch-portal, web-banking related to the new endpoint.",
-      "Channels-access: Verify that atm, branch-portal, web-banking no longer route to the card freeze/unfreeze endpoint; check gateway logs for 404/403.",
-      "Channels-access: Monitor latency and error rates for affected channels; communicate status to channel-access owner.",
-      "Identity: Revert authentication-service changes that added step-up authentication binding for device, card, and action.",
-      "Identity: Ensure authentication-service audit-db writes revert to prior format; confirm no new fields.",
-      "Identity: Monitor authentication-service latency and error rates; inform identity team lead.",
-      "Documents: Roll back document-service updates that may have added references to the new endpoint (if any).",
-      "Documents: Confirm document-service health; notify document owner.",
-      "Data-platform: Revert any reporting-service or audit-db changes tied to the new endpoint (e.g., new log tables or metrics).",
-      "Data-platform: Validate that reporting-db and audit-db show expected pre-deployment data patterns; alert on drift.",
-      "Data-platform: Notify data-platform owner of rollback status.",
-      "Customer-platform: Revert crm, customer-db, customer-service, notification-service changes that exposed the new endpoint or step-up auth flows.",
-      "Customer-platform: Check that customer-facing services no longer invoke card freeze/unfreeze; monitor for failed calls.",
-      "Customer-platform: Inform customer-platform lead of rollback completion.",
-      "Core-payments: Roll back fraud-engine, payment-service, risk-engine updates that integrated step-up authentication for card freeze/unfreeze.",
-      "Core-payments: Verify payment flows remain stable; watch for auth failures.",
-      "Core-payments: Notify core-payments owner.",
-      "Core-banking: Revert card-service changes that updated card status via the new endpoint (code and config).",
-      "Core-banking: Ensure account-service, loan-service, transaction-db retain prior behavior; confirm no new write paths.",
-      "Core-banking: Monitor card-service latency, error rates, and audit-db entries for irregularities.",
-      "Core-banking: Alert core-banking owner and stakeholder that rollback is finished."
+      "For NO_GO, hold production deployment and prepare this rollback plan for a later approved release; if aborted, reverse deployment order as channels-mobile, channels-access, identity, documents, data-platform, customer-platform, core-payments, core-banking.",
+      "During rollback, disable any configured feature flags for card freeze/unfreeze and restore affected services (card-service, api-gateway, authentication-service, mobile-banking) with their groups while monitoring masked card-control traces for unchanged card status on fail-closed proof validation.",
+      "Notify the release owner, security/PCI reviewers and affected stakeholders before and after rollback, then record the outcome; no database migration rollback is required because changes_db_schema is false."
     ],
     "deployment_notes": [
-      "Core-banking: Review and approve PCI DSS and security sign-off for card freeze/unfreeze feature.",
-      "Core-banking: Deploy card-service code that exposes update-card-status endpoint (no schema change).",
-      "Core-banking: Update account-service and loan-service to call card-service only via existing paths (no new calls).",
-      "Core-banking: Verify backward compatibility; run integration tests with transaction-db.",
-      "Core-banking: Notify core-banking team of deployment readiness.",
-      "Core-payments: Deploy fraud-engine, payment-service, risk-engine updates to accept step-up authentication tokens for card freeze/unfreeze requests.",
-      "Core-payments: Conduct canary testing with synthetic transactions; monitor for auth failures.",
-      "Core-payments: Inform core-payments owner of completion.",
-      "Customer-platform: Deploy crm, customer-service, notification-service updates to support new step-up auth flow (if needed for internal tools).",
-      "Customer-platform: Ensure customer-db schema unchanged; confirm no new PII exposure.",
-      "Customer-platform: Notify customer-platform lead.",
-      "Data-platform: Deploy reporting-service and audit-db updates to ingest new event logs from card-service (if any).",
-      "Data-platform: Validate that new logs are correctly formatted and do not contain PAN.",
-      "Data-platform: Alert data-platform owner.",
-      "Documents: Deploy document-service changes to link any new documentation for card freeze/unfreeze (no data change).",
-      "Documents: Confirm documentation build success; notify document owner.",
-      "Identity: Deploy authentication-service changes to enforce step-up authentication binding to device, card, and action for the new endpoint.",
-      "Identity: Update api-gateway and authorization policies to require fresh step-up token.",
-      "Identity: Monitor authentication-service latency and error rates; notify identity lead.",
-      "Channels-access: Deploy API gateway routing and policy updates for atm, branch-portal, web-banking to expose the new endpoint under protected path.",
-      "Channels-access: Perform smoke tests confirming masked card identifiers are returned.",
-      "Channels-access: Notify channels-access owner.",
-      "Channels-mobile: Deploy mobile-banking UI updates that invoke the new endpoint with step-up authentication.",
-      "Channels-mobile: Conduct UI functional tests on device lab; ensure only masked card data displayed.",
-      "Channels-mobile: Alert mobile product owner and stakeholder of deployment readiness."
+      "For NO_GO, explicitly hold production deployment; treat these notes as preparation for a later approved release and do not roll out until PCI DSS review, security sign-off and a rehearsed rollback are complete.",
+      "Prepare deployment in this order: core-banking, core-payments, customer-platform, data-platform, documents, identity, channels-access, channels-mobile, with any configured feature flags disabled where applicable.",
+      "Monitor masked card-control traces and step-up proof validation for replay and cross-customer failures, and communicate deployment status to the release owner and stakeholders; fail closed if authentication is unavailable or proof validation fails."
     ]
   },
   "providers_used": {
-    "requirement": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "requirement": "tokenharbor:deepseek-v4.1-flash:free",
     "dependency": "deterministic",
     "scoring": "deterministic",
     "testing": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
-    "compliance": "tokenharbor:deepseek-v4.1-flash:free",
-    "release": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
+    "compliance": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "release": "tokenharbor:deepseek-v4.1-flash:free"
   },
-  "duration_ms": 220969,
-  "created_at": "2026-10-06T20:15:58.570570Z"
+  "duration_ms": 22,
+  "created_at": "2026-10-07T15:32:50.068240Z"
 }

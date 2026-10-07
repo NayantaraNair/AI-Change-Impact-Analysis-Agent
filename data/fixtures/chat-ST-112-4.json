@@ -1,7 +1,9 @@
 {
-  "answer": "**Computed result (as supplied): decision NO_GO, confidence 27, highest risk \"delivery\" at 77, test coverage 65%.**\n\n**Triggered rules**\n- `NO_GO: highest risk 77 with test coverage 65% (< 70%)` — the primary driver: the highest risk dimension (delivery, 77) coincides with coverage below the 70% gate.\n- `GO_WITH_CONDITIONS: highest risk is 77 (>= 60)`\n- Medium-risk frameworks: GDPR, PCI DSS, SOX, Internal Governance\n- `GO_WITH_CONDITIONS: sprint deployment collision between ST-107 and ST-112 on authentication-service`\n\n**Contributing risk factors (labels + component IDs)**\n- Delivery 77 (high): `owner coordination` 32 — 20 nodes incl. authentication-service, mobile-banking, api-gateway; `medium ambiguity` 30 — authentication-service, mobile-banking; `direct services` 10 — authentication-service, mobile-banking.\n- Security 73 (high): `auth flow change` 25, `customer data` 20, `critical identity path` 10 — api-gateway, authentication-service.\n- Operational 71 (high): `service criticality` 40 — authentication-service; `downstream systems` 20.\n- Compliance 63 (medium); technical 42 (medium); performance 40 (medium).\n\n**Open items feeding the low confidence**\n- Unresolved scope: device-registration storage/schema and possible gateway/contract versioning for api-gateway and customer-db (Internal Governance finding).\n- 24 conditions attached, including raising coverage to ≥70% and rerunning the assessment, plus the ST-107 sequencing/rollback reconciliation.\n- Coverage estimate 0.65 against `changes_auth_flow: true` and `touches_customer_data: true` on a fast-coupling identity path.\n\nNote: scores, decision and confidence are produced by code; I'm reporting them as supplied, not recalculating.",
+  "answer": "**Confidence is 57 (as supplied by the analysis) — decision: GO_WITH_CONDITIONS.** The context does not expose a confidence formula, but these supplied factors sit behind it:\n\n**Risk that is not low**\n- Overall risk 64; highest dimension is **security 73 (high)** with top factors: `auth flow change` (+25, authentication-service/mobile-banking), `customer data` (+20, api-gateway/authentication-service/customer-db/mobile-banking), `critical identity path` (+10, api-gateway/authentication-service).\n- **operational 69 (medium)** — top factor `service criticality` (+40, authentication-service), `downstream systems` (+18 across 9 services including customer-db, payment-service, account-service).\n- **delivery 49 (medium)** — `owner coordination` (+24 across all 11 listed services); **compliance 45 (medium)**, **performance 40 (medium)**.\n\n**Triggered rules**\n- `GO_WITH_CONDITIONS: highest risk is 73 (>= 60)`\n- `GO_WITH_CONDITIONS: GDPR risk is medium`\n- `GO_WITH_CONDITIONS: Internal Governance risk is medium`\n\n**Open conditions gating release (21 supplied)**\n- 13 P1 test gates (8 catalog: TC-001, TC-002, TC-021, TC-022, TC-046, TC-048, TC-051, TC-059; 5 generated: GEN-1 to GEN-5).\n- Privacy/data items: consent evidence and revocation propagation, data minimization for challenge artifacts, logging/masking at api-gateway and authentication-service, records-of-processing review with Customer Platform and Identity & Access owners.\n- Governance/ops items: service-owner change approval and rollback plan, negative-test evidence, operational monitoring for challenge failures/revocation/fallback.\n\n**Coordination drag**\n- Requirement flags `complexity: high` and states the authentication-service deployment, shared challenge contract and rollback policy must be scheduled **jointly with ST-107** because both stories change challenge validation — an explicit condition and compliance finding (Internal Governance, authentication-service/mobile-banking).\n\n**Rollback is multi-group**\n- Three-step reverse rollback across channels-mobile, identity, documents, customer-platform, core-payments and core-banking.",
   "cited_nodes": [
     "mobile-banking",
+    "account-service",
+    "payment-service",
     "authentication-service",
     "api-gateway",
     "customer-db"
@@ -10,10 +12,8 @@
     "customer data",
     "auth flow change",
     "critical identity path",
-    "direct services",
     "service criticality",
     "downstream systems",
-    "medium ambiguity",
     "owner coordination"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"

@@ -1,8 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
-import { BACKLOG_HANDOFF_KEY, readAttachment } from "@/lib/attach";
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/components/shell/app-context";
 import { ApiError, getDemoSprint, getReport, runStory, type TrackedResult } from "@/lib/api";
@@ -31,8 +29,6 @@ export function StoryAnalysisPage({ reportId }: { reportId: string | null }) {
   const [loading, setLoading] = useState<RequestKind | null>(reportId ? "report" : null);
   const [error, setError] = useState<string | null>(null);
   const [sampleMismatch, setSampleMismatch] = useState(false);
-  const [attachError, setAttachError] = useState<string | null>(null);
-  const router = useRouter();
   const active = useRef(true);
   const sequence = useRef(0);
   const lastRequest = useRef<{ task: Task; kind: RequestKind; story?: StoryInput } | null>(null);
@@ -123,22 +119,6 @@ export function StoryAnalysisPage({ reportId }: { reportId: string | null }) {
     void run((onProgress) => runStory(story, { refresh: true, onProgress }), "story", story);
   }
 
-  async function attach(file: File) {
-    setAttachError(null);
-    try {
-      const stories = await readAttachment(file);
-      if (stories.length === 1) {
-        setForm(formFromStory(stories[0]));
-        return;
-      }
-      // A backlog belongs on the sprint page, which analyses stories together.
-      try { window.sessionStorage.setItem(BACKLOG_HANDOFF_KEY, JSON.stringify(stories)); } catch { /* storage blocked */ }
-      router.push("/sprint");
-    } catch (reason) {
-      setAttachError(reason instanceof Error ? reason.message : "Couldn't read that file.");
-    }
-  }
-
   function retry() {
     const request = lastRequest.current;
     if (request) void run(request.task, request.kind, request.story);
@@ -148,14 +128,14 @@ export function StoryAnalysisPage({ reportId }: { reportId: string | null }) {
     <div className="min-w-0">
       <StoryForm value={form} onChange={setForm} onSubmit={submit} examples={examples}
         onExample={(story) => { setForm(formFromStory(story)); setError(null); }}
-        examplesLoading={examplesLoading} examplesError={examplesError} onRetryExamples={() => void loadExamples()} busy={Boolean(loading)} onAttach={(file) => void attach(file)} attachError={attachError} />
+        examplesLoading={examplesLoading} examplesError={examplesError} onRetryExamples={() => void loadExamples()} busy={Boolean(loading)} />
       {error && <div role="alert" className="mb-4 flex flex-wrap items-center gap-3 rounded-md border border-impact-high/40 bg-surface p-4"><p className="flex-1 text-body">{error}</p><Button type="button" variant="outline" onClick={retry}>Try again</Button></div>}
       {loading === "report" ? <p role="status" className="border-y border-line py-4 text-muted">Loading saved analysis…</p> : loading ? <RunProgress run={progress} title={`Analyzing ${pending?.id ?? "story"}`} /> : analysis ? (
         <>
           {sampleMismatch && <p role="status" className="mb-4 border-l-2 border-chalk bg-surface px-4 py-3 text-dense text-muted">Showing the available sample report for {analysis.story.id}: {analysis.story.title}. Start the backend to analyze the requested story.</p>}
           <AnalysisResults key={`${analysis.story.id}-${analysis.created_at}`} analysis={analysis} components={components} run={progress?.story_result?.story.id === analysis.story.id ? progress : null} onRerunLive={() => rerunLive(analysis.story)} />
         </>
-      ) : !error && <div className="flex min-h-[380px] items-center justify-center border-y border-line bg-surface/40"><p className="text-body text-muted">Attach or paste a story, then select Analyze.</p></div>}
+      ) : !error && <div className="flex min-h-[380px] items-center justify-center border-y border-line bg-surface/40"><p className="text-body text-muted">Paste a story, then select Analyze.</p></div>}
     </div>
   );
 }

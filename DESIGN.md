@@ -26,6 +26,13 @@ Avoid the generic AI-dashboard look. **Do not use:**
 
 ## The one memorable element: the dependency graph
 
+**Current form (simple):** a left-to-right map. Changed components sit in the left column with a tinted fill and thick border; each column to the right is one step further away. Cards show the name and "type · criticality n/10", bordered by impact level. Straight links, a faint grid behind, and a three-item legend (changed, high/medium/low impact). Only affected components appear.
+
+**Themes:** dark (default) and light, toggled in the header and remembered per browser. Both keep the same colour roles.
+
+The notes below describe the earlier ring layout and are kept for reference.
+
+
 - The services a story directly changes (hop 0) sit at the **centre**. Impacted nodes are arranged in **concentric rings by hop distance** (hop 1, hop 2, hop 3+). Unimpacted components sit in a faint outer ring at low opacity.
 - Node fill and border colour encode **severity** (impact-low/med/high). Unimpacted nodes are `line`-coloured.
 - **Edges on the impact path animate once**, a single flowing dash along the path for about 1.2 s when the analysis loads, then stay solid in severity colour. All other edges are thin, `line`-coloured and still.

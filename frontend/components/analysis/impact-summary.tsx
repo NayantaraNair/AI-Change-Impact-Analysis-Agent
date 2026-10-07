@@ -48,7 +48,7 @@ export function ImpactSummary({ analysis }: { analysis: StoryAnalysis }) {
       <h2 id="impact-summary-heading" className="flex items-center gap-1.5">Impact summary <InfoTip label="the impact summary">{explain.summary}</InfoTip></h2>
       <ul className="mt-2 divide-y divide-line border-y border-line">
         <Line label="Changes">{list(changed) || "No catalog services matched. Add more detail to the story."}</Line>
-        <Line label="Affects">{affected.length} components{highImpact ? `, ${highImpact} at high impact` : ""}</Line>
+        <Line label="Affects">{affected.length} components{highImpact ? `, ${highImpact} at high impact` : ""} ({risk.change_size} change)</Line>
         <Line label="Teams">{list(teams, 5) || "None"}</Line>
         <Line label="Main risks">
           {mainRisks.map((dimension, index) => (
@@ -56,7 +56,7 @@ export function ImpactSummary({ analysis }: { analysis: StoryAnalysis }) {
           ))}
         </Line>
         <Line label="Compliance">{frameworks.length ? list(frameworks.map((item) => `${item.framework} (${item.risk_level})`)) : "No review needed"}</Line>
-        <Line label="Tests">{tests.tests.length} to run, {p1} must-run · {formatHours(tests.effort_hours)} · {formatPercent(tests.coverage_estimate)} coverage</Line>
+        <Line label="Tests">{Math.min(5, tests.tests.length)} key tests of {tests.tests.length} ({p1} must-run) · {formatHours(tests.effort_hours)} · {formatPercent(tests.coverage_estimate)} coverage</Line>
         <Line label="Release">
           {release.decision === "NO_GO" ? `Blocked. ${shorten(plainRule(blockers[0] ?? "Blocking rule fired"))}`
             : release.decision === "GO_WITH_CONDITIONS" ? `Go once: ${shorten(release.conditions[0] ?? "conditions are met")}`

@@ -1,27 +1,25 @@
 {
-  "answer": "Only one story is present in the analysis context, so the answer covers that one: **ST-104 — Customer profile: add preferred name and secondary email**.\n\n**Overall risk**\n- Overall risk score: **62**; highest dimension: **operational**.\n- Release decision: **GO_WITH_CONDITIONS** (confidence 53) — triggered by highest risk 63 (≥60), GDPR high, PCI DSS medium, SOX medium.\n\n**Risk dimensions (score / level)**\n- operational: 63 / medium — top factor: service criticality (32 pts, `customer-service`); also downstream systems (20 pts, 15 nodes) and deployment groups (6 pts).\n- delivery: 62 / medium — top factor: owner coordination (32 pts across 19 nodes); direct services (15 pts, `crm`, `customer-service`, `notification-service`).\n- compliance: 61 / medium — top factor: PII data (20 pts, `crm`, `customer-db`, `customer-service`, `notification-service`).\n- technical: 53 / medium — top factor: database schema change (20 pts, `audit-db`, `customer-db`).\n- security: 48 / medium — top factor: customer data (20 pts, 9 nodes); critical identity path (10 pts, `api-gateway`, `authentication-service`).\n- performance: 40 / medium — top factor: transaction path (20 pts, `payment-service`).\n\n**Compliance frameworks (score / level)**\n- GDPR: 55 / **high** — new PII in `customer-service`/`customer-db`; consent purpose for `notification-service`/`crm`; profile read paths via `api-gateway`, `authentication-service`.\n- PCI DSS: 75 / medium — `card-service`, `api-gateway`, `customer-db` shared paths; `audit-db` record integrity.\n- SOX: 75 / medium — `customer-db`/`audit-db` schema change effects on financial joins and audit queries.\n- Internal Governance: 85 / low — tier1 approval and rollback evidence for `customer-service`/`customer-db`.\n\nNote: the framework-level scores are reported as supplied; lower compliance scores correspond to higher risk levels in this context (GDPR is the high-risk framework).",
+  "answer": "- **ST-104** — “Customer profile: add preferred name and secondary email” is the only story in the analysis context, and it is flagged as risky.\n  - **Overall risk:** 57; highest dimension: **compliance** (61, medium).\n  - **Compliance top factors:** “pii data” (20 pts) → `crm`, `customer-db`, `customer-service`, `notification-service`; “nearby card data” (12 pts) → `card-service`; “database schema change” (10 pts) → `audit-db`, `customer-db`.\n  - **Release decision:** `GO_WITH_CONDITIONS`, confidence 58. Triggered rules include “highest risk is 61 (>= 60)”, “GDPR risk is high”, “PCI DSS risk is medium”, “SOX risk is medium”.\n  - **Technical risk:** 58; top factors: “database schema change” (20 pts) → `audit-db`, `customer-db`; “direct services” (18 pts) → `crm`, `customer-service`, `notification-service`; “new feature” (10 pts) → `crm`, `customer-db`, `customer-service`, `notification-service`.\n  - **Operational risk:** 53; top factor: “service criticality” (32 pts) → `customer-service`; “downstream systems” (10 pts) → `account-service`, `audit-db`, `card-service`, `loan-service`, `payment-service`.\n  - **Security risk:** 38; top factor: “customer data” (20 pts) → `account-service`, `card-service`, `crm`, `customer-db`, `customer-service`, `loan-service`, `notification-service`.\n  - **Compliance frameworks:** 4 of 4 apply; overall compliance score 55. **GDPR** high (55) with PII-bearing nodes `crm`, `customer-db`, `customer-service`, `notification-service`, `audit-db`; **PCI DSS** medium (75) with `card-service`, `customer-db`, `customer-service`, `notification-service`; **SOX** medium (75) with `account-service`, `payment-service`, `loan-service`, `audit-db`, `customer-db`; **Internal Governance** low (85) with `customer-service`, `customer-db`, `crm`, `notification-service`, `audit-db`.\n\nNo other stories are present in the supplied analysis context.",
   "cited_nodes": [
     "customer-service",
+    "account-service",
     "payment-service",
+    "loan-service",
     "card-service",
     "crm",
-    "authentication-service",
     "notification-service",
-    "api-gateway",
     "customer-db",
     "audit-db"
   ],
   "cited_factors": [
     "customer data",
-    "critical identity path",
     "pii data",
+    "nearby card data",
     "database schema change",
     "direct services",
+    "new feature",
     "service criticality",
-    "downstream systems",
-    "deployment groups",
-    "transaction path",
-    "owner coordination"
+    "downstream systems"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

@@ -1,10 +1,7 @@
 {
-  "answer": "**Directly changed services**\n- mobile-banking\n- authentication-service\n\n**Downstream services (impacted)**\n- account-service, api-gateway, atm, audit-db, branch-portal, card-service, crm, customer-db, customer-service, document-service, fraud-engine, loan-service, notification-service, payment-service, reporting-service, risk-engine, transaction-db, web-banking\n\n**Databases**\n- audit-db, customer-db, transaction-db\n\n**Deployment groups**\n- channels-access, channels-mobile, core-banking, core-payments, customer-platform, data-platform, documents, identity\n\n**APIs touched (examples from the impacted set)**\n- Auth/identity: POST /auth/biometric/challenges, POST /auth/token, POST /auth/introspect, POST /auth/step-up\n- Channels: POST /mobile/login, POST /web/login, PATCH /mobile/cards/{id}/status, PATCH /web/profile\n- Accounts/cards/payments: GET /accounts/{id}/balance, GET /accounts/{id}/limits, PUT /accounts/{id}/limits, GET /cards/{id}, PATCH /cards/{id}/status\n- Plus customer, fraud, risk, reporting, notification, loan, ATM, branch and document endpoints in the impacted API list.\n\nNote: the affected services for the change itself are only mobile-banking and authentication-service; the remaining services, databases and APIs appear in the broader impact/downstream set. The risk and compliance dimensions also flag identity-path nodes (api-gateway, web-banking, branch-portal) and card/financial paths (card-service, fraud-engine, atm, payment-service, loan-service, account-service, audit-db, transaction-db).",
+  "answer": "**Impacted — ST-112 (Biometric login for mobile banking)**\n\n**Directly changed components**\n- `mobile-banking`, `authentication-service`\n\n**Impacted services (all)**\n- `account-service`, `api-gateway`, `authentication-service`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `loan-service`, `mobile-banking`, `payment-service`\n\n**Databases**\n- `customer-db`\n\n**APIs in scope**\n- `POST /auth/biometric/challenges`, `POST /auth/token`, `POST /auth/introspect`, `POST /auth/step-up`\n- `POST /mobile/login`, `POST /mobile/payments`, `POST /mobile/payments`\n- `PATCH /mobile/cards/{id}/status`, `PATCH /cards/{id}/status`\n- `GET /accounts/{id}/limits`, `POST /payments`, `POST /loans/applications`\n- `PATCH /customers/{id}/profile`\n- `GET /internal/customer-store/profiles/{id}`, `PUT /internal/customer-store/profiles/{id}`\n\n**Downstream components**\n- `account-service`, `api-gateway`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `loan-service`, `payment-service`\n\n**Deployment groups**\n- `channels-mobile`, `core-banking`, `core-payments`, `customer-platform`, `documents`, `identity`\n\n**Capability impact (from requirement)**\n- Biometric (device-bound) authentication; mobile login and session establishment; device registration opt-in and revocation; credential login fallback; challenge replay/expiry protection.\n\n**Data flags**\n- Touches customer data: true | card data: false | financial data: false | changes auth flow: true | changes external API contract: false | changes DB schema: false\n\nNote: risk and compliance outputs list the same nodes as impact drivers — e.g. security top factors \"auth flow change\" (`authentication-service`, `mobile-banking`), \"customer data\" (`api-gateway`, `authentication-service`, `customer-db`, `mobile-banking`), and operational \"service criticality\" (`authentication-service`).",
   "cited_nodes": [
     "mobile-banking",
-    "web-banking",
-    "atm",
-    "branch-portal",
     "customer-service",
     "account-service",
     "payment-service",
@@ -12,17 +9,15 @@
     "card-service",
     "crm",
     "authentication-service",
-    "notification-service",
     "api-gateway",
     "document-service",
-    "customer-db",
-    "transaction-db",
-    "audit-db",
-    "fraud-engine",
-    "risk-engine",
-    "reporting-service"
+    "customer-db"
   ],
   "cited_factors": [
+    "customer data",
+    "auth flow change",
+    "financial data",
+    "service criticality",
     "deployment groups"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"

@@ -20,9 +20,9 @@ from app.contracts import (
 _DECAY = {0: 1.0, 1: 0.7, 2: 0.45, 3: 0.25}
 
 
-def _severity(criticality: int, hop: int) -> Severity:
+def _severity(criticality: int, hop: int, scale: float = 1.0) -> Severity:
     # Explicitly requested deeper traversals retain the weakest decay.
-    score = criticality * 10 * _DECAY[min(hop, 3)]
+    score = criticality * 10 * _DECAY[min(hop, 3)] * scale
     if score >= 60:
         return "high"
     if score >= 35:
@@ -63,13 +63,19 @@ def _positions(
 
 
 def build_impact_graph(
-    affected: list[ServiceId], arch: Architecture, max_hops: int = 3
+    affected: list[ServiceId], arch: Architecture, max_hops: int = 3,
+    include_callers: bool = True, blocked: frozenset[ServiceId] = frozenset(),
+    severity_scale: float = 1.0,
 ) -> ImpactGraph:
     """Follow callees and callers, keeping minimum distance from any change.
 
     Downstream declarations are the source of truth for directed edges; their
     reverse direction supplies callers during traversal. Every catalog component
     and downstream edge is included, even when outside the impact radius.
+    ``include_callers`` limits spread to callees when the change keeps its
+    contract; ``blocked`` components are never reached (shared platform
+    services a contained change does not touch). ``severity_scale`` lowers
+    impact for smaller changes: a limit tweak hits a critical service less hard.
     """
     if max_hops < 0:
         raise ValueError("max_hops must be non-negative")
@@ -88,7 +94,8 @@ def build_impact_graph(
     # Walk each direction separately: dependents of what we change, and callers
     # of what we change. Mixing directions would hop through shared sinks such as
     # audit-db and mark the whole estate as impacted.
-    for neighbours in (graph.successors, graph.predecessors):
+    directions = (graph.successors, graph.predecessors) if include_callers else (graph.successors,)
+    for neighbours in directions:
         seen = {component_id: 0 for component_id in start}
         pending = deque(start)
         while pending:
@@ -97,7 +104,7 @@ def build_impact_graph(
                 continue
             for target in sorted(neighbours(source)):
                 # Dangling references have no component metadata and cannot be impacted.
-                if target not in components or target in seen:
+                if target not in components or target in seen or target in blocked:
                     continue
                 seen[target] = seen[source] + 1
                 pending.append(target)
@@ -115,7 +122,7 @@ def build_impact_graph(
                 label=component.name,
                 type=component.type,
                 hop=hop,
-                severity=_severity(component.criticality, hop) if hop is not None else None,
+                severity=_severity(component.criticality, hop, severity_scale) if hop is not None else None,
                 x=x,
                 y=y,
                 criticality=component.criticality,

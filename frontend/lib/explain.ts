@@ -8,6 +8,7 @@ export const explain = {
   summary: "Built from the analysis, not written by AI. Each line is a count or a rule result.",
   decision: "Set by fixed rules, never by AI. No go: any risk 85+, or risk 70+ with test coverage under 70%, or high compliance risk on card data or login changes. Go with conditions: risk 60+, any compliance risk, or a sprint conflict.",
   confidence: "Starts at 100. Drops with the highest risk, missing test coverage, compliance risks and sprint conflicts.",
+  changeSize: "Set by rules from the facts. Small: a limit, rule, text or config change in one or two services, so impact spreads one step and fewer tests run. Large: four or more services, or both a login and public API change.",
   highestRisk: "The worst of the six risk areas, 0 to 100. Under 40 low, 40–69 medium, 70+ high.",
   impacted: "Everything the change reaches, up to 3 steps away in the architecture map.",
   coverage: "Share of affected components with at least one test.",

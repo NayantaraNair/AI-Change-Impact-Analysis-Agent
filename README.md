@@ -1,8 +1,8 @@
 # Change Impact Copilot
 
-Attach a story, epic or sprint backlog. See what it affects, how risky it is and whether it can ship, before you plan the sprint.
+Paste a story or epic, or attach a sprint backlog. See what it affects, how risky it is and whether it can ship, before you plan the sprint.
 
-![Impact analysis for ST-107: a card freeze feature](docs/story.png)
+![Impact analysis for ST-101: a small payment-limit change](docs/story.png)
 
 ## The problem
 
@@ -10,17 +10,18 @@ When a change request lands, developers, leads, testers and business analysts sp
 
 ## What it does
 
-Attach or paste a Jira-style story, epic or backlog (JSON, CSV, Markdown or text) and get a short impact summary first, then the detail:
+Paste a Jira-style story or epic, or attach a sprint backlog (JSON, CSV, Markdown or text), and get a short impact summary first, then the detail:
 
 - **Requirement analysis**: business and technical summary, domain, affected capabilities and services.
-- **Dependency graph**: what the change touches and how far it spreads. Changed services sit in the centre; each ring is one step further away.
+- **Change size and a practical scope**: code classifies each change as small, medium or large. A limit, rule, text or config change in one or two services is small: impact spreads one step, only to what it calls, and shared platform services (login, gateway, audit) count only when the change touches them. Small changes also earn a named "small, contained change" credit and run fewer tests.
+- **Dependency graph**: a simple left-to-right map. Changed components on the left, each column one step further away, coloured by impact.
 - **Risk in six dimensions** (security, compliance, technical, operational, performance, delivery), each 0–100 with the factors that produced it.
-- **Test plan**: existing tests picked from a catalog plus generated tests for the gaps, prioritised P1–P3, with coverage and effort.
+- **Test plan**: the top 5 tests to run first, from existing catalog tests plus new tests for gaps, prioritised P1–P3. The number of tests scales with change size.
 - **Compliance**: GDPR, PCI DSS, SOX and internal governance, each with findings, a score and recommendations.
-- **Release decision**: GO / GO_WITH_CONDITIONS / NO_GO with the rules that fired, a confidence score, a rollback plan and deployment notes.
+- **Release decision**: GO / GO_WITH_CONDITIONS / NO_GO with the rules that fired, a confidence score, and rollback and deployment plans of at most three steps each.
 - **Sprint simulator**: all stories analysed in parallel, with conflict detection (two stories changing the same service, database, API or deployment group) and a sprint health score.
 - **Copilot**: a side drawer that answers questions about the current analysis and cites the components it talks about.
-- **Live progress and a debug pane**: every analysis runs as a tracked job. The page shows each step as it happens, which model is working on it and for how long, and every fallback with its reason (timed out, rate limited, cut off at the token limit). A slide-over debug pane on both pages shows the full run, every model call with token counts, the log, the provider chain and limits, and the raw JSON. Tooltips explain how each number is worked out.
+- **Live progress and a debug pane**: every analysis runs as a tracked job. The page shows each step as it happens, which model is working on it and for how long, and every fallback with its reason (timed out, rate limited, cut off at the token limit). A slide-over debug pane on both pages shows the full run, every model call with token counts, the log, the provider chain and limits, and the raw JSON. Tooltips explain how each number is worked out. Light and dark modes.
 
 | Risk factors drive the graph | Sprint conflicts | Copilot |
 |---|---|---|
@@ -31,7 +32,8 @@ Attach or paste a Jira-style story, epic or backlog (JSON, CSV, Markdown or text
 ```mermaid
 flowchart LR
     S[Story text] --> R[Requirement agent<br/>LLM extracts facts]
-    R --> D[Dependency engine<br/>graph walk, no LLM]
+    R --> Z[Scope<br/>change size, no LLM]
+    Z --> D[Dependency engine<br/>graph walk, no LLM]
     D --> K[Scoring engine<br/>deterministic factors]
     K --> T[Testing agent]
     K --> C[Compliance agent]
@@ -52,15 +54,14 @@ Every point in a score is a named factor tied to the components that caused it. 
 | Factor | Points | Components |
 |---|---:|---|
 | baseline | 8 | |
-| card data | +25 | card-service, fraud-engine, atm |
-| auth flow change | +25 | authentication-service, api-gateway, card-service |
-| customer data | +20 | authentication-service, api-gateway, account-service |
-| external API contract | +15 | api-gateway, authentication-service, card-service |
-| critical identity path | +10 | authentication-service, api-gateway |
-| dependency reach | +10 | nodes within two steps |
-| **Security risk** | **100 (clamped)** | |
+| card data | +25 | atm, card-service, fraud-engine |
+| auth flow change | +25 | api-gateway, authentication-service, card-service, mobile-banking |
+| external API contract | +15 | api-gateway, authentication-service, card-service, mobile-banking |
+| critical identity path | +10 | api-gateway, authentication-service |
+| dependency reach | +10 | components within two steps |
+| **Security risk** | **93** | |
 
-The release agent then applies ordered rules (`NO_GO` if any dimension ≥ 85; `NO_GO` if a framework is high risk and the change touches card data or authentication; …) and records each rule that fired. ST-107 comes out `NO_GO` with 15% confidence, and the UI shows exactly why. Clicking a factor highlights its components in the graph.
+The release agent then applies ordered rules (`NO_GO` if any dimension ≥ 85; `NO_GO` if a framework is high risk and the change touches card data or authentication; …) and records each rule that fired. ST-107 is a large change (login flow and a public API both change), so it comes out `NO_GO` with 39% confidence, and the UI shows exactly why. Scope follows the change: ST-101, a payment-limit change in two services, is small. It reaches 6 components one step away, runs 5 tests and comes out `GO` at 70%.
 
 Why it matters in banking: the same story always gets the same score, every score can be traced to a factor and a component, and the weights can be reviewed and tuned like any other control — something you cannot say about a number an LLM made up.
 
@@ -99,7 +100,7 @@ cd frontend && npm install && npm run dev        # http://localhost:3000
 Checks:
 
 ```bash
-cd backend && uv run pytest -q                    # 446 tests, no network
+cd backend && uv run pytest -q                    # 462 tests, no network
 cd backend && uv run python ../scripts/validate_data.py
 cd frontend && npm run lint && npm run build
 ```

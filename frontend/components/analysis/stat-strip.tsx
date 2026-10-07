@@ -32,6 +32,9 @@ export function StatStrip({ analysis }: { analysis: StoryAnalysis }) {
       <Stat label="Highest risk" detail={`${dimensionLabel[risk.highest] ?? risk.highest}${highest ? `, ${highest.level}` : ""}`} tip={explain.highestRisk}>
         <dd className={`text-hero numeral ${highest ? severityClass[highest.level] : "text-muted"}`}>{highest ? formatNumber(highest.score) : "–"}</dd>
       </Stat>
+      <Stat label="Change size" tip={`${explain.changeSize} This one: ${risk.change_size_reason || "not recorded"}.`}>
+        <dd className="text-hero numeral capitalize">{risk.change_size}</dd>
+      </Stat>
     </dl>
     </div>
   );

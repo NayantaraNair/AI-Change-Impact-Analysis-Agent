@@ -141,6 +141,8 @@ export interface RiskReport {
   dimensions: RiskDimension[];
   overall: number;
   highest: string;
+  change_size: "small" | "medium" | "large";
+  change_size_reason: string;
 }
 
 // ---------------------------------------------------------------- tests

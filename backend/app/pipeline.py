@@ -25,7 +25,8 @@ from app.contracts import (
     TestCase, TestPlan,
 )
 from app.engine.dependency import build_impact_graph
-from app.engine.scoring import score_risk
+from app.engine.scope import plan_scope
+from app.engine.scoring import load_scoring_config, score_risk
 
 
 def _jsonable(value):
@@ -162,8 +163,13 @@ async def _analyze_story(
         _describe_facts,
     )
     with runs.stage("dependency") as item:
-        graph = build_impact_graph(facts.affected_services, arch)
-        runs.describe(item, "deterministic", _describe_graph(graph))
+        scope = plan_scope(facts, arch, load_scoring_config())
+        graph = build_impact_graph(
+            facts.affected_services, arch, max_hops=scope.max_hops,
+            include_callers=scope.include_callers, blocked=scope.blocked,
+            severity_scale=scope.severity_scale,
+        )
+        runs.describe(item, "deterministic", f"{scope.size.capitalize()} change: {_describe_graph(graph)}")
     with runs.stage("scoring") as item:
         risk = score_risk(facts, graph, arch)
         runs.describe(item, "deterministic", _describe_risk(risk))

@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app import llm
 from app.architecture import get_component
+from app.engine.scoring import load_scoring_config
 from app.contracts import (
     CatalogTest,
     GraphNode,
@@ -143,7 +144,8 @@ async def plan_tests(
     facts: RequirementFacts, graph: ImpactGraph, risk: RiskReport,
     catalog: list[CatalogTest],
 ) -> tuple[TestPlan, str]:
-    """Return at most 15 catalog tests plus eight new, impacted-only tests.
+    """Return catalog tests plus new, impacted-only tests, capped by change size
+    (small 5 + 3, medium 8 + 5, large 15 + 8; see scoring_config.yaml).
 
     Catalog order is highest covered severity, alphabetical type, then ID.
     A graph node is impacted when its hop is nonnegative, including databases.
@@ -153,6 +155,9 @@ async def plan_tests(
             graph.nodes, key=lambda node: (_SEVERITY_ORDER[node.severity], node.id)
         ) if node.hop is not None and node.hop >= 0
     }
+    caps = load_scoring_config().get("tests", {})
+    catalog_cap = int(caps.get("catalog", {}).get(risk.change_size, 15))
+    generated_cap = int(caps.get("generated", {}).get(risk.change_size, 8))
     high = sorted(
         (dimension for dimension in risk.dimensions if dimension.score >= 70),
         key=lambda dimension: (-dimension.score, dimension.name),
@@ -165,7 +170,7 @@ async def plan_tests(
                 for node_id in test.services if node_id in nodes),
             test.type, test.id,
         ),
-    )[:15]
+    )[:catalog_cap]
     tests = []
     for test in selected:
         covers = sorted(set(test.services) & nodes.keys())
@@ -180,7 +185,8 @@ async def plan_tests(
         ))
     covered = {node_id for test in tests for node_id in test.covers}
     uncovered = [node_id for node_id in nodes if node_id not in covered]
-    provider = "template-fallback"
+    # Full coverage and no high risk leave nothing for a model to write.
+    provider = "template-fallback" if nodes and (uncovered or high) else "deterministic"
     generated = []
     if nodes and (uncovered or high):
         prompt = {
@@ -201,7 +207,7 @@ async def plan_tests(
         try:
             result, provider = await llm.complete_structured(
                 system=(
-                    "Draft at most eight NEW banking test cases for uncovered impacted nodes "
+                    f"Draft at most {generated_cap} NEW banking test cases for uncovered impacted nodes "
                     "and risk dimensions scoring at least 70. Do not repeat existing tests. "
                     "Use only impacted node IDs in covers. Include explicit risk dimension "
                     "names in titles for dimension tests, and use security type for security "
@@ -213,13 +219,13 @@ async def plan_tests(
             )
             generated = _GeneratedTests.model_validate(result.model_dump()).tests
         except llm.NoLLM:
-            generated = _fallback_tests(uncovered, nodes, high, facts)
+            generated = _fallback_tests(uncovered, nodes, high, facts)[:generated_cap]
 
     titles = {" ".join(test.title.casefold().split()) for test in catalog}
     used_ids = {test.id for test in tests}
     generated_count = 0
     next_id = 1
-    for test in generated[:8]:
+    for test in generated[:generated_cap]:
         covers = sorted(set(test.covers) & nodes.keys())
         title_key = " ".join(test.title.casefold().split())
         if not covers or title_key in titles:

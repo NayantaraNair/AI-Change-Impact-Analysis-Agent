@@ -1,20 +1,14 @@
 {
-  "answer": "**Confidence is 24 (reported as supplied; decision GO_WITH_CONDITIONS).** The JSON doesn't state a derivation for the confidence number, but the surrounding signals that flag elevated release risk are:\n\n- **Highest risk 81 = compliance (high)** — top factors: `card data` 30 pts (`fraud-engine`), `pii data` 20 pts (`account-service`), `financial data` 20 pts (`account-service`, `fraud-engine`, `payment-service`, `transaction-db`). Overall risk = 70.\n- **Operational risk 71 (high)** — `service criticality` 40 pts (`payment-service`), `downstream systems` 20 pts across 13 services, `deployment groups` 6 pts.\n- **Other dimensions**: delivery 58 medium (`owner coordination` 28 pts across 17 nodes), performance 55 medium (`transaction path` 20 pts — `payment-service`, `transaction-db`), security 48 medium, technical 33 low.\n- **Sprint deployment collisions**: ST-101 vs ST-107 on `transaction-db`; ST-101 vs ST-110 on `payment-service`.\n- **Triggered conditions**: highest risk ≥ 60; GDPR/PCI DSS/SOX/Internal Governance all medium; both collision rules.\n- **Large condition list** (P1 api/functional/integration/security/regression tests plus privacy, card-data, reconciliation, flag-governance and sequencing conditions) — complexity rated `high`.\n- **Rollback spans 7 deployment groups** (channels-access, channels-mobile, core-banking, core-payments, customer-platform, data-platform, identity).\n- **Compliance**: 4 of 4 frameworks apply, minimum score 65/100, framing on a financially significant path (`payment-service`, `account-service`) and shared screening component (`fraud-engine`).\n\nThe context does not contain an explicit rationale field for the confidence score itself — only the decision, triggered rules, conditions and risk factors above.",
+  "answer": "The context does not describe release confidence as low — it reports a computed confidence of **70** with decision **GO**.\n\n- Release confidence: **70** (as supplied)\n- Decision: **GO**, triggered rule: \"GO: no blocking or conditional release rules fired\"\n- Conditions: none; rollback plan exists (feature-flag disable → core-payments, core-banking, customer-platform)\n- Complexity: **medium**\n\nIf the question is about what makes this release non-trivial despite the GO, the context points to:\n- Operational risk **44 (medium)**, top factor \"service criticality\" 40 pts, node_ids: `payment-service`\n- Compliance risk **40 (medium)** — \"pii data\" 20 pts (`account-service`) and \"financial data\" 20 pts (`account-service`, `payment-service`)\n- Multi-group coordination: deployment_groups `core-banking`, `core-payments`, `customer-platform`\n- Cross-group coupling: `payment-service` gains runtime dependency on `account-service` and `transaction-db` daily totals\n\nNote: no rule or factor in the context labels confidence as \"low,\" so I can't cite a cause for a low-confidence rating.",
   "cited_nodes": [
     "account-service",
     "payment-service",
-    "transaction-db",
-    "fraud-engine"
+    "transaction-db"
   ],
   "cited_factors": [
     "pii data",
-    "card data",
     "financial data",
-    "service criticality",
-    "downstream systems",
-    "deployment groups",
-    "transaction path",
-    "owner coordination"
+    "service criticality"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

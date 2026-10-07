@@ -1,39 +1,20 @@
 {
-  "answer": "**Overall risk = 70; highest dimension = compliance (81, high)** — this is what the decision rule \"GO_WITH_CONDITIONS: highest risk is 81 (>= 60)\" keys off.\n\nCompliance dimension (81, high) — top factors:\n- \"card data\" — 30 points — `fraud-engine`\n- \"pii data\" — 20 points — `account-service`\n- \"financial data\" — 20 points — `account-service`, `fraud-engine`, `payment-service`, `transaction-db`\n\nOther dimensions also elevated:\n- Operational — 71 (high): \"service criticality\" 40 (`payment-service`); \"downstream systems\" 20 (`api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `loan-service`, `mobile-banking`, `notification-service`, `reporting-db`, `risk-engine`, `web-banking`); \"deployment groups\" 6.\n- Delivery — 58 (medium): \"owner coordination\" 28 across the full service set; \"direct services\" 15 (`account-service`, `fraud-engine`, `payment-service`).\n- Performance — 55 (medium): \"transaction path\" 20 and \"payment business rule\" 15 (`payment-service`, `transaction-db`); \"channel path\" 15 (`api-gateway`, `mobile-banking`, `web-banking`).\n- Security — 48 (medium): \"customer data\" 20; \"critical identity path\" 10 (`api-gateway`, `authentication-service`); \"blast radius size\" 10.\n- Technical — 33 (low).\n\nSupporting compliance findings (framework scores, as supplied):\n- GDPR medium (65), PCI DSS medium (65), SOX medium (65), Internal Governance medium (70); overall compliance score 65, \"0 applicable framework(s) have high risk.\"\n\nAlso note the triggered release conditions for medium GDPR/PCI DSS/SOX/Internal Governance risk and the two sprint deployment collisions (`transaction-db` with ST-107, `payment-service` with ST-110).",
+  "answer": "Risk is not rated high in this analysis. The supplied scores show:\n\n- **Overall risk: 39** (highest dimension: **operational**, score **44 — medium**)\n- **Operational (44, medium)** — top factors: \"service criticality\" (40 pts, `payment-service`), \"downstream systems\" (8 pts, `customer-db`, `fraud-engine`, `notification-service`, `transaction-db`), \"deployment groups\" (6 pts).\n- **Compliance (40, medium)** — \"pii data\" (20 pts, `account-service`), \"financial data\" (20 pts, `account-service`, `payment-service`), baseline (5 pts).\n- **Security (33, low)**, **Performance (30, low)**, **Technical (17, low)**, **Delivery (23, low)**.\n\nThe nearest thing to a \"high\" signal is that **operational** is the highest dimension and `payment-service` carries the largest single factor (\"service criticality\", 40 pts), but it is classified **medium**, not high. On the compliance side, 3 of 4 frameworks apply with minimum score **80/100**, and **0 applicable frameworks have high risk**.\n\nIf you meant the release decision instead: it is **GO** with **confidence 70**, complexity **medium**, triggered rule \"GO: no blocking or conditional release rules fired\", and no conditions.",
   "cited_nodes": [
-    "mobile-banking",
-    "web-banking",
-    "atm",
-    "branch-portal",
     "account-service",
     "payment-service",
-    "loan-service",
-    "card-service",
-    "authentication-service",
     "notification-service",
-    "api-gateway",
     "customer-db",
     "transaction-db",
-    "audit-db",
-    "reporting-db",
-    "fraud-engine",
-    "risk-engine"
+    "fraud-engine"
   ],
   "cited_factors": [
-    "customer data",
-    "critical identity path",
-    "blast radius size",
+    "baseline",
     "pii data",
-    "card data",
     "financial data",
-    "direct services",
     "service criticality",
     "downstream systems",
-    "deployment groups",
-    "transaction path",
-    "channel path",
-    "payment business rule",
-    "owner coordination"
+    "deployment groups"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

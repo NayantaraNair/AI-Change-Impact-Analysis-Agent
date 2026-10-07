@@ -1,26 +1,26 @@
 {
-  "answer": "**Sprint 42 release confidence (as supplied): 37** — health score 20; release decisions are 1 GO, 2 GO_WITH_CONDITIONS, 3 NO_GO.\n\n**Per-story confidence (as supplied)**\n- ST-107: 15 — decision NO_GO\n- ST-101: 24 — GO_WITH_CONDITIONS\n- ST-112: 27 — NO_GO\n- ST-110: 30 — NO_GO\n- ST-104: 53 — GO_WITH_CONDITIONS\n- ST-115: 73 — GO\n\n**Blocking rules driving the NO_GO decisions**\n- ST-107: \"NO_GO: security risk is 100 (>= 85)\"; \"NO_GO: delivery risk is 87 (>= 85)\"; plus GDPR, PCI DSS and Internal Governance high-risk-with-card-data-and-auth triggers (factors \"card data\", \"auth flow change\" across api-gateway, authentication-service, card-service, mobile-banking).\n- ST-110: \"NO_GO: highest risk 78 with test coverage 59% (< 70%)\".\n- ST-112: \"NO_GO: highest risk 77 with test coverage 65% (< 70%)\".\n\n**Conditional approvals**\n- ST-101: highest risk 81 (compliance, level high) — factors \"card data\" (fraud-engine), \"pii data\" (account-service), \"financial data\".\n- ST-104: GDPR risk high — factors \"pii data\" (crm, customer-db, customer-service, notification-service), \"database schema change\" (audit-db, customer-db).\n\n**Cross-story friction**\n- 3 high-risk deployment collisions (risk score 100 each): C-ST-101-ST-107 on transaction-db, C-ST-101-ST-110 on payment-service, C-ST-107-ST-112 on authentication-service.\n- 4 compliance issues; 3 conflicts; health score 20.\n- High-risk stories: ST-101, ST-107, ST-110, ST-112.\n\n**Note:** the specific computation that turns these inputs into the 37 confidence figure is not described in the context; only the supplied value is reported here.",
+  "answer": "The context doesn't state a formula for the sprint release-confidence score, so I'll report the supplied value and the drivers visible in the analysis.\n\n- **Sprint 42 release confidence = 58** (with health score 49, 6 stories, 17 applications impacted, 19 dependencies affected, 3 conflicts, 3 compliance issues).\n\nMain contributing drivers in the data:\n- **ST-107 is NO_GO with confidence 23**, the low point of the sprint, and is the flagged high-risk story. Triggered NO_GO rules: **security risk 93 (≥85)** — factors \"card data\" (25, card-service/atm/fraud-engine), \"auth flow change\" (25, api-gateway/authentication-service/card-service/mobile-banking), \"external API contract\" (15); and **delivery risk 87 (≥85)** — factors \"owner coordination\" (32), \"medium ambiguity\" (30), \"direct services\" (20). Also NO_GO on high PCI DSS (40) and Internal Governance (45) risk for a card-data + auth change.\n- **Other stories carry conditions, not clean GO**: ST-112 confidence 49 (security 73 high, GDPR/Internal Governance medium, collision with ST-107), ST-101 confidence 54, ST-104 confidence 58. Only ST-115 is a plain GO (confidence 94).\n- **Three high-risk deployment collisions** on shared components: ST-101 vs ST-107 on account-service (risk_score 100), ST-107 vs ST-112 on authentication-service (100), ST-101 vs ST-110 on payment-service (80) — each forcing sequencing and shared regression runs.\n- **Compliance exposure**: ST-104 GDPR high (score 55, \"pii data\" 20, \"nearby card data\" 12 on card-service), plus ST-107's high PCI DSS and Internal Governance.\n- **Broad blast radius and coordination load**: e.g. ST-107 operational factor \"service criticality\" 40 (api-gateway, authentication-service) and \"downstream systems\" 20; delivery \"owner coordination\" 32.\n\nNet: the sprint's low confidence is driven by the ST-107 NO_GO plus pervasive conditional decisions, cross-story deployment collisions, and high compliance/security factors on card, auth and PII components — not by a single factor.",
   "cited_nodes": [
     "mobile-banking",
-    "customer-service",
+    "atm",
     "account-service",
     "payment-service",
     "card-service",
-    "crm",
     "authentication-service",
-    "notification-service",
     "api-gateway",
-    "customer-db",
-    "transaction-db",
-    "audit-db",
     "fraud-engine"
   ],
   "cited_factors": [
     "pii data",
+    "direct services",
+    "service criticality",
+    "downstream systems",
+    "owner coordination",
+    "nearby card data",
     "card data",
-    "financial data",
-    "database schema change",
-    "auth flow change"
+    "auth flow change",
+    "external API contract",
+    "medium ambiguity"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

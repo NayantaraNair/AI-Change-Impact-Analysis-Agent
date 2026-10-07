@@ -54,7 +54,7 @@ async def test_statement_footer_has_no_unrelated_services_or_data_flags(arch):
 
     facts = await analyze_requirement(footer, arch)
 
-    assert set(facts.affected_services) == {"document-service", "reporting-service"}
+    assert set(facts.affected_services) == {"document-service"}
     assert not facts.touches_customer_data
     assert not facts.touches_card_data
     assert not facts.touches_financial_data

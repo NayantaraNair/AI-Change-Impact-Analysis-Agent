@@ -1,36 +1,20 @@
 {
-  "answer": "Only one story is present in the analysis context — **ST-101** (\"Increase daily payment limits for premium customers\"). Its computed risk profile, as supplied:\n\n- **Overall risk: 70**; highest dimension: **compliance**\n- **Compliance: 81 (high)**\n  - card data (30 pts): `fraud-engine`\n  - pii data (20 pts): `account-service`\n  - financial data (20 pts): `account-service`, `fraud-engine`, `payment-service`, `transaction-db`\n- **Operational: 71 (high)**\n  - service criticality (40 pts): `payment-service`\n  - downstream systems (20 pts): `api-gateway`, `atm`, `audit-db`, `authentication-service`, `branch-portal`, `card-service`, `customer-db`, `loan-service`, `mobile-banking`, `notification-service`, `reporting-db`, `risk-engine`, `web-banking`\n  - deployment groups (6 pts)\n- **Delivery: 58 (medium)** — owner coordination (28 pts) across 17 components\n- **Performance: 55 (medium)** — transaction path (`payment-service`, `transaction-db`), channel path (`api-gateway`, `mobile-banking`, `web-banking`)\n- **Security: 48 (medium)** — customer data (20 pts), critical identity path (10 pts: `api-gateway`, `authentication-service`)\n- **Technical: 33 (low)**\n\nDecision: **GO_WITH_CONDITIONS**, confidence **24**, triggered by highest risk 81 (≥60), medium GDPR/PCI DSS/SOX/Internal Governance risk, and sprint deployment collisions.\n\nOther story IDs appear only as collision partners, with no risk data in this context:\n- **ST-107** — deployment collision on `transaction-db`; sequence ST-107 first behind a flag, run shared regression suite for `transaction-db` before ST-101.\n- **ST-110** — deployment collision on `payment-service`; sequence ST-110 first behind a flag, run shared regression suite for `payment-service` before ST-101.\n\nI can't assess ST-107 or ST-110 as \"risky\" stories — the context contains no risk analysis for them.",
+  "answer": "Only one story is present in the analysis context: **ST-101 – \"Increase daily payment limits for premium customers.\"**\n\n**Is it risky?**\n- Overall risk score **39** (computed by code), highest dimension = **operational** — so it is not rated high overall, but two dimensions land at medium.\n\n**Medium-risk dimensions**\n- **Operational: 44 (medium)** — top factors: \"service criticality\" (40 pts, node_ids: `payment-service`), \"downstream systems\" (8 pts, node_ids: `customer-db`, `fraud-engine`, `notification-service`, `transaction-db`), \"deployment groups\" (6 pts, node_ids: `account-service`, `customer-db`, `fraud-engine`, `notification-service`, `payment-service`, `transaction-db`).\n- **Compliance: 40 (medium)** — top factors: \"financial data\" (20 pts, node_ids: `account-service`, `payment-service`), \"pii data\" (20 pts, node_ids: `account-service`), \"baseline\" (5 pts).\n\n**Low-risk dimensions**\n- Security **33** (low), technical **17** (low), performance **30** (low), delivery **23** (low).\n\n**Compliance frameworks**\n- Applicable: GDPR (low, 80), SOX (low, 90), Internal Governance (low, 85); PCI DSS not applicable. Compliance overall **80/100**, with **0 applicable frameworks at high risk**.\n\n**Release position**\n- Decision **GO**, confidence **70**, triggered rule: \"GO: no blocking or conditional release rules fired\"; conditions: none; complexity: medium.",
   "cited_nodes": [
-    "mobile-banking",
-    "web-banking",
-    "atm",
-    "branch-portal",
     "account-service",
     "payment-service",
-    "loan-service",
-    "card-service",
-    "authentication-service",
     "notification-service",
-    "api-gateway",
     "customer-db",
     "transaction-db",
-    "audit-db",
-    "reporting-db",
-    "fraud-engine",
-    "risk-engine"
+    "fraud-engine"
   ],
   "cited_factors": [
-    "customer data",
-    "critical identity path",
+    "baseline",
     "pii data",
-    "card data",
     "financial data",
     "service criticality",
     "downstream systems",
-    "deployment groups",
-    "transaction path",
-    "channel path",
-    "owner coordination"
+    "deployment groups"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

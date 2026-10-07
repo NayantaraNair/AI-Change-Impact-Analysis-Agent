@@ -256,18 +256,28 @@ def deployment_graph(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_no_llm_templates_order_groups_and_cover_flags_migrations_and_comms(deployment_graph):
+async def test_no_llm_templates_are_three_steps_in_dependency_order(deployment_graph):
     rollback, notes, provider = await release.write_plans(facts(changes_db_schema=True), deployment_graph, "GO_WITH_CONDITIONS")
     assert provider == "template-fallback"
-    deployments = [note for note in notes if note.startswith("Deploy ")]
-    assert [note.split()[1] for note in deployments] == ["database", "services", "channels"]
-    flags = [step for step in rollback if "feature flags" in step]
-    assert [step.split(":")[0] for step in flags] == ["channels", "services", "database"]
-    migration = [step for step in rollback if "roll back the DB migration" in step]
-    assert len(migration) == 1 and migration[0].startswith("database:")
-    assert any("backups" in note for note in notes)
-    assert any("monitor" in note for note in notes)
-    assert any("stakeholders" in note for note in notes)
+    assert len(rollback) == len(notes) == release.MAX_STEPS
+    assert "database, then services, then channels" in notes[1]
+    assert "channels, then services, then database" in rollback[0]
+    assert sum("migration" in step for step in rollback) == 1
+    assert "migrations" in notes[1]
+    assert "sign-off" in notes[0]
+    assert "stakeholders" in rollback[2]
+
+
+@pytest.mark.asyncio
+async def test_model_plans_are_cut_to_three_steps(monkeypatch, deployment_graph):
+    async def complete_structured(system, user, schema, tier="fast", max_tokens=1500):
+        assert "at most 3 short steps" in system
+        steps = [f"Step {index}" for index in range(6)]
+        return schema(rollback_plan=steps, deployment_notes=steps), "mock:strong"
+
+    monkeypatch.setattr(llm, "complete_structured", complete_structured)
+    rollback, notes, _ = await release.write_plans(facts(), deployment_graph, "GO")
+    assert rollback == notes == ["Step 0", "Step 1", "Step 2"]
 
 
 @pytest.mark.asyncio
