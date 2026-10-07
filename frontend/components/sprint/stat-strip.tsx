@@ -1,33 +1,27 @@
-import { formatNumber, severityClass } from "@/lib/format";
-import type { SprintKpis } from "@/lib/types";
 import { InfoTip } from "@/components/ui/info-tip";
 import { explain } from "@/lib/explain";
-import { healthLevel, kpiDefinitions } from "./model";
+import { formatHours, formatNumber, severityClass } from "@/lib/format";
+import type { SprintKpis } from "@/lib/types";
+import { healthLevel } from "./model";
 
-export function SprintStatStrip({ kpis, previous }: { kpis: SprintKpis; previous: SprintKpis | null }) {
+export function SprintStatStrip({ kpis }: { kpis: SprintKpis }) {
+  const stats = [
+    { key: "stories", label: "Stories", value: formatNumber(kpis.stories) },
+    { key: "conflicts", label: "Clashes", value: formatNumber(kpis.conflicts), tone: kpis.conflicts ? "text-impact-med" : "" },
+    { key: "high_risk", label: "High-risk stories", value: formatNumber(kpis.high_risk_stories.length), tone: kpis.high_risk_stories.length ? "text-impact-high" : "" },
+    { key: "testing_effort_hours", label: "Test effort", value: formatHours(kpis.testing_effort_hours) },
+    { key: "health_score", label: "Health", value: `${formatNumber(kpis.health_score)}/100`, tone: severityClass[healthLevel(kpis.health_score)] },
+  ];
   return (
     <div className="border-y border-line py-5">
-    <dl aria-label="Sprint statistics" className="readouts -mx-5 gap-y-5">
-      {kpiDefinitions.map((stat) => {
-        const value = kpis[stat.key];
-        const delta = previous ? Math.round((value - previous[stat.key]) * 10) / 10 : null;
-        const positive = "positive" in stat;
-        const unit = "unit" in stat ? stat.unit : "";
-        return (
-          <div key={stat.key}>
-            <div className="flex items-baseline gap-2">
-              <dt className="order-2 flex items-center gap-1 text-meta text-muted">{stat.label}<InfoTip label={stat.label.toLowerCase()} side="bottom">{explain.kpis[stat.key]}</InfoTip></dt>
-              <dd className={`text-hero numeral ${positive ? severityClass[healthLevel(value)] : "text-text"}`}>
-                {formatNumber(value)}{unit && <span className="ml-1 text-body font-normal text-muted">{unit}</span>}
-              </dd>
-            </div>
-            {delta !== null && <p className="mt-1 text-meta text-muted tabular-nums" aria-label={`${stat.label}: ${delta > 0 ? "increased by" : delta < 0 ? "decreased by" : "unchanged,"} ${formatNumber(Math.abs(delta))}${unit ? ` ${unit}` : positive ? " points" : ""} versus previous run`}>
-              {delta > 0 ? "+" : delta < 0 ? "−" : ""}{formatNumber(Math.abs(delta))}{unit ? ` ${unit}` : positive ? " pts" : ""} vs previous run
-            </p>}
+      <dl aria-label="Sprint numbers" className="readouts -mx-5 gap-y-5">
+        {stats.map((stat) => (
+          <div key={stat.key} className="flex items-baseline gap-2.5">
+            <dt className="order-2 flex items-center gap-1 text-meta text-muted">{stat.label}<InfoTip label={stat.label.toLowerCase()} side="bottom">{explain.kpis[stat.key]}</InfoTip></dt>
+            <dd className={`text-hero numeral ${stat.tone ?? ""}`}>{stat.value}</dd>
           </div>
-        );
-      })}
-    </dl>
+        ))}
+      </dl>
     </div>
   );
 }

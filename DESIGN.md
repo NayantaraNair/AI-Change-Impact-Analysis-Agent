@@ -2,6 +2,9 @@
 
 ## Direction
 
+**Simple first.** The audience is a manager planning a sprint. Every result opens with a short impact summary (one line per question: what changes, what it affects, teams, main risks, compliance, tests, release), then the dependency graph. Detail sits in tabs and folded sections. Copy is short and plain: one line per idea, no jargon ("steps away", not "hops"; "clash", not "conflict kind").
+
+
 Dark graphite, modern and quiet, with one rule above all: **colour is evidence.**
 
 - The risk scale (jade, saffron, coral) only ever means risk level.
@@ -21,7 +24,7 @@ Avoid the generic AI-dashboard look. **Do not use:**
 - accenting a single word in a heading with a different colour or italics
 - `01 / 02 / 03` numbering on content that isn't a sequence (pipeline steps are a sequence)
 
-## The one memorable element: the blast-radius graph
+## The one memorable element: the dependency graph
 
 - The services a story directly changes (hop 0) sit at the **centre**. Impacted nodes are arranged in **concentric rings by hop distance** (hop 1, hop 2, hop 3+). Unimpacted components sit in a faint outer ring at low opacity.
 - Node fill and border colour encode **severity** (impact-low/med/high). Unimpacted nodes are `line`-coloured.
@@ -73,7 +76,7 @@ Check contrast of text on these backgrounds (WCAG AA).
 │v │ risk · Impacted services · Coverage            │  details      │
 │  ├────────────────────────────────────────────────┤  panel        │
 │r │                                                │  (360 px,     │
-│a │           BLAST-RADIUS GRAPH (hero)            │  collapsible) │
+│a │           DEPENDENCY GRAPH (hero)               │  collapsible) │
 │i │                                                │               │
 │l ├────────────────────────────────────────────────┤               │
 │  │ Tabs: Risk | Tests | Compliance | Release |    │               │
@@ -102,7 +105,7 @@ Right (40%): Bar chart of risk by story (stacked by dimension or
              showing the highest)
 ──────────────────────────────────────────────────────────────────────
 Conflicts: table (story A, story B, shared component, kind, risk,
-           recommendation) + conflict graph (reuses the blast-radius
+           recommendation) + conflict graph (reuses the dependency
            component; conflict edges drawn in impact-high, dashed)
 ```
 
@@ -114,5 +117,5 @@ Conflicts: table (story A, story B, shared component, kind, risk,
 - **Respect `prefers-reduced-motion`:** no edge animation, instant transitions.
 - Visible keyboard focus everywhere (a 2 px chalk ring). All controls reachable by keyboard.
 - Designed for desktop at ≥ 1280 px and usable down to 1024 px. Below that, the details panel stacks under the graph.
-- **Empty states give direction:** "Paste a story and select Analyze to see its blast radius." **Errors say what happened and what to do:** "Couldn't reach the analysis server at :8000. Start the backend or set NEXT_PUBLIC_MOCK=1."
-- **Copy:** plain verbs, sentence case, buttons say what they do ("Analyze story", "Analyze sprint", "Export report"), and the vocabulary stays consistent ("blast radius", "impact path", "factor").
+- **Empty states give direction:** "Attach or paste a story, then select Analyze." **Errors say what happened and what to do:** "Couldn't reach the analysis server at :8000. Start the backend or set NEXT_PUBLIC_MOCK=1."
+- **Copy:** plain verbs, sentence case, buttons say what they do ("Analyze story", "Analyze sprint", "Export report"), and the vocabulary stays consistent ("dependency graph", "impact summary", "clash").

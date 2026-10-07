@@ -16,6 +16,13 @@ export type ImpactFlowEdge = Edge<ImpactEdgeData, "impact">;
 export const severityColor = (severity: Severity | null) =>
   severity === "medium" ? "var(--impact-med)" : severity ? `var(--impact-${severity})` : "var(--line)";
 
+/** Plain-language distance from the change. */
+export function hopLabel(hop: number | null): string {
+  if (hop === null) return "Not affected";
+  if (hop === 0) return "Changed";
+  return hop === 1 ? "1 step away" : `${hop} steps away`;
+}
+
 export function hopRings(nodes: GraphNode[]): { hop: number | null; radius: number }[] {
   const distances = new Map<number | null, number[]>();
   for (const node of nodes) {
@@ -93,6 +100,9 @@ export function toFlowElements(
     // A partial graph can omit endpoints; do not ask React Flow to render a broken edge.
     if (!source || !target) continue;
     const [sourceSide, targetSide] = connectionSides(source, target);
+    // Only links between affected components tell the story; the rest is noise
+    // until the user asks to see every component.
+    const quiet = !edge.conflict && !edge.on_impact_path;
     const color = edge.conflict ? "var(--impact-high)" : edge.on_impact_path ? severityColor(target.severity) : "var(--line)";
     edges.push({
       id: edge.id,
@@ -101,7 +111,7 @@ export function toFlowElements(
       sourceHandle: `source-${sourceSide}`,
       targetHandle: `target-${targetSide}`,
       type: "impact",
-      hidden: hidden.has(source.id) || hidden.has(target.id),
+      hidden: hidden.has(source.id) || hidden.has(target.id) || (quiet && !options.showUnimpacted),
       selectable: false,
       focusable: false,
       data: { onImpactPath: edge.on_impact_path, conflict: edge.conflict, animate: options.animate && !edge.conflict },

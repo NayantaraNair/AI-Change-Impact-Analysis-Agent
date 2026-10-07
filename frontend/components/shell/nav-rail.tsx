@@ -9,8 +9,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useAppContext } from "./app-context";
 
 const destinations = [
-  { href: "/story", label: "Story analysis", icon: FileSearch },
-  { href: "/sprint", label: "Sprint", icon: GitMerge },
+  { href: "/story", label: "Story or epic", icon: FileSearch },
+  { href: "/sprint", label: "Sprint backlog", icon: GitMerge },
 ];
 
 export function NavRail() {
@@ -35,7 +35,7 @@ export function NavRail() {
             <Bug size={20} aria-hidden="true" />
             {run?.status === "running" && <span aria-hidden="true" className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-model" />}
           </TooltipTrigger>
-          <TooltipContent side="right">Debug: run steps, model calls and setup</TooltipContent>
+          <TooltipContent side="right">Details: steps, AI calls, setup</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger render={<Button id="copilot-toggle" variant="ghost" size="icon-lg" aria-label={copilotOpen ? "Close copilot" : "Open copilot"} aria-expanded={copilotOpen} aria-controls={copilotOpen ? "copilot-drawer" : undefined} onClick={toggleCopilot} className={cn("text-muted hover:text-chalk", copilotOpen && "bg-surface-raised text-chalk")} />}>

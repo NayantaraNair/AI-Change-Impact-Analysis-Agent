@@ -31,7 +31,6 @@ export function TestsTab({ plan, nodes }: { plan: TestPlan; nodes: GraphNode[] }
         <p className="flex items-baseline gap-1"><span className="font-semibold tabular-nums">{formatHours(plan.effort_hours)}</span> <span className="text-meta text-muted">effort</span><InfoTip label="effort">{explain.effort}</InfoTip></p>
         <p className="flex items-baseline gap-1"><span className="font-semibold tabular-nums">{formatNumber(plan.automation_candidates)}</span> <span className="text-meta text-muted">automation candidates</span><InfoTip label="automation candidates">{explain.automation}</InfoTip></p>
       </div>
-      <p className="text-body text-muted">{plan.summary}</p>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
         <div role="group" aria-label="Filter by priority" className="flex items-center gap-1.5">
           <span className="mr-1 text-meta text-muted">Priority</span>
@@ -43,7 +42,7 @@ export function TestsTab({ plan, nodes }: { plan: TestPlan; nodes: GraphNode[] }
         </div>
         {(selectedPriorities.length > 0 || selectedTypes.length > 0) && <Button variant="ghost" onClick={() => { setPriorities([]); setTypes([]); }}>Clear filters</Button>}
       </div>
-      <p role="status" className="text-meta text-muted">{tests.length} of {plan.tests.length} tests · Select a title to see steps and expected results.</p>
+      <p role="status" className="text-meta text-muted">{tests.length} of {plan.tests.length} tests. Click a title for steps.</p>
       <div className="overflow-x-auto rounded-md border border-line">
         <table className="w-full min-w-[760px] text-left text-dense">
           <thead className="bg-surface text-muted"><tr>{["Priority", "Title", "Type", "Covers", "Source", "Automation"].map((label) => <th key={label} scope="col" className="px-3 py-2 font-medium"><span className="inline-flex items-center gap-1">{label}{label === "Priority" && <InfoTip label="priority">{explain.priority}</InfoTip>}{label === "Source" && <InfoTip label="test source">{explain.testSource}</InfoTip>}{label === "Automation" && <InfoTip label="automation">{explain.automation}</InfoTip>}</span></th>)}</tr></thead>
@@ -66,7 +65,7 @@ export function TestsTab({ plan, nodes }: { plan: TestPlan; nodes: GraphNode[] }
                 <td className="px-3 py-3">{test.automation_candidate ? "Candidate" : "Manual"}</td>
               </tr>
             ))}
-            {!tests.length && <tr><td colSpan={6} className="px-3 py-6 text-muted">{plan.tests.length ? "No tests match these filters. Clear filters to see the full plan." : "No tests were returned. Refine the story and analyze it again."}</td></tr>}
+            {!tests.length && <tr><td colSpan={6} className="px-3 py-6 text-muted">{plan.tests.length ? "No tests match. Clear the filters." : "No tests found. Add detail to the story and try again."}</td></tr>}
           </tbody>
         </table>
       </div>

@@ -1,7 +1,8 @@
 "use client";
 
-import type { FormEvent } from "react";
-import { ChevronDown } from "lucide-react";
+import { useRef, type FormEvent } from "react";
+import { ChevronDown, Paperclip } from "lucide-react";
+import { ATTACH_ACCEPT } from "@/lib/attach";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,20 +20,30 @@ interface Props {
   examplesError: boolean;
   onRetryExamples: () => void;
   busy: boolean;
+  onAttach: (file: File) => void;
+  attachError: string | null;
 }
 
-export function StoryForm({ value, onChange, onSubmit, examples, onExample, examplesLoading, examplesError, onRetryExamples, busy }: Props) {
+export function StoryForm({ value, onChange, onSubmit, examples, onExample, examplesLoading, examplesError, onRetryExamples, busy, onAttach, attachError }: Props) {
+  const fileInput = useRef<HTMLInputElement>(null);
   function update(key: keyof StoryFormValue, next: string) {
     onChange({ ...value, [key]: next });
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-4" aria-label="Story input">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1>Story analysis</h1>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1>Impact analysis</h1>
+          <p className="mt-1 text-dense text-muted">Attach or paste a story or epic. See what it affects before you plan the sprint.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+        <input ref={fileInput} type="file" accept={ATTACH_ACCEPT} className="sr-only" tabIndex={-1} aria-hidden="true"
+          onChange={(event) => { const file = event.target.files?.[0]; if (file) onAttach(file); event.target.value = ""; }} />
+        <Button type="button" variant="outline" disabled={busy} onClick={() => fileInput.current?.click()}><Paperclip aria-hidden="true" />Attach file</Button>
         <DropdownMenu>
           <DropdownMenuTrigger render={<Button type="button" variant="outline" disabled={busy || examplesLoading} />}>
-            {examplesLoading ? "Loading examples…" : "Load example"}<ChevronDown aria-hidden="true" />
+            {examplesLoading ? "Loading…" : "Examples"}<ChevronDown aria-hidden="true" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[420px] max-w-[90vw]">
             {examples.map((story) => (
@@ -44,17 +55,19 @@ export function StoryForm({ value, onChange, onSubmit, examples, onExample, exam
             {examplesError && <DropdownMenuItem onClick={onRetryExamples}>Retry loading examples</DropdownMenuItem>}
           </DropdownMenuContent>
         </DropdownMenu>
+        </div>
       </div>
-      {examplesError && <p role="status" className="text-dense text-muted">Couldn&apos;t load examples. Start the backend or restore the demo fixture, then select Retry loading examples.</p>}
+      {attachError && <p role="alert" className="text-dense text-impact-high">{attachError}</p>}
+      {examplesError && <p role="status" className="text-dense text-muted">Couldn&apos;t load examples. Check the backend, then retry.</p>}
       <fieldset disabled={busy} className="grid min-w-0 gap-3 disabled:opacity-60">
         <div className="grid gap-3 sm:grid-cols-[140px_minmax(0,1fr)_150px]">
           <label className="space-y-1 text-dense font-medium">
-            <span>Story ID <span className="text-meta font-normal text-muted">(optional)</span></span>
+            <span>ID <span className="text-meta font-normal text-muted">(optional)</span></span>
             <Input value={value.id} onChange={(event) => update("id", event.target.value)} placeholder="ST-107" maxLength={100} />
           </label>
           <label className="space-y-1 text-dense font-medium">
             <span>Title</span>
-            <Input value={value.title} onChange={(event) => update("title", event.target.value)} placeholder="Describe the change in a sentence" required maxLength={500} />
+            <Input value={value.title} onChange={(event) => update("title", event.target.value)} placeholder="One line: what is changing" required maxLength={500} />
           </label>
           <label className="space-y-1 text-dense font-medium">
             <span>Type</span>
@@ -66,19 +79,19 @@ export function StoryForm({ value, onChange, onSubmit, examples, onExample, exam
         <div className="grid gap-3 md:grid-cols-[3fr_2fr]">
           <label className="space-y-1 text-dense font-medium">
             <span>Description</span>
-            <Textarea value={value.description} onChange={(event) => update("description", event.target.value)} placeholder="What changes, which services are involved, and why?" required rows={4} className="h-28 resize-y" />
+            <Textarea value={value.description} onChange={(event) => update("description", event.target.value)} placeholder="What changes and why" required rows={4} className="h-28 resize-y" />
           </label>
           <label className="space-y-1 text-dense font-medium">
-            <span>Acceptance criteria <span className="text-meta font-normal text-muted">(one per line)</span></span>
-            <Textarea value={value.criteria} onChange={(event) => update("criteria", event.target.value)} placeholder="Describe the expected behavior" rows={4} className="h-28 resize-y" />
+            <span>Acceptance criteria <span className="text-meta font-normal text-muted">(optional)</span></span>
+            <Textarea value={value.criteria} onChange={(event) => update("criteria", event.target.value)} placeholder="One per line" rows={4} className="h-28 resize-y" />
           </label>
         </div>
       </fieldset>
       <div className="flex items-center gap-4 pb-4">
         <Button type="submit" disabled={busy || !value.title.trim() || !value.description.trim()}>
-          {busy ? "Preparing analysis…" : "Analyze story"}
+          {busy ? "Analyzing…" : "Analyze"}
         </Button>
-        <p className="text-meta text-muted">Facts extracted by AI. Scores and release decisions computed by code.</p>
+        <p className="text-meta text-muted">AI reads the story. Rules compute every score.</p>
       </div>
     </form>
   );

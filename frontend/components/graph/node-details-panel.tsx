@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import type { Component, GraphNode } from "@/lib/types";
 import { NodeIcon } from "./impact-nodes";
 import styles from "./graph.module.css";
+import { hopLabel } from "./graph-model";
 
 export interface NodeDetailsPanelProps {
   node: GraphNode;
@@ -21,7 +22,7 @@ export function NodeDetailsPanel({ node, component, factors, onClose }: NodeDeta
     <aside className={styles.details} aria-labelledby={titleId}>
       <header className={styles.detailsHeader}>
         <NodeIcon node={node} size={20} aria-hidden="true" />
-        <div><h2 id={titleId}>{node.label}</h2><p>{node.type.charAt(0).toUpperCase() + node.type.slice(1)} · {node.hop === null ? "Unimpacted" : node.hop === 0 ? "Direct change" : `Hop ${node.hop}`}</p></div>
+        <div><h2 id={titleId}>{node.label}</h2><p>{node.type.charAt(0).toUpperCase() + node.type.slice(1)} · {hopLabel(node.hop)}</p></div>
         <button type="button" className={styles.closeButton} onClick={onClose} aria-label="Close component details"><X size={18} /></button>
       </header>
       <div className={styles.detailsBody}>
@@ -29,7 +30,7 @@ export function NodeDetailsPanel({ node, component, factors, onClose }: NodeDeta
         <dl className={styles.metadata}>
           <div><dt>Owner</dt><dd>{node.owner_team || "Not recorded"}</dd></div>
           <div><dt>Criticality</dt><dd>{node.criticality}<span className={styles.muted}> / 10</span></dd></div>
-          <div><dt>Impact</dt><dd className={styles.severityText} data-severity={node.hop === null ? "none" : node.severity}>{node.hop === null ? "Unimpacted" : node.severity ? `${node.severity.charAt(0).toUpperCase()}${node.severity.slice(1)}` : "Not recorded"}</dd></div>
+          <div><dt>Impact</dt><dd className={styles.severityText} data-severity={node.hop === null ? "none" : node.severity}>{node.hop === null ? "None" : node.severity ? `${node.severity.charAt(0).toUpperCase()}${node.severity.slice(1)}` : "Not recorded"}</dd></div>
           <div><dt>Data classes</dt><dd>{node.data_classes.length ? node.data_classes.map((dataClass) => <span key={dataClass} className={styles.dataTag}>{dataLabels[dataClass]}</span>) : "None"}</dd></div>
         </dl>
         <section className={styles.detailsSection} aria-label="APIs">
