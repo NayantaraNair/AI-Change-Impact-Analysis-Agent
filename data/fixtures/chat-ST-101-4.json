@@ -1,19 +1,13 @@
 {
-  "answer": "The context doesn't describe confidence as low — it reports **confidence: 70**, **decision: GO**, and **triggered_rules: [\"GO: no blocking or conditional release rules fired\"]** with **0 conditions**. No rule or finding in the analysis labels the confidence level as low.\n\nWhat the context does give as potential drags:\n- **complexity: \"medium\"** for ST-101.\n- **risk.overall = 39**, with the highest dimension **operational (44, medium)**:\n  - \"service criticality\" 40 pts → `payment-service`\n  - \"downstream systems\" 8 pts → `customer-db`, `fraud-engine`, `notification-service`, `transaction-db`\n  - \"deployment groups\" 6 pts\n- **compliance (40, medium)** — the only medium compliance dimension:\n  - \"pii data\" 20 pts → `account-service`\n  - \"financial data\" 20 pts → `account-service`, `payment-service`\n- **Rollout coordination**: deployment notes require sequencing three groups (customer-platform → core-banking → core-payments) plus enabling the approved feature flag, with a three-step rollback plan.\n- **Test coverage estimate: 0.667**, with 5 P1 tests (TC-013, TC-014, TC-043, TC-044, TC-047).\n\nIf your source for \"low\" is something outside this analysis, it isn't in the context provided.",
+  "answer": "The analysis context does not explain how release confidence is derived — it only supplies the computed values, so I can't give the reason.\n\nSupplied release data (not recalculated):\n- **confidence: 70**\n- **decision: GO**\n- **triggered_rules:** \"GO: no blocking or conditional release rules fired\"\n- **conditions:** none\n- **complexity:** medium\n\nContext that exists but is *not* stated as a cause of the confidence value:\n- Risk dimensions: operational 44 (medium) with top factor \"service criticality\" 40 pts on `payment-service`; compliance 40 (medium) with \"pii data\" 20 pts on `account-service` and \"financial data\" 20 pts on `account-service`,`payment-service`.\n- Compliance summary: 3 of 4 frameworks apply, minimum compliance score 80/100, 0 high-risk frameworks.\n\nIf you need the actual rationale for the 70, it is not in this JSON — say so and I can't supply it from here.",
   "cited_nodes": [
     "account-service",
-    "payment-service",
-    "notification-service",
-    "customer-db",
-    "transaction-db",
-    "fraud-engine"
+    "payment-service"
   ],
   "cited_factors": [
     "pii data",
     "financial data",
-    "service criticality",
-    "downstream systems",
-    "deployment groups"
+    "service criticality"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

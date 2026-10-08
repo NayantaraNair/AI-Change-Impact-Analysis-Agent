@@ -7,6 +7,7 @@ export const shortStageLabel: Record<string, string> = {
   requirement: "Read", dependency: "Map", scoring: "Score", testing: "Tests",
   compliance: "Compliance", release: "Release", conflicts: "Conflicts",
   recheck: "Re-check", summary: "Summary", answer: "Answer",
+  fetch_repo: "Repository", map_services: "Services", map_files: "Files", map_classes: "Classes", plan_tests: "Tests",
 };
 
 /** What each stage does, for tooltips on the progress view. */
@@ -20,7 +21,11 @@ export const stageExplain: Record<string, string> = {
   conflicts: "Code compares every pair of stories for shared components, databases, APIs and deployment groups.",
   recheck: "Release rules are re-applied to stories that conflict with another, without new model calls.",
   summary: "A model writes the sprint summary from the computed numbers.",
-  answer: "The copilot answers from the current analysis.",
+  fetch_repo: "Code downloads the repository archive from GitHub and indexes classes, routes and tables. Nothing in it is run.",
+  map_services: "The AI reads the story and picks which services' code must change. Names it invents are dropped.",
+  map_files: "The AI picks the files to edit within those services. Only real paths and class names are kept.",
+  map_classes: "Code lists the affected classes, API routes and database tables from the chosen files.",
+  plan_tests: "The AI writes 5 to 7 developer tests by category; code tops up or trims to keep 5 to 7.",
 };
 
 export function formatElapsed(ms: number | null | undefined): string {

@@ -1,9 +1,13 @@
 {
-  "answer": "The analysis context does not enumerate specific test cases. It only supplies test-plan metrics and related verification steps:\n\n- **Test metrics:** `coverage_estimate` = 1.0 (100%), `effort_hours` ≈ 0.57, and **`p1_tests` is empty** — no P1 tests were identified for ST-115.\n- **No test suite, steps, or assertions are listed** in the JSON, so I can't cite specific test cases.\n\nVerification implied by the requirement/release data (not a computed test list):\n- Approved **PDF preview** confirming the fixed footer \"Thank you for banking with us.\" fits the layout before publishing the new template version (`document-service`).\n- Confirm **font, alignment, margins, page numbering and other template content stay unchanged** (presentation-only change).\n- Confirm unchanged interfaces: render payload and template selection (`reporting-service` unchanged).\n- Monitor **newly rendered statements** after publish; rollback via selecting the previous template version in `document-service`.\n\nContext notes:\n- Decision is **GO** with no blocking/conditional rules fired; highest risk dimension is **delivery = 14 (low)**.\n- No compliance frameworks apply (all `applicable: false`), so no compliance-driven test obligations are recorded.",
-  "cited_nodes": [
-    "document-service",
-    "reporting-service"
+  "answer": "- Verify the footer text on newly rendered English monthly statement PDFs displays exactly **“Thank you for banking with us.”**  \n- Confirm that font, alignment, margins, page numbering, and all other template content remain unchanged after the footer update.  \n- Test that publishing a new versioned English monthly statement template in **document‑service** (after an approved PDF preview) makes the updated footer available for subsequent statement renders.  \n- Validate rollback functionality: selecting the previous English monthly statement template version in **document‑service** restores the original footer for later statements.  \n- Ensure **reporting‑service** continues to select the correct template family and render statements without modification (no code, schema, or template‑selection changes).  \n- Exercise the affected APIs to confirm they return expected data:  \n  - `GET /documents/templates/{id}`  \n  - `GET /reports/monthly-statements/{id}`  \n  - `GET /reports/statement-template`  \n  - `POST /documents/statements/render`  \n  - `POST /reports/monthly-statements/jobs`  \n  - `PUT /documents/templates/{id}`  \n- Check that downstream services (e.g., any consumers of statement PDFs) receive correctly formatted documents after both the new template rollout and a rollback.  \n- Monitor the health of the deployment groups **documents** and **data‑platform** before, during, and after the change to ensure no unintended impact.  \n\nThese tests address the direct service change, template versioning/rollback, dependency on reporting‑service, and the low‑ambiguity, small‑contained nature of the update as indicated by the factor labels (baseline, direct services, dependency depth, service criticality, deployment groups, low ambiguity) and component IDs (**document‑service**, **reporting‑service**).",
+  "cited_nodes": [],
+  "cited_factors": [
+    "baseline",
+    "direct services",
+    "dependency depth",
+    "service criticality",
+    "deployment groups",
+    "low ambiguity"
   ],
-  "cited_factors": [],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

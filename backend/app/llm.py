@@ -58,6 +58,7 @@ MAX_TOKENS = {
     "release": 8000,
     "summary": 2000,
     "chat": 2000,
+    "codebase": 5000,
 }
 
 PROVIDERS = (

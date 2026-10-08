@@ -1,34 +1,6 @@
 {
-  "answer": "## Sprint 42 impact summary (from sprint KPIs)\n- **6 stories**; **17 applications impacted**; **19 dependencies impacted**\n- **3 conflicts** (all high-risk deployment collisions) and **3 compliance issues**\n- Testing effort: **36.7 hours**; health score **49**; release confidence **58**\n- High-risk story: **ST-107**\n\n## Per story (directly changed components)\n- **ST-101** (payment limits): `payment-service`, `account-service`; downstream `customer-db`, `fraud-engine`, `notification-service`, `transaction-db`; groups core-banking, core-payments, customer-platform\n- **ST-104** (profile fields): `customer-service`, `customer-db`, `crm`, `notification-service`; downstream `account-service`, `audit-db`, `card-service`, `loan-service`, `payment-service`\n- **ST-107** (card freeze/unfreeze): `mobile-banking`, `api-gateway`, `card-service`, `authentication-service`; 16 downstream services; 8 deployment groups\n- **ST-110** (velocity rule): `fraud-engine`; downstream `risk-engine`, `transaction-db`\n- **ST-112** (biometric login): `mobile-banking`, `authentication-service`; downstream `account-service`, `api-gateway`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `loan-service`, `payment-service`\n- **ST-115** (statement footer): `document-service`; downstream `reporting-service`\n\n## Risk dimensions flagged as top factors\n- **ST-107**: security **93 (high)** — *card data*, *auth flow change*, *external API contract*; delivery **87 (high)**; operational **71 (high)** — *service criticality* on `api-gateway`, `authentication-service`\n- **ST-104**: compliance **61 (medium)** — *pii data*, *nearby card data* (`card-service`), *database schema change* (`audit-db`, `customer-db`)\n- **ST-112**: security **73 (high)** — *auth flow change*, *customer data*; operational **69 (medium)**\n- **ST-101**: operational **44 (medium)** — *service criticality* on `payment-service`\n\n## Compliance frameworks impacted\n- **ST-107**: GDPR (medium), PCI DSS (high), SOX (low), Internal Governance (high)\n- **ST-104**: GDPR (high), PCI DSS (medium), SOX (medium), Internal Governance (low)\n- **ST-101**, **ST-110**: GDPR/PCI/SOX/Governance (none high; minimum scores 80)\n- **ST-112**: GDPR (medium), SOX (low), Internal Governance (medium); PCI DSS not applicable\n- **ST-115**: no framework applies (overall **100/100**)\n\n## Conflicts (shared components)\n- **ST-101 ↔ ST-107** on `account-service` (deployment collision, risk score **100**)\n- **ST-101 ↔ ST-110** on `payment-service` (**80**)\n- **ST-107 ↔ ST-112** on `authentication-service` (**100**)",
-  "cited_nodes": [
-    "mobile-banking",
-    "customer-service",
-    "account-service",
-    "payment-service",
-    "loan-service",
-    "card-service",
-    "crm",
-    "authentication-service",
-    "notification-service",
-    "api-gateway",
-    "document-service",
-    "customer-db",
-    "transaction-db",
-    "audit-db",
-    "fraud-engine",
-    "risk-engine",
-    "reporting-service"
-  ],
-  "cited_factors": [
-    "customer data",
-    "pii data",
-    "service criticality",
-    "deployment groups",
-    "nearby card data",
-    "database schema change",
-    "card data",
-    "auth flow change",
-    "external API contract"
-  ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "answer": "- **Applications impacted:** 17  \n- **Dependencies impacted:** 19  \n\n*(Source: sprint summary – “6 stories impact 17 applications and 19 dependencies”)*【sprint-42】",
+  "cited_nodes": [],
+  "cited_factors": [],
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

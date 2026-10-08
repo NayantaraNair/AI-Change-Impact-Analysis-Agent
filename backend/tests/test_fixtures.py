@@ -8,7 +8,7 @@ import pytest
 from app import config, db
 from app.agents import chat
 from app.architecture import load_demo_portfolio, load_demo_sprint
-from app.contracts import ChatRequest, ChatResponse, DemoSprint, SprintAnalysis, StoryAnalysis
+from app.contracts import ChatRequest, ChatResponse, CodebaseAnalysis, DemoSprint, SprintAnalysis, StoryAnalysis
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA_FIXTURES = ROOT / "data" / "fixtures"
@@ -24,6 +24,8 @@ def fixture_schema(name):
         return DemoSprint
     if name in {"sprint.json", "portfolio-q4.json"}:
         return SprintAnalysis
+    if name == "codebase-demo.json":
+        return CodebaseAnalysis
     if name.startswith("story-"):
         return StoryAnalysis
     if name.startswith("chat-"):
@@ -56,6 +58,7 @@ async def test_builder_exports_final_analyses_and_all_starters(monkeypatch, tmp_
     portfolio = load_demo_portfolio()
     expected.update({f"{portfolio.sprint_id}.json", "demo-portfolio.json"})
     expected.update(f"story-{story.id}.json" for story in portfolio.stories)
+    expected.add("codebase-demo.json")
     contexts = [("story", story.id) for story in demo.stories] + [("sprint", demo.sprint_id)]
     expected.update(f"chat-{context_id}-{n}.json" for _, context_id in contexts for n in range(5))
     assert set(fixtures) == expected

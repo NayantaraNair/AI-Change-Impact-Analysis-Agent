@@ -1,5 +1,5 @@
 {
-  "answer": "Only one story is in context — **ST-101** (\"Increase daily payment limits for premium customers\") — so I can't compare across a set.\n\n**ST-101 risk profile (as supplied by the code):**\n- Overall risk score: **39**, highest dimension: **operational**\n- **Operational — 44 (medium)**: service criticality (40 pts, `payment-service`); downstream systems (8 pts, `customer-db`, `fraud-engine`, `notification-service`, `transaction-db`); deployment groups (6 pts)\n- **Compliance — 40 (medium)**: PII data (20 pts, `account-service`); financial data (20 pts, `account-service`, `payment-service`)\n- **Security — 33 (low)**: customer data (20 pts, `account-service`); blast radius size (10 pts)\n- **Performance — 30 (low)**: transaction path (20 pts, `payment-service`, `transaction-db`); payment business rule (15 pts)\n- **Delivery — 23 (low)**; **Technical — 17 (low)**\n\n**Related decision data:**\n- Release decision: **GO**; confidence 70; complexity medium; triggered rules: \"GO: no blocking or conditional release rules fired\"; conditions: none\n- Compliance: 3 of 4 frameworks apply (GDPR low/80, SOX low/90, Internal Governance low/85; PCI DSS not applicable), overall score **80**; 0 applicable frameworks at high risk\n\nIf you meant risky stories beyond ST-101, that information isn't in the analysis context.",
+  "answer": "The analysis context contains only one story, **ST-101 — \"Increase daily payment limits for premium customers\"**, so that's the only one I can assess.\n\n**Risk profile for ST-101:**\n- Overall risk score: **39** (as supplied); highest dimension: **operational**.\n\nDimension scores:\n- **Operational — 44 (medium)**: top factors are *service criticality* (40, `payment-service`), *downstream systems* (8, `customer-db`, `fraud-engine`, `notification-service`, `transaction-db`), *deployment groups* (6, `account-service`, `customer-db`, `fraud-engine`, `notification-service`, `payment-service`, `transaction-db`).\n- **Compliance — 40 (medium)**: *pii data* (20, `account-service`), *financial data* (20, `account-service`, `payment-service`), *baseline* (5).\n- **Security — 33 (low)**: *customer data* (20, `account-service`), *blast radius size* (10, all six impacted services), *baseline* (8).\n- **Performance — 30 (low)**: *transaction path* (20, `payment-service`, `transaction-db`), *payment business rule* (15, `payment-service`, `transaction-db`), *baseline* (5).\n- **Delivery — 23 (low)**: *low ambiguity* (10), *direct services* (10, `account-service`, `payment-service`), *owner coordination* (8).\n- **Technical — 17 (low)**: *direct services* (12, `account-service`, `payment-service`), *baseline* (5), *dependency depth* (5, the four downstream systems).\n\nRelease position (computed by code, reported as supplied): **decision GO**, confidence **70**, complexity **medium**, no triggered blocking/conditional rules and no conditions.\n\nIf you meant risky stories other than ST-101, that information isn't in this context.",
   "cited_nodes": [
     "account-service",
     "payment-service",
@@ -9,15 +9,20 @@
     "fraud-engine"
   ],
   "cited_factors": [
+    "baseline",
     "customer data",
     "blast radius size",
     "pii data",
     "financial data",
+    "direct services",
+    "dependency depth",
     "service criticality",
     "downstream systems",
     "deployment groups",
     "transaction path",
-    "payment business rule"
+    "payment business rule",
+    "low ambiguity",
+    "owner coordination"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

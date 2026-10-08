@@ -1,8 +1,7 @@
 {
-  "answer": "The analysis does **not** label overall risk as high by score alone: supplied overall risk is **57**, highest dimension is **compliance**. The release gate treats it as high because compliance reaches **61 (>=60)** and **GDPR risk is high**.\n\n- **Release trigger:** `GO_WITH_CONDITIONS`, confidence **58**. Triggered rules include:\n  - `highest risk is 61 (>= 60)`\n  - `GDPR risk is high`\n  - `PCI DSS risk is medium`, `SOX risk is medium`\n\n- **Highest risk dimension: compliance — 61 (medium)**\n  - `pii data` (+20) — `crm`, `customer-db`, `customer-service`, `notification-service`\n  - `nearby card data` (+12) — `card-service`\n  - `database schema change` (+10) — `audit-db`, `customer-db`\n\n- **GDPR framework: risk_level high, score 55**\n  - New optional PII fields (`preferred name`, `secondary email`) in `customer-service`, `customer-db`, synced to `crm`.\n  - Secondary email use by `notification-service` needs consent validity, completed verification, and stop-on-withdrawal checks.\n  - Access, correction, erasure procedures and consent evidence in `audit-db` need confirmation.\n\n- **Other contributing dimensions:**\n  - **technical — 58:** `database schema change` (20) on `audit-db`, `customer-db`; `direct services` (18) on `crm`, `customer-service`, `notification-service`; `new feature` (10).\n  - **operational — 53:** `service criticality` (32) on `customer-service`; `downstream systems` (10) on `account-service`,",
+  "answer": "- The context does **not** label overall risk as “high”: `risk.overall` is **57**, and the highest dimension is **compliance** at **61 (medium)**.\n- The “high” designation comes from the **GDPR** framework: `risk_level: high`, `score: 55`, and the release rule **“GDPR risk is high.”**\n- Compliance dimension top factors:\n  - **“pii data” +20** — `crm`, `customer-db`, `customer-service`, `notification-service`\n  - **“nearby card data” +12** — `card-service`\n  - **“database schema change” +10** — `audit-db`, `customer-db`\n- GDPR findings driving this:\n  - New **preferred name / secondary email** in `customer-service`, `customer-db`, `crm` raise data minimisation, purpose limitation, accuracy and retention concerns.\n  - `notification-service` use of secondary email raises consent validity, verified-destination and stop-on-withdrawal concerns.\n  - Access, correction and erasure must extend to both fields in `customer-db` / `customer-service`, with consent evidence in `audit-db`.\n- Other medium contributors, though not the “high” label:\n  - **technical 58 (medium)** — “database schema change” +20 (`audit-db`, `customer-db`), “direct services” +18 (`crm`, `customer-service`, `notification-service`)\n  - **operational 53 (medium)** — “service criticality” +32 (`customer-service`)\n  - **delivery 46 (medium)** — owner coordination, direct services, low ambiguity\n- Release decision is **GO_WITH_CONDITIONS** (confidence 58), triggered by:\n  - Highest risk is **61 (>= 60)**\n  - **GDPR risk is high**\n  - PCI DSS risk medium\n  - SOX risk medium",
   "cited_nodes": [
     "customer-service",
-    "account-service",
     "card-service",
     "crm",
     "notification-service",
@@ -14,9 +13,9 @@
     "nearby card data",
     "database schema change",
     "direct services",
-    "new feature",
     "service criticality",
-    "downstream systems"
+    "low ambiguity",
+    "owner coordination"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

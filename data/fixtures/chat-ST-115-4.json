@@ -1,12 +1,6 @@
 {
-  "answer": "The context doesn't support that premise — release confidence is not low.\n\n- **Confidence:** 94 (high), **decision:** GO.\n- **Triggered rules:** \"GO: no blocking or conditional release rules fired\"; no conditions listed.\n- **Risk:** overall 12; all dimensions rated low (delivery 14, operational 12, technical 11, security 7, compliance 0, performance 0).\n- **Delivery** is the highest dimension at 14, driven by factors \"low ambiguity\" (+10, `document-service`), \"baseline\" (+5), and \"direct services\" (+5, `document-service`) — but it is still classified low.\n\nIf you were asking why confidence isn't 100, the JSON doesn't state a reason; it only supplies the score and the rule outcome above.",
-  "cited_nodes": [
-    "document-service"
-  ],
-  "cited_factors": [
-    "baseline",
-    "direct services",
-    "low ambiguity"
-  ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "answer": "The release confidence is **not low**—it is **94 %** (see the “release.confidence” field), which indicates a high level of confidence in the release. Therefore, there is no basis for describing the confidence as low.",
+  "cited_nodes": [],
+  "cited_factors": [],
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

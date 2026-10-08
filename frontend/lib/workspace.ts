@@ -9,7 +9,7 @@ export const TAGLINE = "Every Change Before It Happens";
 
 export const workspaces: Record<Workspace, { label: string; view: string; home: string }> = {
   executive: { label: "Executive workspace", view: "Portfolio view", home: "/executive" },
-  engineering: { label: "Engineering workspace", view: "Technical analysis", home: "/story" },
+  engineering: { label: "Engineering workspace", view: "Technical analysis", home: "/engineering" },
 };
 
 const WORKSPACE_KEY = "impactiq-workspace";

@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { DebugPanel } from "@/components/debug/debug-panel";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider } from "./app-context";
-import { CopilotDrawer } from "./copilot-drawer";
 import { Header } from "./header";
 import { NavRail } from "./nav-rail";
 
@@ -22,7 +21,6 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Header />
           <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 p-6">{children}</main>
         </div>
-        <CopilotDrawer />
         <DebugPanel />
         </>}
       </TooltipProvider>

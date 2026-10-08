@@ -1,31 +1,34 @@
 {
-  "answer": "Only one story is in the analysis context — **ST-107** (\"Card freeze/unfreeze in mobile app with step-up authentication\") — and it is rated risky.\n\n**Release decision (as computed):** NO_GO — overall risk **85**, release confidence **39**.\n\n**Risk dimensions (as supplied):**\n- **security — 93 (high)** (highest): factors *card data* (25 pts; atm, card-service, fraud-engine), *auth flow change* (25 pts; api-gateway, authentication-service, card-service, mobile-banking), *external API contract* (15 pts; same four services).\n- **delivery — 87 (high)**: factors *owner coordination* (32 pts; 20 services incl. account-service, card-service, mobile-banking), *medium ambiguity* (30 pts; api-gateway, authentication-service, card-service, mobile-banking), *direct services* (20 pts).\n- **compliance — 75 (high)**: *card data* (30 pts; card-service), *pii data* (20 pts), *financial data* (20 pts; api-gateway, mobile-banking).\n- **operational — 71 (high)**: *service criticality* (40 pts; api-gateway, authentication-service), *downstream systems* (20 pts; 16 systems incl. account-service, atm, fraud-engine, web-banking).\n- **technical — 49 (medium)**: *direct services* (24 pts), *dependency depth* (10 pts; reporting-db), *new feature* (10 pts).\n- **performance — 40 (medium)**: *transaction path* (20 pts), *channel path* (15 pts).\n\n**Triggered rules (as supplied):** NO_GO because security risk 93 ≥ 85; delivery risk 87 ≥ 85; PCI DSS risk high with card data + auth flow; Internal Governance risk high with card data + auth flow. Also GO_WITH_CONDITIONS triggers for highest risk ≥ 60, GDPR medium, PCI DSS high, Internal Governance high.\n\n**Compliance (as supplied):** 4/4 frameworks apply, minimum score 40/100; PCI DSS (high, 40) and Internal Governance (high, 45) are the high-risk ones; GDPR medium (70); SOX low (85).\n\n**Story blockers noted in the requirement:** PCI DSS review, security sign-off and a rehearsed rollback are outstanding; the prototype permits cross-device proof replay and lacks fail-closed verification evidence.\n\nNo other stories exist in this context to compare against.",
+  "answer": "- **ST-107** is risky.  \n  - **Security risk = 93 (high)** – driven by:  \n    - *card data* (25 pts) → node IDs: **atm**, **card-service**, **fraud-engine**  \n    - *auth flow change* (25 pts) → node IDs: **api-gateway**, **authentication-service**, **card-service**, **mobile-banking**  \n    - *external API contract* (15 pts) → node IDs: **api-gateway**, **authentication-service**, **card-service**, **mobile-banking**  \n  - **Delivery risk = 87 (high)** – driven by:  \n    - *owner coordination* (32 pts) → node IDs: many services (e.g., **account-service**, **api-gateway**, **atm**, **authentication-service**, **branch-portal**, **card-service**, **crm**, **customer-db**, **customer-service**, **document-service**, **fraud-engine**, **loan-service**, **mobile-banking**, **notification-service**, **payment-service**, **reporting-db**, **reporting-service**, **risk-engine**, **transaction-db**, **web-banking**)  \n    - *medium ambiguity* (30 pts) → node IDs: **api-gateway**, **authentication-service**, **card-service**, **mobile-banking**  \n    - *direct services* (20 pts) → node IDs: **api-gateway**, **authentication-service**, **card-service**, **mobile-banking**  \n  - **Compliance risks** – PCI DSS and Internal Governance are both rated **high** (scores 40 and 45 respectively) because the change touches card data and authentication flow.  \n  - Overall release confidence = 39 → decision **NO_GO**.  \n\nThus, story **ST-107** is the risky story in the provided context.",
   "cited_nodes": [
     "mobile-banking",
     "web-banking",
     "atm",
+    "branch-portal",
+    "customer-service",
     "account-service",
+    "payment-service",
+    "loan-service",
     "card-service",
+    "crm",
     "authentication-service",
+    "notification-service",
     "api-gateway",
+    "document-service",
+    "customer-db",
+    "transaction-db",
     "reporting-db",
-    "fraud-engine"
+    "fraud-engine",
+    "risk-engine",
+    "reporting-service"
   ],
   "cited_factors": [
     "card data",
     "auth flow change",
     "external API contract",
-    "pii data",
-    "financial data",
     "direct services",
-    "dependency depth",
-    "new feature",
-    "service criticality",
-    "downstream systems",
-    "transaction path",
-    "channel path",
     "medium ambiguity",
     "owner coordination"
   ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

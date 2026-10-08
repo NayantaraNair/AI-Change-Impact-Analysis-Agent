@@ -19,7 +19,7 @@ from itertools import count
 from uuid import uuid4
 
 from app.contracts import (
-    AttemptOutcome, LlmAttempt, Run, RunKind, RunLogEntry, SprintAnalysis,
+    AttemptOutcome, CodebaseAnalysis, LlmAttempt, Run, RunKind, RunLogEntry, SprintAnalysis,
     StageProgress, StoryAnalysis,
 )
 
@@ -38,7 +38,13 @@ STAGE_LABELS = {
     "recheck": "Re-check releases with conflicts",
     "summary": "Write sprint summary",
     "answer": "Answer the question",
+    "fetch_repo": "Read the repository",
+    "map_services": "Map the story to services",
+    "map_files": "Find the files to change",
+    "map_classes": "Find classes, APIs and tables",
+    "plan_tests": "Plan the developer tests",
 }
+CODEBASE_STAGES = ("fetch_repo", "map_services", "map_files", "map_classes", "plan_tests")
 _MAX_RUNS = 30
 _MAX_LOG = 400
 
@@ -82,12 +88,13 @@ def story_plan(story_ids: list[str], sprint: bool = False) -> list[tuple[str | N
 
 
 def _finish(run: Run, story: StoryAnalysis | None = None, sprint: SprintAnalysis | None = None,
-            error: str | None = None) -> None:
+            error: str | None = None, codebase: CodebaseAnalysis | None = None) -> None:
     run.finished_at = _now()
     run.status = "failed" if error else "succeeded"
     run.error = error
     run.story_result = story
     run.sprint_result = sprint
+    run.codebase_result = codebase
     for stage in run.stages:
         if stage.status == "running":
             stage.status = "failed" if error else "done"
@@ -96,7 +103,7 @@ def _finish(run: Run, story: StoryAnalysis | None = None, sprint: SprintAnalysis
 
 
 def launch(kind: RunKind, title: str, story_ids: list[str], plan: list[tuple[str | None, str]],
-           work: Callable[[], Awaitable[StoryAnalysis | SprintAnalysis]]) -> Run:
+           work: Callable[[], Awaitable[StoryAnalysis | SprintAnalysis | CodebaseAnalysis]]) -> Run:
     """Start work in the background; the caller polls get(run.id) for progress."""
     run = _create(kind, title, story_ids, plan)
 
@@ -110,6 +117,8 @@ def launch(kind: RunKind, title: str, story_ids: list[str], plan: list[tuple[str
             return
         if isinstance(result, SprintAnalysis):
             _finish(run, sprint=result)
+        elif isinstance(result, CodebaseAnalysis):
+            _finish(run, codebase=result)
         else:
             _finish(run, story=result)
 
@@ -144,7 +153,7 @@ def get(run_id: str) -> Run | None:
 def recent() -> list[Run]:
     """Newest first, without the large result payloads."""
     return [
-        snapshot(run).model_copy(update={"story_result": None, "sprint_result": None})
+        snapshot(run).model_copy(update={"story_result": None, "sprint_result": None, "codebase_result": None})
         for run in reversed(_runs.values())
     ]
 

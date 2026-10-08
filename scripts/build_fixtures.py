@@ -23,7 +23,8 @@ from pydantic import BaseModel  # noqa: E402
 from app import config  # noqa: E402
 from app.agents import chat  # noqa: E402
 from app.architecture import load_demo_portfolio, load_demo_sprint  # noqa: E402
-from app.contracts import ChatRequest  # noqa: E402
+from app.codebase.pipeline import analyze_codebase  # noqa: E402
+from app.contracts import ChatRequest, CodebaseRequest  # noqa: E402
 from app.engine.sprint import analyze_sprint  # noqa: E402
 from app.pipeline import analyze_story  # noqa: E402
 
@@ -68,6 +69,11 @@ async def build_fixtures(
         # sprint run are reused; only the release decision is recomputed.
         fixtures[f"story-{story.id}.json"] = await analyze_story(story)
 
+    if config.DEMO_CODEBASE_PATH.exists():
+        # The engineering demo: a story mapped onto examples/demo-bank.
+        request = CodebaseRequest.model_validate_json(config.DEMO_CODEBASE_PATH.read_text(encoding="utf-8"))
+        fixtures["codebase-demo.json"] = await analyze_codebase(request)
+
     contexts = [("story", story.story.id) for story in sprint.stories]
     contexts.append(("sprint", sprint.sprint_id))
     chat_providers: Counter[str] = Counter()
@@ -107,6 +113,10 @@ async def build_fixtures(
         f"{analysis.story.id}={analysis.release.decision}" for analysis in sprint.stories
     ))
     print(f"Conflicts: {len(sprint.conflicts)}")
+    if "codebase-demo.json" in fixtures:
+        codebase = fixtures["codebase-demo.json"]
+        print("Codebase: " + ", ".join(f"{k}={v}" for k, v in codebase.providers_used.items())
+              + f"; {len(codebase.services)} services, {len(codebase.files)} files, {len(codebase.tests)} tests")
     if portfolio_analysis is not None:
         print("Portfolio: " + ", ".join(
             f"{analysis.story.id}={analysis.release.decision}" for analysis in portfolio_analysis.stories

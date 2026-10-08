@@ -1,24 +1,10 @@
 {
-  "answer": "Impacted scope for ST-112 (“Biometric login for mobile banking”):\n\n- **Directly changed services:** `mobile-banking`, `authentication-service`.\n- **Affected services:** `account-service`, `api-gateway`, `authentication-service`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `loan-service`, `mobile-banking`, `payment-service`.\n- **Databases:** `customer-db`.\n- **APIs:** `GET /accounts/{id}/limits`, `GET /internal/customer-store/profiles/{id}`, `PATCH /cards/{id}/status`, `PATCH /customers/{id}/profile`, `PATCH /mobile/cards/{id}/status`, `POST /auth/biometric/challenges`, `POST /auth/introspect`, `POST /auth/step-up`, `POST /auth/token`, `POST /loans/applications`, `POST /mobile/login`, `POST /mobile/payments`, `POST /payments`, `PUT /internal/customer-store/profiles/{id}`.\n- **Downstream:** `account-service`, `api-gateway`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `loan-service`, `payment-service`.\n- **Deployment groups:** `channels-mobile`, `core-banking`, `core-payments`, `customer-platform`, `documents`, `identity`.\n\nAffected capabilities from the requirement:\n- Biometric (device-bound) authentication\n- Mobile login and session establishment\n- Device registration opt-in and revocation\n- Credential login fallback for unsupported or failed biometrics\n- Challenge replay/expiry protection\n\nRisk context:\n- **Highest risk dimension:** security, score `73`, level `high`; top factors: `auth flow change` (`authentication-service`, `mobile-banking`), `customer data` (`api-gateway`, `authentication-service`, `customer-db`, `mobile-banking`), `critical identity path` (`api-gateway`, `authentication-service`).\n- **Operational:** score `69`, medium; top factor `service criticality` (`authentication-service`).\n- **Compliance:** GDPR medium `65`; Internal Governance medium `70`; SOX low `85`; PCI DSS not applicable.\n- **Overall risk:** `64`; release decision: `GO_WITH_CONDITIONS`, confidence `57`.",
+  "answer": "- **Directly changed services:** mobile‑banking, authentication‑service [impact.directly_changed]  \n- **Other impacted services:** account‑service, api‑gateway, card‑service, crm, customer‑db, customer‑service, document‑service, loan‑service, payment‑service [impact.services]  \n- **Databases:** customer‑db [impact.databases]  \n- **APIs impacted:**  \n  - GET /accounts/{id}/limits  \n  - GET /internal/customer-store/profiles/{id}  \n  - PATCH /cards/{id}/status  \n  - PATCH /customers/{id}/profile  \n  - PATCH /mobile/cards/{id}/status  \n  - POST /auth/biometric/challenges  \n  - POST /auth/introspect  \n  - POST /auth/step-up  \n  - POST /auth/token  \n  - POST /loans/applications  \n  - POST /mobile/login  \n  - POST /mobile/payments  \n  - POST /payments  \n  - PUT /internal/customer-store/profiles/{id} [impact.apis]  \n- **Downstream services:** account‑service, api‑gateway, card‑service, crm, customer‑db, customer‑service, document‑service, loan‑service, payment‑service [impact.downstream]  \n- **Deployment groups:** channels‑mobile, core‑banking, core‑payments, customer‑platform, documents, identity [impact.deployment_groups]",
   "cited_nodes": [
-    "mobile-banking",
-    "customer-service",
-    "account-service",
-    "payment-service",
-    "loan-service",
-    "card-service",
-    "crm",
-    "authentication-service",
-    "api-gateway",
-    "document-service",
-    "customer-db"
+    "crm"
   ],
   "cited_factors": [
-    "customer data",
-    "auth flow change",
-    "critical identity path",
-    "service criticality",
     "deployment groups"
   ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

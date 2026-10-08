@@ -111,7 +111,18 @@ def samples() -> list[BaseModel]:
         max_concurrent_calls=4, max_tokens={"requirement": 4000}, cache_enabled=True,
         fixtures_available=["sprint"],
     )
+    code_file = c.CodeFile(path="services/auth/app.py", service="auth", language="python",
+                           classes=["SessionManager"], functions=["login"], apis=["POST /auth/login"], tables=["users"])
+    code_service = c.CodeService(name="auth", path="services/auth", languages=["python"], files=1, classes=1, apis=1, tables=["users"])
+    repo = c.RepoIndex(repo_url="https://github.com/a/b", ref="HEAD", root="", tree=[code_file.path], files=[code_file], services=[code_service])
+    impacted = c.ImpactedFile(path=code_file.path, service="auth", reason="login", classes=["SessionManager"], apis=["POST /auth/login"], tables=["users"])
+    service_impact = c.ServiceImpact(service="auth", reason="login", files=[code_file.path], classes=["SessionManager"], apis=["POST /auth/login"], tables=["users"])
+    dev_test = c.DevTest(id="DT-1", title="Login issues a session", category="api", target="POST /auth/login", steps=["Call it"], expected="200")
+    codebase_request = c.CodebaseRequest(repo_url="https://github.com/a/b", story=story)
+    codebase = c.CodebaseAnalysis(story=story, repo=repo, summary="Changes auth", services=[service_impact], files=[impacted],
+                                  tests=[dev_test], providers_used={"map_services": "mock"}, duration_ms=5, created_at=at)
     return [
+        code_file, code_service, repo, impacted, service_impact, dev_test, codebase_request, codebase,
         api, component, architecture, catalog, story, demo, facts, node, edge, graph,
         factor, dimension, risk, case, plan, finding, framework, compliance, release,
         analysis, conflict, kpis, sprint, request, chat_request, chat_response,

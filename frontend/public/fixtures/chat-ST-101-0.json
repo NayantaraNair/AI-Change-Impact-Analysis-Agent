@@ -1,18 +1,9 @@
 {
-  "answer": "**Directly changed services**\n- payment-service\n- account-service\n\n**Databases**\n- customer-db\n- transaction-db\n\n**Downstream systems**\n- customer-db\n- fraud-engine\n- notification-service\n- transaction-db\n\n**All affected services**\n- account-service, customer-db, fraud-engine, notification-service, payment-service, transaction-db\n\n**Affected capabilities**\n- Domestic payment processing, Premium eligibility check, Daily limit enforcement, Fraud screening, Feature flag toggling\n\n**Affected APIs**\n- GET /accounts/{id}/balance\n- GET /accounts/{id}/limits\n- GET /internal/customer-store/profiles/{id}\n- GET /internal/ledger/accounts/{id}/daily-total\n- GET /internal/ledger/entries/{id}\n- GET /notifications/preferences/{customerId}\n- GET /notifications/{id}\n- GET /payments/limits\n- GET /payments/{id}\n- POST /fraud/screenings\n- POST /fraud/velocity-checks\n- POST /internal/ledger/entries\n- POST /notifications\n- POST /payments\n- POST /payments/{id}/cancellation\n- PUT /accounts/{id}/limits\n- PUT /fraud/rules/{id}\n- PUT /internal/customer-store/profiles/{id}\n\n**Deployment groups**\n- core-banking, core-payments, customer-platform\n\n**Data touchpoints**\n- Customer data: yes; Card data: no; Financial data: yes",
-  "cited_nodes": [
-    "account-service",
-    "payment-service",
-    "notification-service",
-    "customer-db",
-    "transaction-db",
-    "fraud-engine"
-  ],
+  "answer": "- **Directly changed services:** payment‑service, account‑service  \n- **All impacted services:** account‑service, customer‑db, fraud‑engine, notification‑service, payment‑service, transaction‑db  \n- **Impacted databases:** customer‑db, transaction‑db  \n- **Downstream systems:** customer‑db, fraud‑engine, notification‑service, transaction‑db  \n- **Deployment groups affected:** core‑banking, core‑payments, customer‑platform  \n- **Impacted APIs (selected):** GET /accounts/{id}/balance, GET /accounts/{id}/limits, GET /internal/customer-store/profiles/{id}, GET /internal/ledger/accounts/{id}/daily-total, POST /payments, POST /fraud/screenings, PUT /accounts/{id}/limits, etc. (full list in the analysis).",
+  "cited_nodes": [],
   "cited_factors": [
-    "customer data",
-    "financial data",
     "downstream systems",
     "deployment groups"
   ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

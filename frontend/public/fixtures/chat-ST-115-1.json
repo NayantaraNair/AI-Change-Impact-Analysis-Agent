@@ -1,18 +1,10 @@
 {
-  "answer": "Risk is **not** high — the analysis reports **overall risk 12**, and every dimension is rated **low** (highest is delivery at 14). So there's no high-risk finding to explain.\n\nReported scores by dimension:\n- **delivery** — 14 (low): top factors \"low ambiguity\" +10 (`document-service`), \"baseline\" +5, \"direct services\" +5 (`document-service`)\n- **operational** — 12 (low): \"service criticality\" +16 (`document-service`), \"baseline\" +5, \"deployment groups\" +4 (`document-service`, `reporting-service`)\n- **technical** — 11 (low): \"direct services\" +6 (`document-service`), \"baseline\" +5, \"dependency depth\" +5 (`reporting-service`)\n- **security** — 7 (low): \"baseline\" +8, \"blast radius size\" +4 (`document-service`, `reporting-service`), \"small, contained change\" −5 (`document-service`)\n- **compliance** — 0 (low): \"baseline\" +5, \"small, contained change\" −5 (`document-service`)\n- **performance** — 0 (low): \"baseline\" +5, \"small, contained change\" −10 (`document-service`)\n\nWhat may look concerning but is scored low:\n- **\"service criticality\" +16 on `document-service`** is the single largest factor, but it sits inside the operational dimension, which is still only 12 (low).\n- **Blast radius spans two services** (`document-service`, `reporting-service`), yet offset by \"small, contained change\" penalties.\n\nRelease posture: decision **GO**, confidence **94**, complexity **medium**, no conditions, and rule \"GO: no blocking or conditional release rules fired.\"\n\nIf you were asking why a *particular* dimension is at its value, tell me which one and I'll break out its factors — the context contains no \"high\" risk rating for this story.",
-  "cited_nodes": [
-    "document-service",
-    "reporting-service"
-  ],
+  "answer": "The risk is **not high**; it is assessed as low.  \n\n- Overall risk score: **12** (level = low)【context.risk.overall】.  \n- The highest‑scoring dimension is **delivery** with a score of **14** (still low)【context.risk.delivery.score】.  \n\nThe delivery dimension’s score comes from:  \n- low ambiguity (+10)【context.risk.delivery.top_factors[0].label】,  \n- baseline (+5)【context.risk.delivery.top_factors[1].label】,  \n- direct services (+5)【context.risk.delivery.top_factors[2].label】.  \n\nAll other risk dimensions (security, compliance, technical, operational, performance) also have low scores (≤ 12)【context.risk.dimensions】. Hence, the change poses low risk overall.",
+  "cited_nodes": [],
   "cited_factors": [
     "baseline",
-    "blast radius size",
-    "small, contained change",
     "direct services",
-    "dependency depth",
-    "service criticality",
-    "deployment groups",
     "low ambiguity"
   ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

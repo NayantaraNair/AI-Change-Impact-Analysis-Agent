@@ -7,9 +7,6 @@ import type { Run, StoryAnalysis, SprintAnalysis } from "@/lib/types";
 export type AnalysisContext = { type: "story" | "sprint"; id: string };
 
 interface AppContextValue {
-  copilotOpen: boolean;
-  setCopilotOpen: Dispatch<SetStateAction<boolean>>;
-  toggleCopilot: () => void;
   debugOpen: boolean;
   setDebugOpen: Dispatch<SetStateAction<boolean>>;
   /** The run behind the current page: live while it runs, kept afterwards for the debug pane. */
@@ -29,7 +26,6 @@ const AppContext = createContext<AppContextValue | null>(null);
 const getServerSampleData = () => process.env.NEXT_PUBLIC_MOCK === "1";
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [copilotOpen, setCopilotOpen] = useState(false);
   const [debugOpen, setDebugOpen] = useState(false);
   const [run, setRun] = useState<Run | null>(null);
   const [highlight, setHighlight] = useState<string[]>([]);
@@ -39,7 +35,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   return (
     <AppContext.Provider value={{
-      copilotOpen, setCopilotOpen, toggleCopilot: () => setCopilotOpen((open) => !open),
       debugOpen, setDebugOpen, run, setRun,
       highlight, setHighlight, currentContext, setCurrentContext,
       currentAnalysis, setCurrentAnalysis, usingSampleData, setUsingSampleData,

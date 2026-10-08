@@ -1,5 +1,5 @@
 {
-  "answer": "No dimension in the supplied analysis is rated **high** — the premise doesn't hold.\n\n- Overall risk score **39** (as supplied by code); the **highest** dimension is **operational**, score **44**, level **medium**.\n- Operational top factors: `service criticality` (40 pts, payment-service), `downstream systems` (8 pts, customer-db/fraud-engine/notification-service/transaction-db), `deployment groups` (6 pts).\n- Other dimensions: compliance **40 (medium)** — factors `pii data` (20, account-service) and `financial data` (20, account-service, payment-service); security **33 (low)**; performance **30 (low)**; delivery **23 (low)**; technical **17 (low)**.\n- Release decision is **GO** (confidence 70, complexity medium) with `GO: no blocking or conditional release rules fired` and no conditions.\n- Compliance: 3 of 4 frameworks apply, minimum compliance score **80/100**, and **0 applicable frameworks have high risk** (GDPR low/80, SOX low/90, Internal Governance low/85; PCI DSS not applicable).\n\nIf you meant a specific dimension or the compliance frameworks, tell me which and I'll cite its factors; otherwise the context contains no \"high\" risk rating to explain.",
+  "answer": "No dimension is rated **high** in this analysis — the premise doesn't match the context.\n\n- **Overall risk:** 39 (highest dimension: operational)\n- **Security:** 33 — low\n- **Compliance:** 40 — medium\n- **Technical:** 17 — low\n- **Operational:** 44 — medium (highest)\n- **Performance:** 30 — low\n- **Delivery:** 23 — low\n\nTop contributing factors by dimension:\n- Operational: \"service criticality\" (40 pts, `payment-service`), \"downstream systems\" (8 pts, `customer-db`,`fraud-engine`,`notification-service`,`transaction-db`), \"deployment groups\" (6 pts)\n- Compliance: \"pii data\" (20 pts, `account-service`), \"financial data\" (20 pts, `account-service`,`payment-service`), \"baseline\" (5 pts)\n- Security: \"customer data\" (20 pts, `account-service`), \"blast radius size\" (10 pts), \"baseline\" (8 pts)\n- Performance: \"transaction path\" (20 pts, `payment-service`,`transaction-db`), \"payment business rule\" (15 pts), \"baseline\" (5 pts)\n- Technical: \"direct services\" (12 pts, `account-service`,`payment-service`), \"baseline\" (5 pts), \"dependency depth\" (5 pts)\n- Delivery: \"low ambiguity\" (10 pts), \"direct services\" (10 pts), \"owner coordination\" (8 pts)\n\nRelated: release decision is **GO** with confidence 70, no blocking or conditional rules fired, and compliance overall is 80/100 with 0 applicable frameworks at high risk (PCI DSS is not applicable).",
   "cited_nodes": [
     "account-service",
     "payment-service",
@@ -9,11 +9,20 @@
     "fraud-engine"
   ],
   "cited_factors": [
+    "baseline",
+    "customer data",
+    "blast radius size",
     "pii data",
     "financial data",
+    "direct services",
+    "dependency depth",
     "service criticality",
     "downstream systems",
-    "deployment groups"
+    "deployment groups",
+    "transaction path",
+    "payment business rule",
+    "low ambiguity",
+    "owner coordination"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

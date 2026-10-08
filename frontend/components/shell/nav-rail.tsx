@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, Bot, Bug, FileSearch, GitMerge } from "lucide-react";
+import { BarChart3, Bug, FileSearch, FolderGit2, GitMerge } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { useAppContext } from "./app-context";
 const destinations = {
   executive: [{ href: "/executive", label: "Portfolio view", icon: BarChart3 }],
   engineering: [
+    { href: "/engineering", label: "Codebase impact", icon: FolderGit2 },
     { href: "/story", label: "Story or epic", icon: FileSearch },
     { href: "/sprint", label: "Sprint backlog", icon: GitMerge },
   ],
@@ -20,7 +21,7 @@ const destinations = {
 export function NavRail() {
   const pathname = usePathname();
   const { workspace } = useWorkspace();
-  const { copilotOpen, toggleCopilot, debugOpen, setDebugOpen, run } = useAppContext();
+  const { debugOpen, setDebugOpen, run } = useAppContext();
   return (
     <nav aria-label="Main navigation" className="fixed inset-y-0 left-0 z-30 flex w-14 flex-col items-center gap-2 border-r border-line bg-surface py-3">
       {destinations[workspace ?? (pathname.startsWith("/executive") ? "executive" : "engineering")].map(({ href, label, icon: Icon }) => {
@@ -41,12 +42,6 @@ export function NavRail() {
             {run?.status === "running" && <span aria-hidden="true" className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-model" />}
           </TooltipTrigger>
           <TooltipContent side="right">Details: steps, AI calls, setup</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger render={<Button id="copilot-toggle" variant="ghost" size="icon-lg" aria-label={copilotOpen ? "Close copilot" : "Open copilot"} aria-expanded={copilotOpen} aria-controls={copilotOpen ? "copilot-drawer" : undefined} onClick={toggleCopilot} className={cn("text-muted hover:text-chalk", copilotOpen && "bg-surface-raised text-chalk")} />}>
-            <Bot size={20} aria-hidden="true" />
-          </TooltipTrigger>
-          <TooltipContent side="right">Copilot</TooltipContent>
         </Tooltip>
       </div>
     </nav>

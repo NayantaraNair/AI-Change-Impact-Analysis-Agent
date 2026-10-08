@@ -1,0 +1,15 @@
+{
+  "repo_url": "https://github.com/NayantaraNair/AI-Change-Impact-Analysis-Agent/tree/main/examples/demo-bank",
+  "story": {
+    "id": "EX-201",
+    "title": "OTP multi-factor login for web and mobile banking",
+    "description": "Add a one-time passcode (OTP) step to customer login. After the password is accepted, the auth service sends a six-digit code by SMS through the notification service and only issues a session once the code is verified. Customers must have a verified mobile number and an MFA enrolment flag on their profile. Lock the login after five failed codes and record every attempt.",
+    "type": "epic",
+    "acceptance_criteria": [
+      "Enrolled customers must enter a valid six-digit OTP after their password before a session is issued.",
+      "Codes expire after five minutes; five failed codes lock the login for 30 minutes.",
+      "The OTP SMS is sent through the notification service within 30 seconds.",
+      "Every OTP send, success and failure is recorded."
+    ]
+  }
+}

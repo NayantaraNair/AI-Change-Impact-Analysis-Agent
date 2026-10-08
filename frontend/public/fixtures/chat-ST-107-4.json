@@ -1,24 +1,16 @@
 {
-  "answer": "**Release confidence = 39** (decision: `NO_GO`, ST-107). It is low because the highest risk dimension is 93 (security), well above the 85 NO_GO threshold, and delivery risk is 87, also above threshold.\n\n**Triggered NO_GO rules**\n- Security risk is 93 (>= 85)\n- Delivery risk is 87 (>= 85)\n- PCI DSS risk is high and the change touches card data and authentication\n- Internal Governance risk is high and the change touches card data and authentication\n\n**Risk dimensions**\n- security: 93 (high) — top factors: `card data` (25) on atm, card-service, fraud-engine; `auth flow change` (25) on api-gateway, authentication-service, card-service, mobile-banking; `external API contract` (15) on the same four services\n- delivery: 87 (high) — `owner coordination` (32) across all 20 services, `medium ambiguity` (30) on api-gateway, authentication-service, card-service, mobile-banking; `direct services` (20)\n- compliance: 75 (high) — `card data` (30) on card-service, `pii data` (20), `financial data` (20)\n- operational: 71 (high) — `service criticality` (40) on api-gateway, authentication-service; `downstream systems` (20)\n- technical: 49 (medium); performance: 40 (medium)\n\n**Compliance contribution**\n- 2 applicable frameworks have high risk: PCI DSS (high) and Internal Governance (high); GDPR is medium. Minimum compliance score is 40/100.\n\n**Outstanding blockers in the story itself**\n- PCI DSS review, security sign-off and a rehearsed rollback are unresolved release blockers; the prototype permits cross-device proof replay and lacks fail-closed verification evidence.\n\nNote: confidence is 39, distinct from the overall risk score of 85 — both are supplied by the analysis and are not recalculated here.",
+  "answer": "- **Security risk is high (score 93 ≥ 85)** – driven by:  \n  - *card data* (25 pts) affecting **atm, card‑service, fraud‑engine**  \n  - *auth flow change* (25 pts) affecting **api‑gateway, authentication‑service, card‑service, mobile‑banking**  \n  - *external API contract* (15 pts) affecting **api‑gateway, authentication‑service, card‑service, mobile‑banking**  \n\n- **Delivery risk is high (score 87 ≥ 85)** – driven by:  \n  - *owner coordination* (32 pts) across many services (account‑service, api‑gateway, atm, authentication‑service, branch‑portal, card‑service, crm, customer‑db, customer‑service, document‑service, fraud‑engine, loan‑service, mobile‑banking, notification‑service, payment‑service, reporting‑db, reporting‑service, risk‑engine, transaction‑db, web‑banking)  \n  - *medium ambiguity* (30 pts) on **api‑gateway, authentication‑service, card‑service, mobile‑banking**  \n  - *direct services* (20 pts) on **api‑gateway, authentication‑service, card‑service, mobile‑banking**  \n\n- **PCI DSS risk is high** and the change touches card data and authentication (affects **card‑service, api‑gateway, mobile‑banking, authentication‑service**).  \n\n- **Internal Governance risk is high** and the change touches card data and authentication (same set of components).  \n\nThese combined high‑risk dimensions drive the low release confidence (39) and the NO_GO decision.",
   "cited_nodes": [
-    "mobile-banking",
     "atm",
-    "card-service",
-    "authentication-service",
-    "api-gateway",
-    "fraud-engine"
+    "crm"
   ],
   "cited_factors": [
     "card data",
     "auth flow change",
     "external API contract",
-    "pii data",
-    "financial data",
     "direct services",
-    "service criticality",
-    "downstream systems",
     "medium ambiguity",
     "owner coordination"
   ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }
