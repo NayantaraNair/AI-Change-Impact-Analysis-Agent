@@ -2,7 +2,7 @@
 .venv/
 node_modules/
 .next/
-data/cache/
+Project/data/cache/
 .orchestrator/
 *.db
 __pycache__/
