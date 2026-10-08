@@ -39,7 +39,7 @@ ImpactIQ does that analysis in minutes and shows its working, so a release manag
 
 ## The two workspaces
 
-The app opens with a choice of workspace. No account is needed.
+The app opens with a choice of workspace.
 
 ![Choose a workspace](docs/screenshots/01-workspaces.png)
 
@@ -69,7 +69,7 @@ Five headline numbers for the whole backlog, then one row per change, all in bus
 
 The **heatmap** shows every change against the systems it hits, coloured by how hard (outlined cells are systems the story changes directly).
 
-The **conflict engine** compares every pair of stories and flags the ones that change the same systems. Here, *OTP login* and *self-service password reset* both change the authentication service, the customer database, notifications and both banking apps: a **99% conflict**, so the advice is to plan, build and test them as one change. A milder 40% clash between two payment stories gets "ship ST-110 first, then ST-101".
+The **conflict engine** flags pairs of stories that change the same systems and recommends how to plan them.
 
 ![Impact heatmap and conflict engine](docs/screenshots/03-heatmap-and-conflicts.png)
 
@@ -79,11 +79,9 @@ Click any change to see its **dependency graph**: the changed components on the 
 
 ![Dependency graph and AI reasoning timeline for a payment-limit change](docs/screenshots/04-dependency-graph-and-ai-timeline.png)
 
-Notice the scope: raising a payment limit is classified as a **small change**, so the graph stays one step deep (6 components) instead of lighting up the whole bank.
-
 ### 4. One major feature on its own
 
-Switch to **New major feature** to analyse a single epic in the same layout. OTP login on its own reaches 21 systems, scores high risk (80) and is **No go at 30%**, because its security risk is above the release threshold.
+Switch to **New major feature** to analyse a single epic in the same layout.
 
 ![A single major feature: OTP multi-factor login](docs/screenshots/05-new-feature-summary.png)
 
@@ -99,19 +97,11 @@ On the left, the **codebase explorer** shows the repository tree with the files 
 
 ![Codebase impact: AI flow, codebase explorer and architecture impact](docs/screenshots/06-codebase-impact.png)
 
-In this example (OTP login on the [demo bank](examples/demo-bank) in this repo), ImpactIQ finds 3 services, 7 files, 9 classes, 4 APIs and 5 database tables to change, out of 39 files.
-
 ### 2. A developer test plan
 
 Five to seven concrete tests, each with a category (functional, API, unit, integration, security, regression), the exact class or endpoint it targets, and steps with an expected result.
 
 ![Developer test plan](docs/screenshots/07-developer-tests.png)
-
-### 3. Your own story
-
-Any story works, not only the example. Here a new story, *let customers freeze a card from the mobile app*, maps to the card, payment and auth services, down to `CardController` and `POST /cards/{cardId}/freeze`.
-
-![A custom story analysed against the demo bank](docs/screenshots/08-custom-story.png)
 
 The repository is only read, never run. Classes, routes and tables are found by code (Python, Java, Kotlin, TypeScript/JavaScript, Go, C#, SQL and more). The AI can only choose from services, files and classes that really exist; anything it invents is dropped.
 
@@ -123,8 +113,6 @@ Every analysis runs as a tracked job. While it runs, the page shows each step as
 
 ![Details pane: every model call, with rate limits and fallbacks](docs/screenshots/09-details-pane.png)
 
-In this run the free AI providers were rate limited, so ImpactIQ moved down its provider chain and finished with its built-in rules, and says so. The app never stalls or invents a result when a model is unavailable.
-
 Both workspaces also have a light theme:
 
 ![Light mode](docs/screenshots/10-light-mode.png)
@@ -134,42 +122,43 @@ Both workspaces also have a light theme:
 ## How it works
 
 ```mermaid
+%%{init: {"theme": "base", "themeVariables": {"lineColor": "#8b8fa3", "clusterBkg": "#16161d", "clusterBorder": "#34343f", "titleColor": "#e7e7ee"}}}%%
 flowchart LR
-    classDef input fill:#1f2937,stroke:#9ca3af,color:#f9fafb
-    classDef ai fill:#4c1d95,stroke:#a78bfa,color:#f5f3ff
-    classDef rule fill:#064e3b,stroke:#34d399,color:#ecfdf5
-    classDef out fill:#7c2d12,stroke:#fb923c,color:#fff7ed
-    classDef store fill:#111827,stroke:#6b7280,color:#e5e7eb,stroke-dasharray:4 3
+    classDef input fill:#24242e,stroke:#a1a1b5,stroke-width:1.5px,color:#f4f4f8
+    classDef ai fill:#2b2350,stroke:#a78bfa,stroke-width:2px,color:#ede9fe
+    classDef rule fill:#10302d,stroke:#2dd4bf,stroke-width:2px,color:#ccfbf1
+    classDef out fill:#33240f,stroke:#f5b544,stroke-width:2px,color:#fdf0d5
+    classDef store fill:#1b1b23,stroke:#8b8fa3,stroke-width:1.5px,color:#e4e4ec,stroke-dasharray:5 4
 
-    subgraph IN["Input"]
+    subgraph IN["📥  Input"]
         direction TB
-        S["User story<br/>or sprint backlog"]:::input
-        G["GitHub repo URL<br/>+ user story"]:::input
+        S(["User story<br/>or sprint backlog"]):::input
+        G(["GitHub repo URL<br/>+ user story"]):::input
     end
 
-    subgraph EX["Executive analysis"]
+    subgraph EX["📊  Executive analysis"]
         direction TB
-        R["Read the story<br/>(services, change type,<br/>data touched)"]:::ai
-        Z["Size the change<br/>small / medium / large"]:::rule
-        D["Walk the<br/>dependency graph"]:::rule
-        K["Score 6 risk areas<br/>0 to 100"]:::rule
-        C["Compliance check<br/>GDPR, PCI DSS, SOX"]:::ai
-        L["Release decision<br/>Go / Conditions / No go"]:::rule
-        X["Sprint conflicts<br/>and KPIs"]:::rule
+        R("Read the story<br/>services, change type,<br/>data touched"):::ai
+        Z("Size the change<br/>small · medium · large"):::rule
+        D("Walk the<br/>dependency graph"):::rule
+        K("Score 6 risk areas<br/>0 to 100"):::rule
+        C("Compliance check<br/>GDPR · PCI DSS · SOX"):::ai
+        L("Release decision<br/>Go · Conditions · No go"):::rule
+        X("Sprint conflicts<br/>and KPIs"):::rule
         R --> Z --> D --> K
         K --> C --> L --> X
     end
 
-    subgraph EN["Engineering analysis"]
+    subgraph EN["🛠️  Engineering analysis"]
         direction TB
-        F["Download and index<br/>the repository"]:::rule
-        M["Map story to<br/>services and files"]:::ai
-        Q["Classes, APIs,<br/>database tables"]:::rule
-        T["Plan 5 to 7<br/>developer tests"]:::ai
+        F("Download and index<br/>the repository"):::rule
+        M("Map story to<br/>services and files"):::ai
+        Q("Classes, APIs,<br/>database tables"):::rule
+        T("Plan 5 to 7<br/>developer tests"):::ai
         F --> M --> Q --> T
     end
 
-    subgraph DATA["Knowledge"]
+    subgraph DATA["📚  Knowledge"]
         direction TB
         A[("Bank architecture<br/>21 systems")]:::store
         W[("Scoring rules<br/>and weights")]:::store
@@ -179,19 +168,20 @@ flowchart LR
     G --> F
     A -.-> D
     W -.-> K
-    X --> P["Executive portfolio"]:::out
-    T --> E["Engineering view"]:::out
+    X --> P[["Executive portfolio"]]:::out
+    T --> E[["Engineering view"]]:::out
 ```
 
-<sub>Purple steps use an AI model. Green steps are plain code (rules). Every AI step has a rule-based fallback.</sub>
+<sub>🟣 Violet steps use an AI model. 🟢 Teal steps are plain code (rules). 🟠 Amber boxes are what you see in the app. Every AI step has a rule-based fallback.</sub>
 
 **AI provider chain.** Each AI step tries the providers in order and moves on if one times out, is rate limited, cuts off its answer or returns invalid data:
 
 ```mermaid
+%%{init: {"theme": "base", "themeVariables": {"lineColor": "#8b8fa3"}}}%%
 flowchart LR
-    classDef ai fill:#4c1d95,stroke:#a78bfa,color:#f5f3ff
-    classDef rule fill:#064e3b,stroke:#34d399,color:#ecfdf5
-    A["Token Harbor<br/>DeepSeek v4.1 Flash"]:::ai --> B["OpenRouter<br/>Nemotron 3 Super"]:::ai --> C["OpenRouter<br/>Inkling"]:::ai --> D["OpenRouter<br/>auto-select free"]:::ai --> E["Built-in rules<br/>no AI needed"]:::rule
+    classDef ai fill:#2b2350,stroke:#a78bfa,stroke-width:2px,color:#ede9fe
+    classDef rule fill:#10302d,stroke:#2dd4bf,stroke-width:2px,color:#ccfbf1
+    A("Token Harbor<br/>DeepSeek v4.1 Flash"):::ai --> B("OpenRouter<br/>Nemotron 3 Super"):::ai --> C("OpenRouter<br/>Inkling"):::ai --> D("OpenRouter<br/>auto-select free"):::ai --> E(["Built-in rules<br/>no AI needed"]):::rule
 ```
 
 ---
