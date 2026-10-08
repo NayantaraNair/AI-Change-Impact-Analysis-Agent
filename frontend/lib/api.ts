@@ -51,8 +51,16 @@ async function sample<T>(load: () => Promise<T>): Promise<T> {
   return data;
 }
 
+export const UNREACHABLE = "Can't reach the analysis server, so this couldn't be analysed. Check that the app is running, then try again.";
+
 async function fixture<T>(filename: string): Promise<T> {
-  const response = await fetch(`/fixtures/${filename}`, { cache: "no-store" });
+  let response: Response;
+  try {
+    response = await fetch(`/fixtures/${filename}`, { cache: "no-store" });
+  } catch {
+    // The whole app is down, not just the analysis server.
+    throw new ApiError(503, UNREACHABLE);
+  }
   if (!response.ok) throw new ApiError(response.status, `Sample data could not be loaded (${filename}). Start the backend or restore the fixtures and try again.`);
   return response.json() as Promise<T>;
 }
@@ -62,11 +70,8 @@ async function storyFixture(id: string): Promise<StoryAnalysis> {
     return await fixture<StoryAnalysis>(`story-${encodeURIComponent(id)}.json`);
   } catch (error) {
     if (!(error instanceof ApiError) || error.status !== 404) throw error;
-    // demo-sprint is the fixture index, so T15 can replace the sample stories.
-    const demo = await fixture<DemoSprint>("demo-sprint.json");
-    const firstId = demo.stories[0]?.id;
-    if (!firstId || firstId === id) throw error;
-    return fixture<StoryAnalysis>(`story-${encodeURIComponent(firstId)}.json`);
+    // Only the built-in demos have saved results; never show a different story instead.
+    throw new ApiError(503, UNREACHABLE);
   }
 }
 
@@ -83,7 +88,11 @@ export function analyzeStory(story: StoryInput, options: { refresh?: boolean } =
 }
 
 export function analyzeSprint(req: SprintRequest = {}): Promise<SprintAnalysis> {
-  return request("/analyze-sprint", post(req), json<SprintAnalysis>, () => fixture<SprintAnalysis>("sprint.json"), LLM_TIMEOUT_MS);
+  return request("/analyze-sprint", post(req), json<SprintAnalysis>, async () => {
+    // Saved results exist only for the built-in demo backlogs, not for your own stories.
+    if (req.stories?.length) throw new ApiError(503, UNREACHABLE);
+    return fixture<SprintAnalysis>(req.sprint_id === "portfolio-q4" ? "portfolio-q4.json" : "sprint.json");
+  }, LLM_TIMEOUT_MS);
 }
 
 export function getDemoSprint(): Promise<DemoSprint> {
