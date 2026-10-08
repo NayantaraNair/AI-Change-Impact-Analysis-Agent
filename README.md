@@ -6,12 +6,24 @@ ImpactIQ is an AI assistant for banks that answers one question before a change 
 
 You give it a user story (for example "Add OTP login for mobile banking"), a sprint backlog, or a story plus a link to a GitHub repository. It tells you which systems and code the change touches, scores the risk, checks banking regulations (GDPR, PCI DSS, SOX), plans the tests and gives a clear **Go / Go with conditions / No go** call, with the reason behind every number.
 
-![ImpactIQ portfolio view: five KPIs and one row per change](docs/screenshots/02-portfolio-kpis-and-changes.png)
+![ImpactIQ portfolio view: five KPIs and one row per change](Project/docs/screenshots/02-portfolio-kpis-and-changes.png)
+
+## 🎬 Demo video
+
+A walkthrough of the working prototype: **[Video/ImpactIQ-demo.mp4](Video/ImpactIQ-demo.mp4)** (open it and press play, or use *Download raw file*).
+
+## What is in this repository
+
+| Folder | Contents |
+|---|---|
+| [`Video/`](Video) | The demo video |
+| [`Project/`](Project) | The full application: backend, frontend, demo data, the demo bank codebase and these screenshots |
 
 ---
 
 ## Contents
 
+- [Demo video](#-demo-video)
 - [Why it exists](#why-it-exists)
 - [The two workspaces](#the-two-workspaces)
 - [Executive workspace: tour](#executive-workspace-tour)
@@ -41,7 +53,7 @@ ImpactIQ does that analysis in minutes and shows its working, so a release manag
 
 The app opens with a choice of workspace.
 
-![Choose a workspace](docs/screenshots/01-workspaces.png)
+![Choose a workspace](Project/docs/screenshots/01-workspaces.png)
 
 | | Executive workspace | Engineering workspace |
 |---|---|---|
@@ -57,7 +69,7 @@ The app opens with a choice of workspace.
 
 Five headline numbers for the whole backlog, then one row per change, all in business language.
 
-![Portfolio KPIs and the table of changes](docs/screenshots/02-portfolio-kpis-and-changes.png)
+![Portfolio KPIs and the table of changes](Project/docs/screenshots/02-portfolio-kpis-and-changes.png)
 
 - **Stories analysed** and **impacted systems**: how big the sprint is and how much of the bank it reaches (here 5 stories reach 21 systems).
 - **Risk score**: 0 to 100, from six risk areas (security, compliance, technical, operational, performance, delivery).
@@ -71,19 +83,19 @@ The **heatmap** shows every change against the systems it hits, coloured by how 
 
 The **conflict engine** flags pairs of stories that change the same systems and recommends how to plan them.
 
-![Impact heatmap and conflict engine](docs/screenshots/03-heatmap-and-conflicts.png)
+![Impact heatmap and conflict engine](Project/docs/screenshots/03-heatmap-and-conflicts.png)
 
 ### 3. Dependency graph and AI reasoning timeline
 
 Click any change to see its **dependency graph**: the changed components on the left, then each column one step further away, coloured by impact. Below it, the **AI reasoning timeline** shows each step in order, and whether the AI or a rule did it.
 
-![Dependency graph and AI reasoning timeline for a payment-limit change](docs/screenshots/04-dependency-graph-and-ai-timeline.png)
+![Dependency graph and AI reasoning timeline for a payment-limit change](Project/docs/screenshots/04-dependency-graph-and-ai-timeline.png)
 
 ### 4. One major feature on its own
 
 Switch to **New major feature** to analyse a single epic in the same layout.
 
-![A single major feature: OTP multi-factor login](docs/screenshots/05-new-feature-summary.png)
+![A single major feature: OTP multi-factor login](Project/docs/screenshots/05-new-feature-summary.png)
 
 ---
 
@@ -95,13 +107,13 @@ Paste a public GitHub repository URL (a whole repo or one folder) and a user sto
 
 On the left, the **codebase explorer** shows the repository tree with the files to change marked. On the right, the **architecture impact** panel shows, for each service, the classes, API routes and database tables affected.
 
-![Codebase impact: AI flow, codebase explorer and architecture impact](docs/screenshots/06-codebase-impact.png)
+![Codebase impact: AI flow, codebase explorer and architecture impact](Project/docs/screenshots/06-codebase-impact.png)
 
 ### 2. A developer test plan
 
 Five to seven concrete tests, each with a category (functional, API, unit, integration, security, regression), the exact class or endpoint it targets, and steps with an expected result.
 
-![Developer test plan](docs/screenshots/07-developer-tests.png)
+![Developer test plan](Project/docs/screenshots/07-developer-tests.png)
 
 The repository is only read, never run. Classes, routes and tables are found by code (Python, Java, Kotlin, TypeScript/JavaScript, Go, C#, SQL and more). The AI can only choose from services, files and classes that really exist; anything it invents is dropped.
 
@@ -111,11 +123,11 @@ The repository is only read, never run. Classes, routes and tables are found by 
 
 Every analysis runs as a tracked job. While it runs, the page shows each step as it happens and which AI model is working on it. The **Details** pane shows the full run: every model call, how long it took, and every fallback with its reason.
 
-![Details pane: every model call, with rate limits and fallbacks](docs/screenshots/09-details-pane.png)
+![Details pane: every model call, with rate limits and fallbacks](Project/docs/screenshots/09-details-pane.png)
 
 Both workspaces also have a light theme:
 
-![Light mode](docs/screenshots/10-light-mode.png)
+![Light mode](Project/docs/screenshots/10-light-mode.png)
 
 ---
 
@@ -188,7 +200,7 @@ flowchart LR
 
 ## Why the numbers can be trusted
 
-**The AI reads; code decides.** The AI never produces a score or a Go / No go. It only extracts facts from the story (which systems, what kind of change, does it touch card data or the login flow) and writes the human-readable text. Every number is then computed by plain Python from those facts, the bank's architecture map ([`data/architecture.json`](data/architecture.json)) and a reviewable weights file ([`scoring_config.yaml`](backend/app/scoring_config.yaml)).
+**The AI reads; code decides.** The AI never produces a score or a Go / No go. It only extracts facts from the story (which systems, what kind of change, does it touch card data or the login flow) and writes the human-readable text. Every number is then computed by plain Python from those facts, the bank's architecture map ([`data/architecture.json`](Project/data/architecture.json)) and a reviewable weights file ([`scoring_config.yaml`](Project/backend/app/scoring_config.yaml)).
 
 So the same story always gets the same score, and every point can be traced. For example, the security risk for a card-freeze story with step-up login:
 
@@ -214,17 +226,19 @@ You need [Docker](https://www.docker.com/products/docker-desktop/) and Git.
 
 ```bash
 git clone https://github.com/NayantaraNair/AI-Change-Impact-Analysis-Agent.git
-cd AI-Change-Impact-Analysis-Agent
+cd AI-Change-Impact-Analysis-Agent/Project
 docker compose up --build
 ```
 
 When it is up, open port **3000** of the machine in your browser for the app. The backend API runs on port **8000**.
 
+All commands below run from the `Project/` folder. The demo video is stored with Git LFS; to skip downloading it when cloning, set `GIT_LFS_SKIP_SMUDGE=1` first.
+
 **No API keys are needed.** The demo portfolio, the demo sprint and the codebase example open from saved results, and new stories use the built-in rules.
 
 ### Optional: live AI
 
-To have the AI read your own stories, create a `.env` file from the template and add one or both free keys:
+To have the AI read your own stories, create a `.env` file in `Project/` from the template and add one or both free keys:
 
 ```bash
 cp .env.example .env
@@ -265,9 +279,9 @@ The backend has 480+ tests and none of them call a real AI model. GitHub Actions
 
 ## API
 
-The backend is a FastAPI service with interactive Swagger documentation at **`/docs`** on the backend (port 8000). Every request and response shape is defined once in [`backend/app/contracts.py`](backend/app/contracts.py).
+The backend is a FastAPI service with interactive Swagger documentation at **`/docs`** on the backend (port 8000). Every request and response shape is defined once in [`backend/app/contracts.py`](Project/backend/app/contracts.py).
 
-![Swagger UI for the ImpactIQ API](docs/screenshots/11-api-docs-swagger.png)
+![Swagger UI for the ImpactIQ API](Project/docs/screenshots/11-api-docs-swagger.png)
 
 | Method | Path | What it does |
 |---|---|---|
@@ -291,23 +305,25 @@ The backend is a FastAPI service with interactive Swagger documentation at **`/d
 ## Project structure
 
 ```
-backend/app/
-  agents/        AI steps: read the story, compliance, tests, release text (each with a rule fallback)
-  engine/        Rules: change size, dependency graph, risk scores, conflicts (no AI)
-  codebase/      GitHub download, code indexer, story-to-code mapping
-  llm.py         AI provider chain with fallbacks
-  runs.py        Live progress tracking
-  api/           FastAPI routes
-data/
-  architecture.json   The demo bank: 21 systems and how they connect
-  test_catalog.json   60 existing tests
-  fixtures/           Saved results so the app works without keys
-frontend/
-  app/executive       Executive workspace
-  app/engineering     Engineering workspace
-  components/         Graph, heatmap, conflicts, code tree, details pane
-examples/demo-bank/   A small bank codebase (5 services) for the engineering demo
-docs/screenshots/     The images in this README
+Video/                ImpactIQ-demo.mp4
+Project/
+  backend/app/
+    agents/        AI steps: read the story, compliance, tests, release text (each with a rule fallback)
+    engine/        Rules: change size, dependency graph, risk scores, conflicts (no AI)
+    codebase/      GitHub download, code indexer, story-to-code mapping
+    llm.py         AI provider chain with fallbacks
+    runs.py        Live progress tracking
+    api/           FastAPI routes
+  data/
+    architecture.json   The demo bank: 21 systems and how they connect
+    test_catalog.json   60 existing tests
+    fixtures/           Saved results so the app works without keys
+  frontend/
+    app/executive       Executive workspace
+    app/engineering     Engineering workspace
+    components/         Graph, heatmap, conflicts, code tree, details pane
+  examples/demo-bank/   A small bank codebase (5 services) for the engineering demo
+  docs/screenshots/     The images in this README
 ```
 
 ---

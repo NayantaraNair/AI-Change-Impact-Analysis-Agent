@@ -12,9 +12,9 @@
     ]
   },
   "repo": {
-    "repo_url": "https://github.com/NayantaraNair/AI-Change-Impact-Analysis-Agent/tree/main/examples/demo-bank",
+    "repo_url": "https://github.com/NayantaraNair/AI-Change-Impact-Analysis-Agent/tree/main/Project/examples/demo-bank",
     "ref": "main",
-    "root": "examples/demo-bank",
+    "root": "Project/examples/demo-bank",
     "tree": [
       "db/migrations/001_create_users.sql",
       "db/migrations/002_create_customers.sql",

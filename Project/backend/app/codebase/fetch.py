@@ -23,8 +23,9 @@ MAX_TREE = 5000
 TIMEOUT_S = 60
 
 # This project's own repository is read from the local checkout when present,
-# so the bundled demo (examples/demo-bank) works offline and before it is pushed.
-LOCAL_MIRRORS = {"nayantaranair/ai-change-impact-analysis-agent": config.REPO_ROOT}
+# so the bundled demo (Project/examples/demo-bank) works offline and before it is pushed.
+# The project lives in Project/, so the checkout root is one level above it.
+LOCAL_MIRRORS = {"nayantaranair/ai-change-impact-analysis-agent": config.REPO_ROOT.parent}
 
 _URL = re.compile(
     r"^https?://(?:www\.)?github\.com/(?P<owner>[\w.-]+)/(?P<repo>[\w.-]+?)(?:\.git)?"
