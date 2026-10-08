@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 type Step = { stage: string; title: string; detail: string; by: "ai" | "rules" };
 
 function steps(analysis: StoryAnalysis): Step[] {
-  const { requirement, graph, risk, tests, compliance, release } = analysis;
+  const { requirement, graph, risk, compliance, release } = analysis;
   const changed = graph.nodes.filter((node) => node.hop === 0).map((node) => node.label);
   const flags = [
     requirement.touches_customer_data && "customer data",
@@ -19,7 +19,6 @@ function steps(analysis: StoryAnalysis): Step[] {
   ].filter(Boolean);
   const highest = risk.dimensions.find((dimension) => dimension.name === risk.highest);
   const frameworks = compliance.frameworks.filter((framework) => framework.applicable);
-  const p1 = tests.tests.filter((test) => test.priority === "P1").length;
   const reason = release.triggered_rules.find((rule) => !rule.startsWith("GO:"))?.replace(/^\w+:\s*/, "");
   return [
     { stage: "requirement", by: "ai", title: "Read the change",
@@ -28,8 +27,6 @@ function steps(analysis: StoryAnalysis): Step[] {
       detail: `${risk.change_size[0].toUpperCase()}${risk.change_size.slice(1)} change: ${graph.impacted_services.length} systems affected.` },
     { stage: "scoring", by: "rules", title: "Scored the risk",
       detail: `Overall ${risk.overall}/100; highest is ${highest?.name ?? risk.highest} at ${highest?.score ?? "–"}.` },
-    { stage: "testing", by: "ai", title: "Planned the tests",
-      detail: `${tests.tests.length} tests, ${p1} must-run, ${Math.round(tests.coverage_estimate * 100)}% of affected systems covered.` },
     { stage: "compliance", by: "ai", title: "Checked compliance",
       detail: frameworks.length ? frameworks.map((framework) => `${framework.framework} ${framework.risk_level}`).join(", ") + "." : "No framework applies." },
     { stage: "release", by: "rules", title: "Decided readiness",

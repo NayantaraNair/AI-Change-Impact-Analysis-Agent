@@ -1,4 +1,4 @@
-# ImpactIQ: Every Change Before It Happens
+# ImpactIQ: Understand Every Change Before It Happens
 
 Banking change-impact analysis: paste a story or change request, get its blast radius, 6-dimension risk scores, a test plan, a compliance check and a release decision. Sprint mode adds conflict detection between stories. A copilot drawer answers questions about the current analysis.
 

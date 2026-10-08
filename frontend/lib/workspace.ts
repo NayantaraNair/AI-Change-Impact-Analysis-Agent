@@ -5,7 +5,7 @@ import { useSyncExternalStore } from "react";
 export type Workspace = "executive" | "engineering";
 
 export const APP_NAME = "ImpactIQ";
-export const TAGLINE = "Every Change Before It Happens";
+export const TAGLINE = "Understand Every Change Before It Happens";
 
 export const workspaces: Record<Workspace, { label: string; view: string; home: string }> = {
   executive: { label: "Executive workspace", view: "Portfolio view", home: "/executive" },
