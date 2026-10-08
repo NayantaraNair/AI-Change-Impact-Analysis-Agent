@@ -4,12 +4,12 @@ import type { SprintAnalysis } from "@/lib/types";
 export const DEMO_SPRINT_ID = "sprint-42";
 
 /** A missing saved report is an empty state, rather than a new analysis request. */
-export async function getSavedSprint(signal?: AbortSignal): Promise<SprintAnalysis | null> {
-  if (process.env.NEXT_PUBLIC_MOCK === "1") return analyzeSprint({ sprint_id: DEMO_SPRINT_ID });
+export async function getSavedSprint(signal?: AbortSignal, sprintId = DEMO_SPRINT_ID): Promise<SprintAnalysis | null> {
+  if (process.env.NEXT_PUBLIC_MOCK === "1") return analyzeSprint({ sprint_id: sprintId });
   const base = (process.env.NEXT_PUBLIC_API_URL || "/api").replace(/\/$/, "");
   let response: Response;
   try {
-    response = await fetch(`${base}/sprint/${DEMO_SPRINT_ID}`, {
+    response = await fetch(`${base}/sprint/${encodeURIComponent(sprintId)}`, {
       cache: "no-store",
       signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15_000)]) : AbortSignal.timeout(15_000),
     });

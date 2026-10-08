@@ -1,11 +1,14 @@
 {
-  "answer": "The analysis context does not say release confidence is low — it reports confidence as **78** with a **GO** decision.\n\nAs supplied by the context:\n- Release **confidence: 78**, **decision: GO**\n- Triggered rules: `GO: no blocking or conditional release rules fired`\n- Conditions: none\n- Complexity: medium\n- Overall risk: 39; highest dimension is **compliance** (50, medium), driven by factors \"card data\" (30 pts, `fraud-engine`) and \"financial data\" (20 pts, `fraud-engine`). All other dimensions are low: operational 34, security 34, performance 30, delivery 18, technical 11.\n\nIf you meant why confidence isn't higher, the context offers no explicit rationale beyond the absence of blocking/conditional rules; it does not state a cause for the 78 value.",
+  "answer": "The context does not describe release confidence as low.\n\n- Supplied values: `release.confidence` = **78**, `release.decision` = **GO**, `release.complexity` = **medium**, `release.conditions` = **[]**.\n- Triggered rules: `\"GO: no blocking or conditional release rules fired\"` — so no conditional or blocking rule lowered the outcome.\n- Related signals that are also not \"high\": `risk.overall` = 39; delivery dimension = 18 (low), with top factors \"low ambiguity\" (10 pts, `fraud-engine`) and \"owner coordination\" (8 pts, `fraud-engine`, `risk-engine`, `transaction-db`).\n- Requirement-level `ambiguity` = \"low\"; `engineering_scope` is described as a small, contained change to `fraud-engine`.\n\nSo the stated posture is GO at confidence 78. The context contains no explanation of confidence being low; if you expected a lower figure, it isn't in this analysis JSON (scores and decisions are reported as supplied, not recalculated).",
   "cited_nodes": [
-    "fraud-engine"
+    "transaction-db",
+    "fraud-engine",
+    "risk-engine"
   ],
   "cited_factors": [
-    "card data",
-    "financial data"
+    "small, contained change",
+    "low ambiguity",
+    "owner coordination"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException
 
 from app import db, pipeline, runs
 from app.api.fixtures import story_fixture
-from app.architecture import get_architecture, load_demo_sprint
+from app.architecture import demo_backlogs, get_architecture, load_demo_portfolio, load_demo_sprint
 from app.contracts import Architecture, DemoSprint, ImpactGraph, StoryAnalysis, StoryInput
 
 router = APIRouter()
@@ -37,11 +37,16 @@ def demo_sprint() -> DemoSprint:
     return load_demo_sprint()
 
 
+@router.get("/demo-portfolio", response_model=DemoSprint)
+def demo_portfolio() -> DemoSprint:
+    return load_demo_portfolio()
+
+
 def _latest(story_id: str) -> StoryAnalysis:
     analysis = db.latest_story_analysis(story_id)
     if analysis is None:
         # A fresh database still has saved results for the demo stories.
-        demo = next((s for s in load_demo_sprint().stories if s.id == story_id), None)
+        demo = next((s for backlog in demo_backlogs() for s in backlog.stories if s.id == story_id), None)
         analysis = story_fixture(demo) if demo else None
     if analysis is None:
         raise HTTPException(status_code=404, detail="Story analysis not found")

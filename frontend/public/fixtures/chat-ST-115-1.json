@@ -1,11 +1,17 @@
 {
-  "answer": "Risk is **not** high for this story — overall risk is **12 (low)** per the supplied analysis.\n\nHighest dimension is **delivery** at **14 (low)**, driven by:\n- \"low ambiguity\" +10 (`document-service`)\n- \"baseline\" +5\n- \"direct services\" +5 (`document-service`)\n\nOther dimensions (all low): operational 12, technical 11, security 7, compliance 0, performance 0.\n\nRelease decision supplied: **GO**, confidence 94, with no blocking or conditional rules fired.\n\nIf you meant a different story, share that context — I can only report scores as supplied.",
+  "answer": "Risk is **not** high — the analysis reports **overall risk 12**, and every dimension is rated **low** (highest is delivery at 14). So there's no high-risk finding to explain.\n\nReported scores by dimension:\n- **delivery** — 14 (low): top factors \"low ambiguity\" +10 (`document-service`), \"baseline\" +5, \"direct services\" +5 (`document-service`)\n- **operational** — 12 (low): \"service criticality\" +16 (`document-service`), \"baseline\" +5, \"deployment groups\" +4 (`document-service`, `reporting-service`)\n- **technical** — 11 (low): \"direct services\" +6 (`document-service`), \"baseline\" +5, \"dependency depth\" +5 (`reporting-service`)\n- **security** — 7 (low): \"baseline\" +8, \"blast radius size\" +4 (`document-service`, `reporting-service`), \"small, contained change\" −5 (`document-service`)\n- **compliance** — 0 (low): \"baseline\" +5, \"small, contained change\" −5 (`document-service`)\n- **performance** — 0 (low): \"baseline\" +5, \"small, contained change\" −10 (`document-service`)\n\nWhat may look concerning but is scored low:\n- **\"service criticality\" +16 on `document-service`** is the single largest factor, but it sits inside the operational dimension, which is still only 12 (low).\n- **Blast radius spans two services** (`document-service`, `reporting-service`), yet offset by \"small, contained change\" penalties.\n\nRelease posture: decision **GO**, confidence **94**, complexity **medium**, no conditions, and rule \"GO: no blocking or conditional release rules fired.\"\n\nIf you were asking why a *particular* dimension is at its value, tell me which one and I'll break out its factors — the context contains no \"high\" risk rating for this story.",
   "cited_nodes": [
-    "document-service"
+    "document-service",
+    "reporting-service"
   ],
   "cited_factors": [
     "baseline",
+    "blast radius size",
+    "small, contained change",
     "direct services",
+    "dependency depth",
+    "service criticality",
+    "deployment groups",
     "low ambiguity"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"

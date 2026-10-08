@@ -1,11 +1,14 @@
 {
-  "answer": "**Impacted components**\n- Directly changed: `document-service`\n- Services involved: `document-service`, `reporting-service`\n- Downstream: `reporting-service`\n- Deployment groups: `data-platform`, `documents`\n- Databases: none\n\n**Impacted capabilities**\n- Monthly statement PDF rendering\n- Statement template and layout asset management\n- Statement template versioning and rollback\n\n**Impacted APIs**\n- `GET /documents/templates/{id}`\n- `GET /reports/monthly-statements/{id}`\n- `GET /reports/statement-template`\n- `POST /documents/statements/render`\n- `POST /reports/monthly-statements/jobs`\n- `PUT /documents/templates/{id}`\n\n**Scope**\n- Change type: `config_change`\n- No customer data, card data, financial data, auth-flow, external API contract, or DB schema changes.\n- Engineering scope: small, contained change in `document-service` only.",
+  "answer": "- **Directly changed component:** `document-service`  \n  - Factor label: “direct services” (`node_ids`: `document-service`)\n  - Factor label: “small, contained change” (`node_ids`: `document-service`)\n\n- **Impacted services:** `document-service`, `reporting-service`\n  - Factor label: “blast radius size” (`node_ids`: `document-service`, `reporting-service`)\n  - Factor label: “dependency depth” (`node_ids`: `reporting-service`)\n\n- **Downstream service:** `reporting-service`\n\n- **Affected capabilities:**\n  - Monthly statement PDF rendering\n  - Statement template and layout asset management\n  - Statement template versioning and rollback\n\n- **Affected APIs:**\n  - `GET /documents/templates/{id}`\n  - `GET /reports/monthly-statements/{id}`\n  - `GET /reports/statement-template`\n  - `POST /documents/statements/render`\n  - `POST /reports/monthly-statements/jobs`\n  - `PUT /documents/templates/{id}`\n\n- **Databases impacted:** none listed\n\n- **Deployment groups:** `data-platform`, `documents`\n  - Factor label: “deployment groups” (`node_ids`: `document-service`, `reporting-service`)\n\n- **Data/contract/schema considerations:** no customer data, card data, financial data, auth-flow, external API contract, or DB schema changes.",
   "cited_nodes": [
     "document-service",
     "reporting-service"
   ],
   "cited_factors": [
+    "blast radius size",
     "small, contained change",
+    "direct services",
+    "dependency depth",
     "deployment groups"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"

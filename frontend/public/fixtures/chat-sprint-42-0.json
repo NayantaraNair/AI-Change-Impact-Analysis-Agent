@@ -1,10 +1,7 @@
 {
-  "answer": "**Sprint 42 impact (computed):** 6 stories, **17 applications impacted**, **19 dependencies impacted**, 3 conflicts, 3 compliance issues, 36.7 testing hours. Health score **49**, release confidence **58**; high-risk story: **ST-107**.\n\n**Per-story directly changed components**\n\n- **ST-101** (Payments, daily limit increase): `payment-service`, `account-service`. Also touched: `customer-db`, `fraud-engine`, `notification-service`, `transaction-db`; DBs `customer-db`, `transaction-db`; groups core-banking, core-payments, customer-platform.\n- **ST-104** (Customer profile fields): `customer-service`, `customer-db`, `crm`, `notification-service`. Downstream: `account-service`, `audit-db`, `card-service`, `loan-service`, `payment-service`; DBs `audit-db`, `customer-db`; groups core-banking, core-payments, customer-platform, data-platform.\n- **ST-107** (Card freeze/unfreeze + step-up auth): `mobile-banking`, `api-gateway`, `card-service`, `authentication-service`. 16 downstream services (incl. `atm`, `branch-portal`, `web-banking`, `risk-engine`, `reporting-service`); DBs `customer-db`, `reporting-db`, `transaction-db`; 8 deployment groups.\n- **ST-110** (Fraud velocity rule): `fraud-engine`. Downstream: `risk-engine`, `transaction-db`; group core-banking, core-payments.\n- **ST-112** (Biometric login): `mobile-banking`, `authentication-service`. Downstream: `account-service`, `api-gateway`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `loan-service`, `payment-service`; DB `customer-db`; 6 deployment groups.\n- **ST-115** (Statement footer text): `document-service` only. Downstream: `reporting-service`; no databases; groups data-platform, documents.\n\n**Shared-component collisions (3, all high risk)**\n- ST-101 ↔ ST-107 on `account-service` (risk_score 100)\n- ST-101 ↔ ST-110 on `payment-service` (80)\n- ST-107 ↔ ST-112 on `authentication-service` (100)\n\n**Compliance exposure:** GDPR applies to ST-101, ST-104, ST-107, ST-112; PCI DSS to ST-104 (medium), ST-107 (high, score 40), ST-110 (low); SOX to ST-101, ST-104, ST-107, ST-110, ST-112; Internal Governance to ST-101, ST-104, ST-107 (high, 45), ST-110, ST-112. ST-115 has no applicable framework.",
+  "answer": "## Sprint 42 impact summary (from sprint KPIs)\n- **6 stories**; **17 applications impacted**; **19 dependencies impacted**\n- **3 conflicts** (all high-risk deployment collisions) and **3 compliance issues**\n- Testing effort: **36.7 hours**; health score **49**; release confidence **58**\n- High-risk story: **ST-107**\n\n## Per story (directly changed components)\n- **ST-101** (payment limits): `payment-service`, `account-service`; downstream `customer-db`, `fraud-engine`, `notification-service`, `transaction-db`; groups core-banking, core-payments, customer-platform\n- **ST-104** (profile fields): `customer-service`, `customer-db`, `crm`, `notification-service`; downstream `account-service`, `audit-db`, `card-service`, `loan-service`, `payment-service`\n- **ST-107** (card freeze/unfreeze): `mobile-banking`, `api-gateway`, `card-service`, `authentication-service`; 16 downstream services; 8 deployment groups\n- **ST-110** (velocity rule): `fraud-engine`; downstream `risk-engine`, `transaction-db`\n- **ST-112** (biometric login): `mobile-banking`, `authentication-service`; downstream `account-service`, `api-gateway`, `card-service`, `crm`, `customer-db`, `customer-service`, `document-service`, `loan-service`, `payment-service`\n- **ST-115** (statement footer): `document-service`; downstream `reporting-service`\n\n## Risk dimensions flagged as top factors\n- **ST-107**: security **93 (high)** — *card data*, *auth flow change*, *external API contract*; delivery **87 (high)**; operational **71 (high)** — *service criticality* on `api-gateway`, `authentication-service`\n- **ST-104**: compliance **61 (medium)** — *pii data*, *nearby card data* (`card-service`), *database schema change* (`audit-db`, `customer-db`)\n- **ST-112**: security **73 (high)** — *auth flow change*, *customer data*; operational **69 (medium)**\n- **ST-101**: operational **44 (medium)** — *service criticality* on `payment-service`\n\n## Compliance frameworks impacted\n- **ST-107**: GDPR (medium), PCI DSS (high), SOX (low), Internal Governance (high)\n- **ST-104**: GDPR (high), PCI DSS (medium), SOX (medium), Internal Governance (low)\n- **ST-101**, **ST-110**: GDPR/PCI/SOX/Governance (none high; minimum scores 80)\n- **ST-112**: GDPR (medium), SOX (low), Internal Governance (medium); PCI DSS not applicable\n- **ST-115**: no framework applies (overall **100/100**)\n\n## Conflicts (shared components)\n- **ST-101 ↔ ST-107** on `account-service` (deployment collision, risk score **100**)\n- **ST-101 ↔ ST-110** on `payment-service` (**80**)\n- **ST-107 ↔ ST-112** on `authentication-service` (**100**)",
   "cited_nodes": [
     "mobile-banking",
-    "web-banking",
-    "atm",
-    "branch-portal",
     "customer-service",
     "account-service",
     "payment-service",
@@ -18,13 +15,20 @@
     "customer-db",
     "transaction-db",
     "audit-db",
-    "reporting-db",
     "fraud-engine",
     "risk-engine",
     "reporting-service"
   ],
   "cited_factors": [
-    "deployment groups"
+    "customer data",
+    "pii data",
+    "service criticality",
+    "deployment groups",
+    "nearby card data",
+    "database schema change",
+    "card data",
+    "auth flow change",
+    "external API contract"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

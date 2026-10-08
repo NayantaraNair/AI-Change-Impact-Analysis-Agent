@@ -1,16 +1,11 @@
 {
-  "answer": "The context contains only one story, so I can't compare across a backlog.\n\n**ST-115 — Update the footer text on monthly statement PDFs**\n- Overall risk: **12** (highest dimension: **delivery**, 14 — level: low)\n- Dimension scores (as supplied):\n  - security 7 (low) — top factors: baseline (8), blast radius size (4; document-service, reporting-service), small contained change (-5; document-service)\n  - compliance 0 (low) — baseline (5), small contained change (-5; document-service)\n  - technical 11 (low) — direct services (6; document-service), baseline (5), dependency depth (5; reporting-service)\n  - operational 12 (low) — service criticality (16; document-service), baseline (5), deployment groups (4)\n  - performance 0 (low) — baseline (5), small contained change (-10; document-service)\n  - delivery 14 (low) — low ambiguity (10; document-service), baseline (5), direct services (5; document-service)\n- Release decision: **GO**, confidence **94**, complexity medium, no triggered blocking/conditional rules, no conditions.\n\nNo story in this context reaches a medium or high risk level, so none would be flagged as risky on these scores. If you have other story analyses, share them and I'll compare.",
+  "answer": "The context contains only one story, so I can only speak to that one.\n\n- **ST-115** — \"Update the footer text on monthly statement PDFs\": **not risky**. Overall risk score **12** (decision **GO**, confidence **94**).\n- Highest dimension: **delivery = 14** (low). Top factors: \"low ambiguity\" (+10, `document-service`), \"baseline\" (+5), \"direct services\" (+5, `document-service`).\n- All other dimensions are low: operational 12, technical 11, security 7, compliance 0, performance 0.\n- No blocking or conditional release rules fired; no compliance framework applies (overall compliance score 100/100).\n\nNo other stories are present in the analysis context, so I can't identify risky stories beyond this one.",
   "cited_nodes": [
-    "document-service",
-    "reporting-service"
+    "document-service"
   ],
   "cited_factors": [
     "baseline",
-    "blast radius size",
     "direct services",
-    "dependency depth",
-    "service criticality",
-    "deployment groups",
     "low ambiguity"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"

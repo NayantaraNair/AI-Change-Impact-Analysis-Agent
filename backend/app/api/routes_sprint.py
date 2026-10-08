@@ -8,8 +8,8 @@ from uuid import uuid4
 from fastapi import APIRouter, HTTPException
 
 from app import db, runs
-from app.api.fixtures import sprint_fixture
-from app.architecture import load_demo_sprint
+from app.api.fixtures import demo_backlog_for, sprint_fixture
+from app.architecture import demo_backlogs, load_demo_sprint
 from app.contracts import SprintAnalysis, SprintRequest, StoryInput
 from app.engine import sprint as sprint_engine
 
@@ -18,7 +18,7 @@ router = APIRouter()
 
 def resolve(request: SprintRequest) -> tuple[str, str, list[StoryInput]]:
     """Sprint ID, name and stories for a request; raises 422 on duplicate story IDs."""
-    demo = load_demo_sprint()
+    demo = demo_backlog_for(request) or load_demo_sprint()
     stories = request.stories or demo.stories
     if len({story.id for story in stories}) != len(stories):
         raise HTTPException(status_code=422, detail="Story IDs must be unique within a sprint")
@@ -48,8 +48,8 @@ async def analyze_sprint(request: SprintRequest, refresh: bool = False) -> Sprin
 @router.get("/sprint/{sprint_id}", response_model=SprintAnalysis)
 def sprint(sprint_id: str) -> SprintAnalysis:
     analysis = db.latest_sprint(sprint_id)
-    if analysis is None and sprint_id == load_demo_sprint().sprint_id:
-        # A fresh database still has the saved demo sprint.
+    if analysis is None and any(backlog.sprint_id == sprint_id for backlog in demo_backlogs()):
+        # A fresh database still has the saved demo backlogs.
         analysis = sprint_fixture(SprintRequest(sprint_id=sprint_id))
     if analysis is None:
         raise HTTPException(status_code=404, detail="Sprint analysis not found")

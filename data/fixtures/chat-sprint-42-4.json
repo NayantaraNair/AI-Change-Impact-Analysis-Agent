@@ -1,26 +1,12 @@
 {
-  "answer": "The context doesn't state a formula for the sprint release-confidence score, so I'll report the supplied value and the drivers visible in the analysis.\n\n- **Sprint 42 release confidence = 58** (with health score 49, 6 stories, 17 applications impacted, 19 dependencies affected, 3 conflicts, 3 compliance issues).\n\nMain contributing drivers in the data:\n- **ST-107 is NO_GO with confidence 23**, the low point of the sprint, and is the flagged high-risk story. Triggered NO_GO rules: **security risk 93 (≥85)** — factors \"card data\" (25, card-service/atm/fraud-engine), \"auth flow change\" (25, api-gateway/authentication-service/card-service/mobile-banking), \"external API contract\" (15); and **delivery risk 87 (≥85)** — factors \"owner coordination\" (32), \"medium ambiguity\" (30), \"direct services\" (20). Also NO_GO on high PCI DSS (40) and Internal Governance (45) risk for a card-data + auth change.\n- **Other stories carry conditions, not clean GO**: ST-112 confidence 49 (security 73 high, GDPR/Internal Governance medium, collision with ST-107), ST-101 confidence 54, ST-104 confidence 58. Only ST-115 is a plain GO (confidence 94).\n- **Three high-risk deployment collisions** on shared components: ST-101 vs ST-107 on account-service (risk_score 100), ST-107 vs ST-112 on authentication-service (100), ST-101 vs ST-110 on payment-service (80) — each forcing sequencing and shared regression runs.\n- **Compliance exposure**: ST-104 GDPR high (score 55, \"pii data\" 20, \"nearby card data\" 12 on card-service), plus ST-107's high PCI DSS and Internal Governance.\n- **Broad blast radius and coordination load**: e.g. ST-107 operational factor \"service criticality\" 40 (api-gateway, authentication-service) and \"downstream systems\" 20; delivery \"owner coordination\" 32.\n\nNet: the sprint's low confidence is driven by the ST-107 NO_GO plus pervasive conditional decisions, cross-story deployment collisions, and high compliance/security factors on card, auth and PII components — not by a single factor.",
+  "answer": "The supplied sprint `release_confidence` is **58**. The context attributes the drag to story-level decisions and collisions, not to a single score:\n\n- **ST-107 is NO_GO** with confidence **23**, the lowest in the sprint. Triggered rules: `NO_GO: security risk is 93 (>= 85)`, `NO_GO: delivery risk is 87 (>= 85)`, plus PCI DSS and Internal Governance high risk on a card-data + authentication change. It is also the flagged `high_risk_stories` entry. Outstanding blockers: PCI DSS review, security sign-off, no rehearsed rollback.\n- **Four of six stories are GO_WITH_CONDITIONS**, adding unresolved conditions: ST-101 (54), ST-104 (58), ST-110 (70), ST-112 (49). ST-112 carries `highest risk is 73 (>= 60)` on security (auth flow change).\n- **Three high-risk deployment collisions** remain: ST-101 vs ST-107 on `account-service` (risk 100), ST-101 vs ST-110 on `payment-service` (80), ST-107 vs ST-112 on `authentication-service` (100) — all requiring enforced sequencing.\n- **Sprint health score is 49** with 3 compliance issues, 19 dependencies impacted, and 36.7 testing hours of P1 work.\n- **ST-115 is the only GO** (confidence 94), and it is a presentation-only change with no compliance framework applying — it does not offset the others.\n\nIn short: confidence is pulled down by the ST-107 NO_GO on security/delivery risk, the number of conditional releases, and the unfired-but-unresolved sequencing constraints across `account-service`, `payment-service` and `authentication-service`.",
   "cited_nodes": [
-    "mobile-banking",
-    "atm",
     "account-service",
     "payment-service",
-    "card-service",
-    "authentication-service",
-    "api-gateway",
-    "fraud-engine"
+    "authentication-service"
   ],
   "cited_factors": [
-    "pii data",
-    "direct services",
-    "service criticality",
-    "downstream systems",
-    "owner coordination",
-    "nearby card data",
-    "card data",
-    "auth flow change",
-    "external API contract",
-    "medium ambiguity"
+    "auth flow change"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

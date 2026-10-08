@@ -11,7 +11,7 @@ const monaSans = Mona_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Change Impact Copilot",
+  title: "ImpactIQ: Every Change Before It Happens",
   description: "See what a story, epic or sprint backlog affects before you plan the sprint.",
 };
 

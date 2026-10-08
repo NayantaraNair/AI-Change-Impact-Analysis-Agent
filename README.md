@@ -1,4 +1,4 @@
-# Change Impact Copilot
+# ImpactIQ: Every Change Before It Happens
 
 Paste a story or epic, or attach a sprint backlog. See what it affects, how risky it is and whether it can ship, before you plan the sprint.
 
@@ -6,7 +6,25 @@ Paste a story or epic, or attach a sprint backlog. See what it affects, how risk
 
 ## The problem
 
-When a change request lands, developers, leads, testers and business analysts spend days working out what it touches downstream, which regulations apply and whether it is safe to release. That analysis is repeated for every story and every sprint, and it lives in people's heads. Change Impact Copilot automates it for a banking estate: the goal is to turn days of impact analysis into minutes, with every number explained.
+When a change request lands, developers, leads, testers and business analysts spend days working out what it touches downstream, which regulations apply and whether it is safe to release. That analysis is repeated for every story and every sprint, and it lives in people's heads. ImpactIQ automates it for a banking estate: the goal is to turn days of impact analysis into minutes, with every number explained.
+
+## Two workspaces
+
+ImpactIQ opens with a workspace choice:
+
+- **Executive workspace (Portfolio view)** for product, release and delivery leads. Analyse a whole sprint backlog or a single major feature, and see the answers in business terms:
+  - **Five KPIs:** stories analysed, impacted systems, risk score, compliance impact and release confidence.
+  - **One row per change:** business impact, affected customers, affected systems, risk and release readiness, all derived by rules from the engineering analysis. For example: *OTP MFA login: business impact High, affected customers High, affected systems Authentication Service, API Gateway, Customer Database, Notification Service and more, risk High (80), release readiness 14%: no go until security risk (88) drops below 85.*
+  - **Impact heatmap:** changes against the systems they hit, coloured by how hard.
+  - **Conflict engine:** for each pair of stories, a conflict %, the systems they share, and a recommendation. For example: *OTP login ↔ Password reset: 99% conflict, shared Authentication Service, Customer Database, Notification Service, Mobile and Web Banking: "Merge sprint planning".*
+  - **Dependency graph and AI reasoning timeline** for the selected change: what the AI read, what the rules computed, and how the decision was reached.
+- **Engineering workspace (Technical analysis)** for tech leads, engineers and testers: everything below, story by story and sprint by sprint.
+
+| Choose a workspace | Executive portfolio view |
+|---|---|
+| ![Workspace screen](docs/workspaces.png) | ![Portfolio view](docs/portfolio.png) |
+
+An example portfolio (`data/demo_portfolio.json`) with OTP MFA login and self-service password reset ships with saved live results, so it opens instantly without API keys.
 
 ## What it does
 

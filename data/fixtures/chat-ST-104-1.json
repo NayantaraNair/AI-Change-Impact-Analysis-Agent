@@ -1,7 +1,8 @@
 {
-  "answer": "Short answer: overall risk is **57 (medium)** — not high. The \"high\" label applies to one compliance framework only.\n\n**Overall risk (risk.overall = 57, level medium)**\n- Highest dimension: **compliance = 61 (medium)** — not high.\n- Other dimensions: technical 58 (medium), operational 53 (medium), delivery 46 (medium), security 38 (low), performance 25 (low).\n\n**Why compliance leads (score 61, medium)** — top factors:\n- `pii data` (20 pts) — nodes: crm, customer-db, customer-service, notification-service\n- `nearby card data` (12 pts) — node: card-service\n- `database schema change` (10 pts) — nodes: audit-db, customer-db\n\n**The only \"high\" rating: GDPR framework (risk_level high, score 55)**\n- New optional PII fields (preferred name, secondary email) in customer-service / customer-db with a contact projection to crm — exposure around data minimisation, purpose limitation, accuracy and retention (nodes: customer-service, customer-db, crm).\n- Secondary email as a notification destination — consent validity, completed-verification gate and stop-on-withdrawal handling (nodes: notification-service, crm, customer-service).\n- Access/correction/erasure coverage plus consent evidence completeness in audit-db (nodes: customer-db, customer-service, audit-db).\n\n**Why the release decision reflects it**\n- Decision: **GO_WITH_CONDITIONS** (confidence 58), triggered by \"GDPR risk is high\" plus highest risk 61 (>= 60), PCI DSS medium, SOX medium.\n\nOther frameworks are medium/low: PCI DSS 75, SOX 75, Internal Governance 85 (framework risk levels: medium, medium, low).",
+  "answer": "The analysis does **not** label overall risk as high by score alone: supplied overall risk is **57**, highest dimension is **compliance**. The release gate treats it as high because compliance reaches **61 (>=60)** and **GDPR risk is high**.\n\n- **Release trigger:** `GO_WITH_CONDITIONS`, confidence **58**. Triggered rules include:\n  - `highest risk is 61 (>= 60)`\n  - `GDPR risk is high`\n  - `PCI DSS risk is medium`, `SOX risk is medium`\n\n- **Highest risk dimension: compliance — 61 (medium)**\n  - `pii data` (+20) — `crm`, `customer-db`, `customer-service`, `notification-service`\n  - `nearby card data` (+12) — `card-service`\n  - `database schema change` (+10) — `audit-db`, `customer-db`\n\n- **GDPR framework: risk_level high, score 55**\n  - New optional PII fields (`preferred name`, `secondary email`) in `customer-service`, `customer-db`, synced to `crm`.\n  - Secondary email use by `notification-service` needs consent validity, completed verification, and stop-on-withdrawal checks.\n  - Access, correction, erasure procedures and consent evidence in `audit-db` need confirmation.\n\n- **Other contributing dimensions:**\n  - **technical — 58:** `database schema change` (20) on `audit-db`, `customer-db`; `direct services` (18) on `crm`, `customer-service`, `notification-service`; `new feature` (10).\n  - **operational — 53:** `service criticality` (32) on `customer-service`; `downstream systems` (10) on `account-service`,",
   "cited_nodes": [
     "customer-service",
+    "account-service",
     "card-service",
     "crm",
     "notification-service",
@@ -11,7 +12,11 @@
   "cited_factors": [
     "pii data",
     "nearby card data",
-    "database schema change"
+    "database schema change",
+    "direct services",
+    "new feature",
+    "service criticality",
+    "downstream systems"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

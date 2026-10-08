@@ -1,8 +1,7 @@
 {
-  "answer": "**Overall risk is 64/100 (medium)** — but the highest dimension, **security, is 73/100 (high)**, which is what triggered `GO_WITH_CONDITIONS: highest risk is 73 (>= 60)`.\n\nSecurity dimension factors (score 73, level high):\n- **auth flow change** — 25 pts → `authentication-service`, `mobile-banking`\n- **customer data** — 20 pts → `api-gateway`, `authentication-service`, `customer-db`, `mobile-banking`\n- **critical identity path** — 10 pts → `api-gateway`, `authentication-service`\n\nOther dimensions at medium (not high):\n- **operational** 69 (medium): service criticality 40 → `authentication-service`; downstream systems 18; deployment groups 6\n- **compliance** 45 (medium): pii data 20, financial data 20\n- **delivery** 49 (medium): owner coordination 24\n- **performance** 40 (medium): transaction path 20 → `payment-service`; channel path 15\n- **technical** 37 (low)\n\nCompliance frameworks driving medium risk: GDPR (medium, 65) and Internal Governance (medium, 70); SOX is low (85); PCI DSS not applicable. Overall compliance score is 65/100, with no applicable framework at high risk.",
+  "answer": "**Overall risk is 64 (medium), not high — the highest *dimension* risk is high: `security` = 73.**\n\nWhy `security` is high (score 73), by top factor:\n- `auth flow change` (+25) — `authentication-service`, `mobile-banking`\n- `customer data` (+20) — `api-gateway`, `authentication-service`, `customer-db`, `mobile-banking`\n- `critical identity path` (+10) — `api-gateway`, `authentication-service`\n\nOther dimensions for contrast:\n- `operational` 69 — medium (`service criticality` 40 on `authentication-service`)\n- `compliance` 45, `delivery` 49, `performance` 40 — medium\n- `technical` 37 — low\n\nRelease decision: `GO_WITH_CONDITIONS` (confidence 57), triggered by \"highest risk is 73 (>= 60)\" plus GDPR and Internal Governance risk being medium.",
   "cited_nodes": [
     "mobile-banking",
-    "payment-service",
     "authentication-service",
     "api-gateway",
     "customer-db"
@@ -11,14 +10,7 @@
     "customer data",
     "auth flow change",
     "critical identity path",
-    "pii data",
-    "financial data",
-    "service criticality",
-    "downstream systems",
-    "deployment groups",
-    "transaction path",
-    "channel path",
-    "owner coordination"
+    "service criticality"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

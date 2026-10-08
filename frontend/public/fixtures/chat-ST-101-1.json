@@ -1,5 +1,5 @@
 {
-  "answer": "Risk is not rated high in this analysis. The supplied scores show:\n\n- **Overall risk: 39** (highest dimension: **operational**, score **44 — medium**)\n- **Operational (44, medium)** — top factors: \"service criticality\" (40 pts, `payment-service`), \"downstream systems\" (8 pts, `customer-db`, `fraud-engine`, `notification-service`, `transaction-db`), \"deployment groups\" (6 pts).\n- **Compliance (40, medium)** — \"pii data\" (20 pts, `account-service`), \"financial data\" (20 pts, `account-service`, `payment-service`), baseline (5 pts).\n- **Security (33, low)**, **Performance (30, low)**, **Technical (17, low)**, **Delivery (23, low)**.\n\nThe nearest thing to a \"high\" signal is that **operational** is the highest dimension and `payment-service` carries the largest single factor (\"service criticality\", 40 pts), but it is classified **medium**, not high. On the compliance side, 3 of 4 frameworks apply with minimum score **80/100**, and **0 applicable frameworks have high risk**.\n\nIf you meant the release decision instead: it is **GO** with **confidence 70**, complexity **medium**, triggered rule \"GO: no blocking or conditional release rules fired\", and no conditions.",
+  "answer": "No dimension in the supplied analysis is rated **high** — the premise doesn't hold.\n\n- Overall risk score **39** (as supplied by code); the **highest** dimension is **operational**, score **44**, level **medium**.\n- Operational top factors: `service criticality` (40 pts, payment-service), `downstream systems` (8 pts, customer-db/fraud-engine/notification-service/transaction-db), `deployment groups` (6 pts).\n- Other dimensions: compliance **40 (medium)** — factors `pii data` (20, account-service) and `financial data` (20, account-service, payment-service); security **33 (low)**; performance **30 (low)**; delivery **23 (low)**; technical **17 (low)**.\n- Release decision is **GO** (confidence 70, complexity medium) with `GO: no blocking or conditional release rules fired` and no conditions.\n- Compliance: 3 of 4 frameworks apply, minimum compliance score **80/100**, and **0 applicable frameworks have high risk** (GDPR low/80, SOX low/90, Internal Governance low/85; PCI DSS not applicable).\n\nIf you meant a specific dimension or the compliance frameworks, tell me which and I'll cite its factors; otherwise the context contains no \"high\" risk rating to explain.",
   "cited_nodes": [
     "account-service",
     "payment-service",
@@ -9,7 +9,6 @@
     "fraud-engine"
   ],
   "cited_factors": [
-    "baseline",
     "pii data",
     "financial data",
     "service criticality",

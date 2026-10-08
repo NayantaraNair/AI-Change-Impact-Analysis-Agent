@@ -90,6 +90,10 @@ export function getDemoSprint(): Promise<DemoSprint> {
   return request("/demo-sprint", {}, json<DemoSprint>, () => fixture<DemoSprint>("demo-sprint.json"));
 }
 
+export function getDemoPortfolio(): Promise<DemoSprint> {
+  return request("/demo-portfolio", {}, json<DemoSprint>, () => fixture<DemoSprint>("demo-portfolio.json"));
+}
+
 export const COPILOT_STARTER_QUESTIONS = [
   "What is impacted?",
   "Why is risk high?",
