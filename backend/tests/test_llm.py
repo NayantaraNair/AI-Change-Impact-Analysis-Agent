@@ -233,7 +233,7 @@ async def test_inkling_tool_only_and_openrouter_headers(monkeypatch, mock_chain)
     assert "response_format" not in mock_chain.calls[1]
     assert "tool_choice" in mock_chain.calls[1]
     assert mock_chain.clients[-1]["default_headers"] == {
-        "X-Title": "Change Impact Copilot", "HTTP-Referer": "https://copilot.example",
+        "X-Title": "ImpactIQ", "HTTP-Referer": "https://copilot.example",
     }
 
 

@@ -1,14 +1,19 @@
 {
-  "answer": "The context does not describe release confidence as low — it reports a computed confidence of **70** with decision **GO**.\n\n- Release confidence: **70** (as supplied)\n- Decision: **GO**, triggered rule: \"GO: no blocking or conditional release rules fired\"\n- Conditions: none; rollback plan exists (feature-flag disable → core-payments, core-banking, customer-platform)\n- Complexity: **medium**\n\nIf the question is about what makes this release non-trivial despite the GO, the context points to:\n- Operational risk **44 (medium)**, top factor \"service criticality\" 40 pts, node_ids: `payment-service`\n- Compliance risk **40 (medium)** — \"pii data\" 20 pts (`account-service`) and \"financial data\" 20 pts (`account-service`, `payment-service`)\n- Multi-group coordination: deployment_groups `core-banking`, `core-payments`, `customer-platform`\n- Cross-group coupling: `payment-service` gains runtime dependency on `account-service` and `transaction-db` daily totals\n\nNote: no rule or factor in the context labels confidence as \"low,\" so I can't cite a cause for a low-confidence rating.",
+  "answer": "The context doesn't describe confidence as low — it reports **confidence: 70**, **decision: GO**, and **triggered_rules: [\"GO: no blocking or conditional release rules fired\"]** with **0 conditions**. No rule or finding in the analysis labels the confidence level as low.\n\nWhat the context does give as potential drags:\n- **complexity: \"medium\"** for ST-101.\n- **risk.overall = 39**, with the highest dimension **operational (44, medium)**:\n  - \"service criticality\" 40 pts → `payment-service`\n  - \"downstream systems\" 8 pts → `customer-db`, `fraud-engine`, `notification-service`, `transaction-db`\n  - \"deployment groups\" 6 pts\n- **compliance (40, medium)** — the only medium compliance dimension:\n  - \"pii data\" 20 pts → `account-service`\n  - \"financial data\" 20 pts → `account-service`, `payment-service`\n- **Rollout coordination**: deployment notes require sequencing three groups (customer-platform → core-banking → core-payments) plus enabling the approved feature flag, with a three-step rollback plan.\n- **Test coverage estimate: 0.667**, with 5 P1 tests (TC-013, TC-014, TC-043, TC-044, TC-047).\n\nIf your source for \"low\" is something outside this analysis, it isn't in the context provided.",
   "cited_nodes": [
     "account-service",
     "payment-service",
-    "transaction-db"
+    "notification-service",
+    "customer-db",
+    "transaction-db",
+    "fraud-engine"
   ],
   "cited_factors": [
     "pii data",
     "financial data",
-    "service criticality"
+    "service criticality",
+    "downstream systems",
+    "deployment groups"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

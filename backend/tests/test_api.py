@@ -197,3 +197,22 @@ def test_demo_sprint_fixture_saved_only_for_exact_demo(client, stages):
     assert stages["calls"]["requirement"] == 1
     refreshed = client.post("/analyze-sprint?refresh=true", json={})
     assert refreshed.json()["summary"] != "Real fixture prose"
+
+
+def test_demo_portfolio_is_served_and_resolved(client):
+    from app.architecture import load_demo_portfolio
+    from app.api.fixtures import demo_backlog_for
+    from app.contracts import SprintRequest
+
+    portfolio = load_demo_portfolio()
+    assert client.get("/demo-portfolio").json() == portfolio.model_dump(mode="json")
+    assert demo_backlog_for(SprintRequest(sprint_id=portfolio.sprint_id)) == portfolio
+    assert demo_backlog_for(SprintRequest(stories=portfolio.stories)) == portfolio
+    assert demo_backlog_for(SprintRequest()) == load_demo_sprint()
+    response = client.post("/analyze-sprint", json={"sprint_id": portfolio.sprint_id})
+    assert response.status_code == 200, response.text
+    result = SprintAnalysis.model_validate(response.json())
+    assert [analysis.story for analysis in result.stories] == portfolio.stories
+    otp, reset = (next(a for a in result.stories if a.story.id == sid) for sid in ("EX-201", "EX-202"))
+    shared = {n.id for n in otp.graph.nodes if n.hop == 0} & {n.id for n in reset.graph.nodes if n.hop == 0}
+    assert "authentication-service" in shared

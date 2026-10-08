@@ -1,0 +1,2013 @@
+{
+  "story": {
+    "id": "EX-201",
+    "title": "OTP multi-factor login for web and mobile banking",
+    "description": "Add a one-time passcode (OTP) step to customer login on web-banking and mobile-banking. The authentication-service generates, sends and verifies six-digit codes with a five-minute expiry; the notification-service delivers each code by SMS to the customer's verified mobile number; customer-db stores the MFA enrolment flag and verified phone number in two new columns. The API gateway exposes new /auth/otp/send and /auth/otp/verify endpoints. Lock the login after five failed codes and record every attempt for audit.",
+    "type": "epic",
+    "acceptance_criteria": [
+      "Customers enrolled in MFA must enter a valid six-digit OTP after their password before a session is issued.",
+      "Codes expire after five minutes and five failed attempts lock the login for 30 minutes.",
+      "OTP SMS messages are delivered within 30 seconds through the notification service.",
+      "Every OTP send, success and failure is recorded for audit."
+    ]
+  },
+  "requirement": {
+    "business_summary": "Web and mobile banking customers will be required to complete a one-time passcode (OTP) step after entering their password when they are enrolled in multi-factor authentication. The six-digit code is sent by SMS to the customer's verified mobile number, expires after five minutes, and five failed codes lock the login for 30 minutes. Every OTP send, success and failure is recorded for audit.",
+    "technical_summary": "The authentication-service is extended to generate, deliver and verify six-digit OTPs with a five-minute expiry, enforce a five-failed-attempt lockout for 30 minutes, and emit audit records for every send, success and failure. Codes are dispatched as SMS via the notification-service to the customer's verified mobile number. The customer-db adds two columns to hold the MFA enrolment flag and the verified phone number. The api-gateway exposes two new routes, /auth/otp/send and /auth/otp/verify. The web-banking and mobile-banking login flows gain an OTP entry step between password entry and session issuance for MFA-enrolled customers.",
+    "business_domain": "Retail Digital Banking — Customer Authentication and Access",
+    "affected_capabilities": [
+      "Customer login and multi-factor authentication",
+      "One-time passcode generation, expiry and verification",
+      "SMS delivery of authentication codes",
+      "Login lockout after repeated failed OTP attempts",
+      "Customer MFA enrolment and verified phone number storage",
+      "External authentication API endpoints",
+      "Audit recording of authentication attempts"
+    ],
+    "affected_services": [
+      "web-banking",
+      "mobile-banking",
+      "authentication-service",
+      "api-gateway",
+      "customer-db",
+      "notification-service"
+    ],
+    "change_type": "new_feature",
+    "touches_customer_data": true,
+    "touches_card_data": false,
+    "touches_financial_data": false,
+    "changes_auth_flow": true,
+    "changes_external_api_contract": true,
+    "changes_db_schema": true,
+    "ambiguity": "low",
+    "engineering_scope": "Contained change spanning six components: new OTP generation/verification and lockout logic in authentication-service; a new OTP SMS notification in notification-service; two new columns (MFA enrolment flag, verified phone number) in customer-db; two new gateway routes (/auth/otp/send, /auth/otp/verify) in api-gateway; and an OTP entry step in the web-banking and mobile-banking login screens. No changes to balances, payments, cards or loan processing; audit attempt records are written as new entries to the existing append-only audit store without schema change. Thresholds (five-minute expiry, five attempts, 30-minute lockout) are configuration/business rules local to the authentication flow.",
+    "source": "tokenharbor:deepseek-v4.1-flash:free"
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "account-service",
+        "label": "Account Service",
+        "type": "core",
+        "hop": 1,
+        "severity": "high",
+        "x": -348.1,
+        "y": 182.7,
+        "criticality": 9,
+        "owner_team": "Core Banking",
+        "data_classes": [
+          "financial",
+          "pii"
+        ]
+      },
+      {
+        "id": "api-gateway",
+        "label": "API Gateway",
+        "type": "platform",
+        "hop": 0,
+        "severity": "high",
+        "x": -181.4,
+        "y": 0.0,
+        "criticality": 10,
+        "owner_team": "Identity & Access",
+        "data_classes": [
+          "pii",
+          "financial"
+        ]
+      },
+      {
+        "id": "atm",
+        "label": "ATM Network",
+        "type": "channel",
+        "hop": 1,
+        "severity": "medium",
+        "x": -47.4,
+        "y": 390.2,
+        "criticality": 7,
+        "owner_team": "Assisted Channels",
+        "data_classes": [
+          "card",
+          "financial"
+        ]
+      },
+      {
+        "id": "audit-db",
+        "label": "Audit Database",
+        "type": "database",
+        "hop": 1,
+        "severity": "medium",
+        "x": 294.2,
+        "y": -260.7,
+        "criticality": 8,
+        "owner_team": "Data & Analytics",
+        "data_classes": [
+          "audit"
+        ]
+      },
+      {
+        "id": "authentication-service",
+        "label": "Authentication Service",
+        "type": "platform",
+        "hop": 0,
+        "severity": "high",
+        "x": -90.7,
+        "y": -157.1,
+        "criticality": 10,
+        "owner_team": "Identity & Access",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "branch-portal",
+        "label": "Branch Portal",
+        "type": "channel",
+        "hop": 1,
+        "severity": "medium",
+        "x": -223.3,
+        "y": 323.5,
+        "criticality": 6,
+        "owner_team": "Assisted Channels",
+        "data_classes": [
+          "pii",
+          "financial"
+        ]
+      },
+      {
+        "id": "card-service",
+        "label": "Card Service",
+        "type": "core",
+        "hop": 1,
+        "severity": "high",
+        "x": -393.1,
+        "y": 0.0,
+        "criticality": 9,
+        "owner_team": "Cards Platform",
+        "data_classes": [
+          "card",
+          "pii"
+        ]
+      },
+      {
+        "id": "crm",
+        "label": "Customer Relationship Management",
+        "type": "core",
+        "hop": 1,
+        "severity": "medium",
+        "x": -348.1,
+        "y": -182.7,
+        "criticality": 6,
+        "owner_team": "Customer Platform",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "customer-db",
+        "label": "Customer Database",
+        "type": "database",
+        "hop": 0,
+        "severity": "high",
+        "x": -90.7,
+        "y": 157.1,
+        "criticality": 9,
+        "owner_team": "Customer Platform",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "customer-service",
+        "label": "Customer Service",
+        "type": "core",
+        "hop": 1,
+        "severity": "medium",
+        "x": -223.3,
+        "y": -323.5,
+        "criticality": 8,
+        "owner_team": "Customer Platform",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "document-service",
+        "label": "Document Service",
+        "type": "platform",
+        "hop": 1,
+        "severity": "low",
+        "x": 381.7,
+        "y": -94.1,
+        "criticality": 4,
+        "owner_team": "Document Operations",
+        "data_classes": []
+      },
+      {
+        "id": "fraud-engine",
+        "label": "Fraud Engine",
+        "type": "analytics",
+        "hop": 1,
+        "severity": "high",
+        "x": 381.7,
+        "y": 94.1,
+        "criticality": 9,
+        "owner_team": "Payments Platform",
+        "data_classes": [
+          "financial",
+          "card"
+        ]
+      },
+      {
+        "id": "loan-service",
+        "label": "Loan Service",
+        "type": "core",
+        "hop": 1,
+        "severity": "medium",
+        "x": -47.4,
+        "y": -390.2,
+        "criticality": 8,
+        "owner_team": "Core Banking",
+        "data_classes": [
+          "financial",
+          "pii"
+        ]
+      },
+      {
+        "id": "mobile-banking",
+        "label": "Mobile Banking",
+        "type": "channel",
+        "hop": 0,
+        "severity": "high",
+        "x": 181.4,
+        "y": 0.0,
+        "criticality": 8,
+        "owner_team": "Digital Channels",
+        "data_classes": [
+          "pii",
+          "financial"
+        ]
+      },
+      {
+        "id": "notification-service",
+        "label": "Notification Service",
+        "type": "platform",
+        "hop": 0,
+        "severity": "high",
+        "x": 90.7,
+        "y": -157.1,
+        "criticality": 6,
+        "owner_team": "Customer Platform",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "payment-service",
+        "label": "Payment Service",
+        "type": "core",
+        "hop": 1,
+        "severity": "high",
+        "x": 139.4,
+        "y": -367.6,
+        "criticality": 10,
+        "owner_team": "Payments Platform",
+        "data_classes": [
+          "financial"
+        ]
+      },
+      {
+        "id": "reporting-db",
+        "label": "Reporting Database",
+        "type": "database",
+        "hop": 3,
+        "severity": "low",
+        "x": -733.1,
+        "y": 0.0,
+        "criticality": 6,
+        "owner_team": "Data & Analytics",
+        "data_classes": [
+          "financial"
+        ]
+      },
+      {
+        "id": "reporting-service",
+        "label": "Reporting Service",
+        "type": "analytics",
+        "hop": 1,
+        "severity": "medium",
+        "x": 294.2,
+        "y": 260.7,
+        "criticality": 5,
+        "owner_team": "Data & Analytics",
+        "data_classes": []
+      },
+      {
+        "id": "risk-engine",
+        "label": "Risk Engine",
+        "type": "analytics",
+        "hop": 1,
+        "severity": "medium",
+        "x": 139.4,
+        "y": 367.6,
+        "criticality": 8,
+        "owner_team": "Data & Analytics",
+        "data_classes": [
+          "financial"
+        ]
+      },
+      {
+        "id": "transaction-db",
+        "label": "Transaction Ledger Database",
+        "type": "database",
+        "hop": 2,
+        "severity": "medium",
+        "x": 563.1,
+        "y": 0.0,
+        "criticality": 10,
+        "owner_team": "Core Banking",
+        "data_classes": [
+          "financial"
+        ]
+      },
+      {
+        "id": "web-banking",
+        "label": "Web Banking",
+        "type": "channel",
+        "hop": 0,
+        "severity": "high",
+        "x": 90.7,
+        "y": 157.1,
+        "criticality": 8,
+        "owner_team": "Digital Channels",
+        "data_classes": [
+          "pii",
+          "financial"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "id": "account-service->audit-db",
+        "source": "account-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "account-service->authentication-service",
+        "source": "account-service",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "account-service->customer-db",
+        "source": "account-service",
+        "target": "customer-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "account-service->transaction-db",
+        "source": "account-service",
+        "target": "transaction-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->account-service",
+        "source": "api-gateway",
+        "target": "account-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->audit-db",
+        "source": "api-gateway",
+        "target": "audit-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->authentication-service",
+        "source": "api-gateway",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->card-service",
+        "source": "api-gateway",
+        "target": "card-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->crm",
+        "source": "api-gateway",
+        "target": "crm",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->customer-service",
+        "source": "api-gateway",
+        "target": "customer-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->document-service",
+        "source": "api-gateway",
+        "target": "document-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->loan-service",
+        "source": "api-gateway",
+        "target": "loan-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->payment-service",
+        "source": "api-gateway",
+        "target": "payment-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "atm->api-gateway",
+        "source": "atm",
+        "target": "api-gateway",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "atm->audit-db",
+        "source": "atm",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "atm->authentication-service",
+        "source": "atm",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "authentication-service->audit-db",
+        "source": "authentication-service",
+        "target": "audit-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "authentication-service->customer-db",
+        "source": "authentication-service",
+        "target": "customer-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "branch-portal->api-gateway",
+        "source": "branch-portal",
+        "target": "api-gateway",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "branch-portal->audit-db",
+        "source": "branch-portal",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "branch-portal->authentication-service",
+        "source": "branch-portal",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "card-service->account-service",
+        "source": "card-service",
+        "target": "account-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "card-service->audit-db",
+        "source": "card-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "card-service->authentication-service",
+        "source": "card-service",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "card-service->customer-db",
+        "source": "card-service",
+        "target": "customer-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "card-service->fraud-engine",
+        "source": "card-service",
+        "target": "fraud-engine",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "card-service->transaction-db",
+        "source": "card-service",
+        "target": "transaction-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "crm->audit-db",
+        "source": "crm",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "crm->authentication-service",
+        "source": "crm",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "crm->customer-db",
+        "source": "crm",
+        "target": "customer-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "crm->notification-service",
+        "source": "crm",
+        "target": "notification-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "customer-service->audit-db",
+        "source": "customer-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "customer-service->authentication-service",
+        "source": "customer-service",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "customer-service->crm",
+        "source": "customer-service",
+        "target": "crm",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "customer-service->customer-db",
+        "source": "customer-service",
+        "target": "customer-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "customer-service->notification-service",
+        "source": "customer-service",
+        "target": "notification-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "document-service->audit-db",
+        "source": "document-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "document-service->authentication-service",
+        "source": "document-service",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "document-service->reporting-service",
+        "source": "document-service",
+        "target": "reporting-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "fraud-engine->audit-db",
+        "source": "fraud-engine",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "fraud-engine->authentication-service",
+        "source": "fraud-engine",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "fraud-engine->risk-engine",
+        "source": "fraud-engine",
+        "target": "risk-engine",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "fraud-engine->transaction-db",
+        "source": "fraud-engine",
+        "target": "transaction-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->account-service",
+        "source": "loan-service",
+        "target": "account-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->audit-db",
+        "source": "loan-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->authentication-service",
+        "source": "loan-service",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->customer-db",
+        "source": "loan-service",
+        "target": "customer-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->risk-engine",
+        "source": "loan-service",
+        "target": "risk-engine",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->transaction-db",
+        "source": "loan-service",
+        "target": "transaction-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "mobile-banking->api-gateway",
+        "source": "mobile-banking",
+        "target": "api-gateway",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "mobile-banking->audit-db",
+        "source": "mobile-banking",
+        "target": "audit-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "mobile-banking->authentication-service",
+        "source": "mobile-banking",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "notification-service->audit-db",
+        "source": "notification-service",
+        "target": "audit-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "notification-service->authentication-service",
+        "source": "notification-service",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "notification-service->customer-db",
+        "source": "notification-service",
+        "target": "customer-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->account-service",
+        "source": "payment-service",
+        "target": "account-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->audit-db",
+        "source": "payment-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->authentication-service",
+        "source": "payment-service",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->fraud-engine",
+        "source": "payment-service",
+        "target": "fraud-engine",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->notification-service",
+        "source": "payment-service",
+        "target": "notification-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->transaction-db",
+        "source": "payment-service",
+        "target": "transaction-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "reporting-service->audit-db",
+        "source": "reporting-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "reporting-service->authentication-service",
+        "source": "reporting-service",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "reporting-service->reporting-db",
+        "source": "reporting-service",
+        "target": "reporting-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "risk-engine->audit-db",
+        "source": "risk-engine",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "risk-engine->authentication-service",
+        "source": "risk-engine",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "risk-engine->transaction-db",
+        "source": "risk-engine",
+        "target": "transaction-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "transaction-db->reporting-db",
+        "source": "transaction-db",
+        "target": "reporting-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "web-banking->api-gateway",
+        "source": "web-banking",
+        "target": "api-gateway",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "web-banking->audit-db",
+        "source": "web-banking",
+        "target": "audit-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "web-banking->authentication-service",
+        "source": "web-banking",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      }
+    ],
+    "impacted_services": [
+      "account-service",
+      "api-gateway",
+      "atm",
+      "audit-db",
+      "authentication-service",
+      "branch-portal",
+      "card-service",
+      "crm",
+      "customer-db",
+      "customer-service",
+      "document-service",
+      "fraud-engine",
+      "loan-service",
+      "mobile-banking",
+      "notification-service",
+      "payment-service",
+      "reporting-db",
+      "reporting-service",
+      "risk-engine",
+      "transaction-db",
+      "web-banking"
+    ],
+    "impacted_databases": [
+      "audit-db",
+      "customer-db",
+      "reporting-db",
+      "transaction-db"
+    ],
+    "impacted_apis": [
+      "GET /accounts/{id}/balance",
+      "GET /accounts/{id}/limits",
+      "GET /atm/accounts/{id}/balance",
+      "GET /branch/customers",
+      "GET /cards/{id}",
+      "GET /crm/customers/{id}/contacts",
+      "GET /customers/{id}",
+      "GET /documents/templates/{id}",
+      "GET /internal/audit/events",
+      "GET /internal/customer-store/profiles/{id}",
+      "GET /loans/{id}",
+      "GET /notifications/preferences/{customerId}",
+      "GET /notifications/{id}",
+      "GET /payments/limits",
+      "GET /payments/{id}",
+      "GET /reports/monthly-statements/{id}",
+      "GET /reports/statement-template",
+      "GET /risk/policies/{id}",
+      "GET /web/accounts",
+      "PATCH /cards/{id}/status",
+      "PATCH /customers/{id}/profile",
+      "PATCH /mobile/cards/{id}/status",
+      "PATCH /web/profile",
+      "POST /atm/withdrawals",
+      "POST /auth/biometric/challenges",
+      "POST /auth/introspect",
+      "POST /auth/step-up",
+      "POST /auth/token",
+      "POST /branch/service-requests",
+      "POST /cards/{id}/replacement",
+      "POST /customers/{id}/emails/verification",
+      "POST /documents/statements/render",
+      "POST /fraud/screenings",
+      "POST /fraud/velocity-checks",
+      "POST /internal/audit/events",
+      "POST /loans/applications",
+      "POST /loans/{id}/disbursements",
+      "POST /mobile/login",
+      "POST /mobile/payments",
+      "POST /notifications",
+      "POST /payments",
+      "POST /payments/{id}/cancellation",
+      "POST /reports/monthly-statements/jobs",
+      "POST /risk/assessments",
+      "POST /web/login",
+      "PUT /accounts/{id}/limits",
+      "PUT /crm/customers/{id}/contacts",
+      "PUT /documents/templates/{id}",
+      "PUT /fraud/rules/{id}",
+      "PUT /internal/customer-store/profiles/{id}",
+      "PUT /risk/policies/{id}"
+    ],
+    "downstream_systems": [
+      "account-service",
+      "atm",
+      "audit-db",
+      "branch-portal",
+      "card-service",
+      "crm",
+      "customer-service",
+      "document-service",
+      "fraud-engine",
+      "loan-service",
+      "payment-service",
+      "reporting-db",
+      "reporting-service",
+      "risk-engine",
+      "transaction-db"
+    ],
+    "deployment_groups": [
+      "channels-access",
+      "channels-mobile",
+      "core-banking",
+      "core-payments",
+      "customer-platform",
+      "data-platform",
+      "documents",
+      "identity"
+    ]
+  },
+  "risk": {
+    "dimensions": [
+      {
+        "name": "security",
+        "score": 88,
+        "level": "high",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 8,
+            "node_ids": []
+          },
+          {
+            "label": "customer data",
+            "points": 20,
+            "node_ids": [
+              "account-service",
+              "api-gateway",
+              "authentication-service",
+              "branch-portal",
+              "card-service",
+              "crm",
+              "customer-db",
+              "customer-service",
+              "loan-service",
+              "mobile-banking",
+              "notification-service",
+              "web-banking"
+            ]
+          },
+          {
+            "label": "auth flow change",
+            "points": 25,
+            "node_ids": [
+              "api-gateway",
+              "authentication-service",
+              "customer-db",
+              "mobile-banking",
+              "notification-service",
+              "web-banking"
+            ]
+          },
+          {
+            "label": "external API contract",
+            "points": 15,
+            "node_ids": [
+              "api-gateway",
+              "authentication-service",
+              "customer-db",
+              "mobile-banking",
+              "notification-service",
+              "web-banking"
+            ]
+          },
+          {
+            "label": "critical identity path",
+            "points": 10,
+            "node_ids": [
+              "api-gateway",
+              "authentication-service"
+            ]
+          },
+          {
+            "label": "blast radius size",
+            "points": 10,
+            "node_ids": [
+              "account-service",
+              "api-gateway",
+              "atm",
+              "audit-db",
+              "authentication-service",
+              "branch-portal",
+              "card-service",
+              "crm",
+              "customer-db",
+              "customer-service",
+              "document-service",
+              "fraud-engine",
+              "loan-service",
+              "mobile-banking",
+              "notification-service",
+              "payment-service",
+              "reporting-service",
+              "risk-engine",
+              "transaction-db",
+              "web-banking"
+            ]
+          }
+        ],
+        "explanation": "Security risk is high (88) because auth flow change (+25) on api-gateway, authentication-service, customer-db and 3 more; customer data (+20) on account-service, api-gateway, authentication-service and 9 more; external API contract (+15) on api-gateway, authentication-service, customer-db and 3 more."
+      },
+      {
+        "name": "compliance",
+        "score": 73,
+        "level": "high",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 5,
+            "node_ids": []
+          },
+          {
+            "label": "pii data",
+            "points": 20,
+            "node_ids": [
+              "api-gateway",
+              "authentication-service",
+              "customer-db",
+              "mobile-banking",
+              "notification-service",
+              "web-banking"
+            ]
+          },
+          {
+            "label": "nearby card data",
+            "points": 12,
+            "node_ids": [
+              "atm",
+              "card-service",
+              "fraud-engine"
+            ]
+          },
+          {
+            "label": "financial data",
+            "points": 20,
+            "node_ids": [
+              "api-gateway",
+              "mobile-banking",
+              "web-banking"
+            ]
+          },
+          {
+            "label": "nearby audit data",
+            "points": 6,
+            "node_ids": [
+              "audit-db"
+            ]
+          },
+          {
+            "label": "database schema change",
+            "points": 10,
+            "node_ids": [
+              "audit-db",
+              "customer-db",
+              "reporting-db",
+              "transaction-db"
+            ]
+          }
+        ],
+        "explanation": "Compliance risk is high (73) because pii data (+20) on api-gateway, authentication-service, customer-db and 3 more; financial data (+20) on api-gateway, mobile-banking, web-banking; nearby card data (+12) on atm, card-service, fraud-engine."
+      },
+      {
+        "name": "technical",
+        "score": 80,
+        "level": "high",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 5,
+            "node_ids": []
+          },
+          {
+            "label": "database schema change",
+            "points": 20,
+            "node_ids": [
+              "audit-db",
+              "customer-db",
+              "reporting-db",
+              "transaction-db"
+            ]
+          },
+          {
+            "label": "direct services",
+            "points": 30,
+            "node_ids": [
+              "api-gateway",
+              "authentication-service",
+              "mobile-banking",
+              "notification-service",
+              "web-banking"
+            ]
+          },
+          {
+            "label": "dependency depth",
+            "points": 15,
+            "node_ids": [
+              "reporting-db"
+            ]
+          },
+          {
+            "label": "new feature",
+            "points": 10,
+            "node_ids": [
+              "api-gateway",
+              "authentication-service",
+              "customer-db",
+              "mobile-banking",
+              "notification-service",
+              "web-banking"
+            ]
+          }
+        ],
+        "explanation": "Technical risk is high (80) because direct services (+30) on api-gateway, authentication-service, mobile-banking and 2 more; database schema change (+20) on audit-db, customer-db, reporting-db and 1 more; dependency depth (+15) on reporting-db."
+      },
+      {
+        "name": "operational",
+        "score": 71,
+        "level": "high",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 5,
+            "node_ids": []
+          },
+          {
+            "label": "service criticality",
+            "points": 40,
+            "node_ids": [
+              "api-gateway",
+              "authentication-service"
+            ]
+          },
+          {
+            "label": "downstream systems",
+            "points": 20,
+            "node_ids": [
+              "account-service",
+              "atm",
+              "audit-db",
+              "branch-portal",
+              "card-service",
+              "crm",
+              "customer-service",
+              "document-service",
+              "fraud-engine",
+              "loan-service",
+              "payment-service",
+              "reporting-db",
+              "reporting-service",
+              "risk-engine",
+              "transaction-db"
+            ]
+          },
+          {
+            "label": "deployment groups",
+            "points": 6,
+            "node_ids": [
+              "account-service",
+              "api-gateway",
+              "atm",
+              "audit-db",
+              "authentication-service",
+              "branch-portal",
+              "card-service",
+              "crm",
+              "customer-db",
+              "customer-service",
+              "document-service",
+              "fraud-engine",
+              "loan-service",
+              "mobile-banking",
+              "notification-service",
+              "payment-service",
+              "reporting-db",
+              "reporting-service",
+              "risk-engine",
+              "transaction-db",
+              "web-banking"
+            ]
+          }
+        ],
+        "explanation": "Operational risk is high (71) because service criticality (+40) on api-gateway, authentication-service; downstream systems (+20) on account-service, atm, audit-db and 12 more; deployment groups (+6) on account-service, api-gateway, atm and 18 more."
+      },
+      {
+        "name": "performance",
+        "score": 40,
+        "level": "medium",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 5,
+            "node_ids": []
+          },
+          {
+            "label": "transaction path",
+            "points": 20,
+            "node_ids": [
+              "payment-service",
+              "transaction-db"
+            ]
+          },
+          {
+            "label": "channel path",
+            "points": 15,
+            "node_ids": [
+              "api-gateway",
+              "mobile-banking",
+              "web-banking"
+            ]
+          }
+        ],
+        "explanation": "Performance risk is medium (40) because transaction path (+20) on payment-service, transaction-db; channel path (+15) on api-gateway, mobile-banking, web-banking."
+      },
+      {
+        "name": "delivery",
+        "score": 72,
+        "level": "high",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 5,
+            "node_ids": []
+          },
+          {
+            "label": "low ambiguity",
+            "points": 10,
+            "node_ids": [
+              "api-gateway",
+              "authentication-service",
+              "customer-db",
+              "mobile-banking",
+              "notification-service",
+              "web-banking"
+            ]
+          },
+          {
+            "label": "direct services",
+            "points": 25,
+            "node_ids": [
+              "api-gateway",
+              "authentication-service",
+              "mobile-banking",
+              "notification-service",
+              "web-banking"
+            ]
+          },
+          {
+            "label": "owner coordination",
+            "points": 32,
+            "node_ids": [
+              "account-service",
+              "api-gateway",
+              "atm",
+              "audit-db",
+              "authentication-service",
+              "branch-portal",
+              "card-service",
+              "crm",
+              "customer-db",
+              "customer-service",
+              "document-service",
+              "fraud-engine",
+              "loan-service",
+              "mobile-banking",
+              "notification-service",
+              "payment-service",
+              "reporting-db",
+              "reporting-service",
+              "risk-engine",
+              "transaction-db",
+              "web-banking"
+            ]
+          }
+        ],
+        "explanation": "Delivery risk is high (72) because owner coordination (+32) on account-service, api-gateway, atm and 18 more; direct services (+25) on api-gateway, authentication-service, mobile-banking and 2 more; low ambiguity (+10) on api-gateway, authentication-service, customer-db and 3 more."
+      }
+    ],
+    "overall": 80,
+    "highest": "security",
+    "change_size": "large",
+    "change_size_reason": "5 services change and both the login flow and a public API change"
+  },
+  "tests": {
+    "tests": [
+      {
+        "id": "TC-002",
+        "title": "Mobile card status route requires a valid device session",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "mobile-banking"
+        ],
+        "steps": [
+          "Prepare fixtures for Mobile card status route requires a valid device session.",
+          "Execute the scenario: Mobile card status route requires a valid device session.",
+          "Check the documented outcome for Mobile card status route requires a valid device session."
+        ],
+        "expected": "Mobile card status route requires a valid device session meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-004",
+        "title": "Web profile update rejects unsupported fields",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "web-banking"
+        ],
+        "steps": [
+          "Prepare fixtures for Web profile update rejects unsupported fields.",
+          "Execute the scenario: Web profile update rejects unsupported fields.",
+          "Check the documented outcome for Web profile update rejects unsupported fields."
+        ],
+        "expected": "Web profile update rejects unsupported fields meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-012",
+        "title": "Account limits endpoint rejects unauthorized limit overrides",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "account-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Account limits endpoint rejects unauthorized limit overrides.",
+          "Execute the scenario: Account limits endpoint rejects unauthorized limit overrides.",
+          "Check the documented outcome for Account limits endpoint rejects unauthorized limit overrides."
+        ],
+        "expected": "Account limits endpoint rejects unauthorized limit overrides meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-014",
+        "title": "Payment creation returns the same instruction for a repeated idempotency key",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "payment-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Payment creation returns the same instruction for a repeated idempotency key.",
+          "Execute the scenario: Payment creation returns the same instruction for a repeated idempotency key.",
+          "Check the documented outcome for Payment creation returns the same instruction for a repeated idempotency key."
+        ],
+        "expected": "Payment creation returns the same instruction for a repeated idempotency key meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-018",
+        "title": "Card status update rejects an expired step-up proof",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "card-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Card status update rejects an expired step-up proof.",
+          "Execute the scenario: Card status update rejects an expired step-up proof.",
+          "Check the documented outcome for Card status update rejects an expired step-up proof."
+        ],
+        "expected": "Card status update rejects an expired step-up proof meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-022",
+        "title": "Token introspection rejects expired and revoked sessions",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "authentication-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Token introspection rejects expired and revoked sessions.",
+          "Execute the scenario: Token introspection rejects expired and revoked sessions.",
+          "Check the documented outcome for Token introspection rejects expired and revoked sessions."
+        ],
+        "expected": "Token introspection rejects expired and revoked sessions meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-024",
+        "title": "Notification submission rejects an unsupported delivery channel",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "notification-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Notification submission rejects an unsupported delivery channel.",
+          "Execute the scenario: Notification submission rejects an unsupported delivery channel.",
+          "Check the documented outcome for Notification submission rejects an unsupported delivery channel."
+        ],
+        "expected": "Notification submission rejects an unsupported delivery channel meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-026",
+        "title": "Gateway card status route enforces the required authorization scope",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "api-gateway"
+        ],
+        "steps": [
+          "Prepare fixtures for Gateway card status route enforces the required authorization scope.",
+          "Execute the scenario: Gateway card status route enforces the required authorization scope.",
+          "Check the documented outcome for Gateway card status route enforces the required authorization scope."
+        ],
+        "expected": "Gateway card status route enforces the required authorization scope meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-030",
+        "title": "Customer store adapter rejects stale profile versions",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "customer-db"
+        ],
+        "steps": [
+          "Prepare fixtures for Customer store adapter rejects stale profile versions.",
+          "Execute the scenario: Customer store adapter rejects stale profile versions.",
+          "Check the documented outcome for Customer store adapter rejects stale profile versions."
+        ],
+        "expected": "Customer store adapter rejects stale profile versions meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-038",
+        "title": "Fraud screening endpoint returns rule version and decision trace",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "fraud-engine"
+        ],
+        "steps": [
+          "Prepare fixtures for Fraud screening endpoint returns rule version and decision trace.",
+          "Execute the scenario: Fraud screening endpoint returns rule version and decision trace.",
+          "Check the documented outcome for Fraud screening endpoint returns rule version and decision trace."
+        ],
+        "expected": "Fraud screening endpoint returns rule version and decision trace meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-001",
+        "title": "Mobile payment confirmation shows a single successful submission",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "mobile-banking"
+        ],
+        "steps": [
+          "Prepare fixtures for Mobile payment confirmation shows a single successful submission.",
+          "Execute the scenario: Mobile payment confirmation shows a single successful submission.",
+          "Check the documented outcome for Mobile payment confirmation shows a single successful submission."
+        ],
+        "expected": "Mobile payment confirmation shows a single successful submission meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-003",
+        "title": "Web dashboard displays only accounts authorized for the current customer",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "web-banking"
+        ],
+        "steps": [
+          "Prepare fixtures for Web dashboard displays only accounts authorized for the current customer.",
+          "Execute the scenario: Web dashboard displays only accounts authorized for the current customer.",
+          "Check the documented outcome for Web dashboard displays only accounts authorized for the current customer."
+        ],
+        "expected": "Web dashboard displays only accounts authorized for the current customer meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-011",
+        "title": "Account daily limits distinguish premium and standard eligibility",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "account-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Account daily limits distinguish premium and standard eligibility.",
+          "Execute the scenario: Account daily limits distinguish premium and standard eligibility.",
+          "Check the documented outcome for Account daily limits distinguish premium and standard eligibility."
+        ],
+        "expected": "Account daily limits distinguish premium and standard eligibility meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-013",
+        "title": "Payments reject amounts exceeding the remaining daily account limit",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "payment-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Payments reject amounts exceeding the remaining daily account limit.",
+          "Execute the scenario: Payments reject amounts exceeding the remaining daily account limit.",
+          "Check the documented outcome for Payments reject amounts exceeding the remaining daily account limit."
+        ],
+        "expected": "Payments reject amounts exceeding the remaining daily account limit meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-017",
+        "title": "Card freeze and unfreeze preserve the original cardholder linkage",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "card-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Card freeze and unfreeze preserve the original cardholder linkage.",
+          "Execute the scenario: Card freeze and unfreeze preserve the original cardholder linkage.",
+          "Check the documented outcome for Card freeze and unfreeze preserve the original cardholder linkage."
+        ],
+        "expected": "Card freeze and unfreeze preserve the original cardholder linkage meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "GEN-1",
+        "title": "Security: OTP value is not leaked in audit events",
+        "type": "security",
+        "priority": "P1",
+        "covers": [
+          "audit-db",
+          "authentication-service",
+          "notification-service"
+        ],
+        "steps": [
+          "Enroll a test customer in MFA (set enrolment flag and verified phone number).",
+          "Trigger an OTP send via /auth/otp/send or login flow.",
+          "Retrieve the audit event for the OTP send from audit-db (GET /internal/audit/events filtered by customerId and event type).",
+          "Verify the audit event payload does not contain the OTP value.",
+          "Repeat for OTP success and failure verification events."
+        ],
+        "expected": "Audit events contain metadata (timestamp, customerId, event type, success/failure flag) but the OTP value is absent or masked.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-2",
+        "title": "Technical: Customer DB schema includes MFA enrolment flag and verified phone number columns",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "customer-db"
+        ],
+        "steps": [
+          "Query the customer-db schema (e.g., DESCRIBE customer table).",
+          "Confirm presence of columns: mfa_enrolled (BOOLEAN, default false) and verified_phone_number (VARCHAR, nullable).",
+          "Insert a new customer record without specifying these columns.",
+          "Retrieve the record and verify default values: mfa_enrolled = false, verified_phone_number = NULL.",
+          "Update the record with a phone number and set mfa_enrolled = true.",
+          "Retrieve and verify values persisted correctly."
+        ],
+        "expected": "Schema shows the two columns with correct defaults; updates persist as expected.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-3",
+        "title": "Compliance: Verified phone number is not returned in customer profile API",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "api-gateway",
+          "customer-db",
+          "mobile-banking",
+          "web-banking"
+        ],
+        "steps": [
+          "Enroll a customer with MFA and set a verified phone number in customer-db.",
+          "Authenticate the customer via web/mobile login (including OTP) to obtain a session token.",
+          "Call GET /customers/{id} (or equivalent profile endpoint) with the token.",
+          "Inspect the response JSON for fields containing the phone number.",
+          "Ensure the verified phone number is absent or masked (e.g., not present or only last four digits if any)."
+        ],
+        "expected": "The customer profile API does not expose the full verified phone number; PII is protected.",
+        "source": "generated",
+        "automation_candidate": true
+      },
+      {
+        "id": "GEN-4",
+        "title": "Delivery: Notification service logs OTP send attempts for audit",
+        "type": "integration",
+        "priority": "P1",
+        "covers": [
+          "audit-db",
+          "notification-service"
+        ],
+        "steps": [
+          "Trigger an OTP send for a test customer via /auth/otp/send.",
+          "Query notification-service logs (or audit-db) for an OTP send record.",
+          "Verify a log entry exists with customerId, timestamp, and status \"sent\".",
+          "Also verify an audit event is created in audit-db with event type \"otp_send\".",
+          "Repeat for a failed OTP send (e.g., invalid phone number) and verify log indicates failure."
+        ],
+        "expected": "Notification service logs each OTP send attempt; audit-db records an event for each send (success or failure).",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-5",
+        "title": "Operational: OTP failed attempt lockout prevents login for 30 minutes",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "authentication-service",
+          "mobile-banking",
+          "web-banking"
+        ],
+        "steps": [
+          "Enroll a customer in MFA.",
+          "Attempt to log in via web or mobile with correct password but incorrect OTP five times consecutively.",
+          "After the fifth failure, attempt another login with correct OTP.",
+          "Observe login is denied with lockout message.",
+          "Wait 30 minutes (or simulate time shift) and retry login with correct OTP.",
+          "Observe that login succeeds."
+        ],
+        "expected": "After five failed OTP attempts, account is locked for 30 minutes; subsequent login attempts are rejected until lockout expires.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-6",
+        "title": "ATM withdrawal functions normally after MFA OTP feature rollout",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "atm"
+        ],
+        "steps": [
+          "Ensure an ATM terminal is registered and has sufficient cash.",
+          "Using a valid card and PIN, initiate a withdrawal request for an amount within available balance.",
+          "Complete the transaction without any OTP prompt.",
+          "Verify the transaction completes successfully and the account is debited accordingly.",
+          "Verify that no OTP-related audit events are generated for this ATM transaction."
+        ],
+        "expected": "ATM withdrawal proceeds as before; no OTP step is required; audit logs show only standard transaction events.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-7",
+        "title": "Branch portal login unaffected by web/mobile OTP requirement",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "branch-portal"
+        ],
+        "steps": [
+          "A branch staff member logs into the branch portal using username/password (no MFA).",
+          "Verify that login succeeds and the user gains access to branch portal functions.",
+          "Attempt to log in with invalid credentials; verify appropriate error.",
+          "Confirm that no OTP prompt appears during login.",
+          "Verify that audit logs for branch portal login do not contain OTP-related events."
+        ],
+        "expected": "Branch portal login works as before, without OTP step; no OTP audit events.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-8",
+        "title": "Transaction ledger records payments without OTP-related fields",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "transaction-db"
+        ],
+        "steps": [
+          "Perform a payment transaction via web or mobile (including OTP step for authentication).",
+          "After transaction completion, query the transaction-db for the ledger entry corresponding to the payment.",
+          "Inspect the ledger record fields: ensure it contains standard fields (transactionId, amount, timestamp, accounts, etc.) and does not contain any OTP-specific columns (e.g., otp_code, otp_attempt).",
+          "Verify that the ledger entry balances (debits = credits) and matches the payment amount.",
+          "Ensure that audit-db contains an OTP verification success event linked to the transaction via correlation ID."
+        ],
+        "expected": "Payment ledger entry is unchanged by OTP feature; no OTP fields present; transaction balances correctly.",
+        "source": "generated",
+        "automation_candidate": false
+      }
+    ],
+    "coverage_estimate": 0.6666666666666666,
+    "effort_hours": 13.166666666666666,
+    "automation_candidates": 16,
+    "summary": "Selected 15 catalog tests and 8 new tests, covering 14 of 21 impacted nodes (67%); estimated effort is 13.2 hours."
+  },
+  "compliance": {
+    "frameworks": [
+      {
+        "framework": "GDPR",
+        "applicable": true,
+        "reason": "PII-bearing components are impacted; the change touches customer data.",
+        "risk_level": "high",
+        "score": 45,
+        "findings": [
+          {
+            "text": "The change introduces a new authentication step that processes customer identifiers and a verified mobile number, with OTP generation and verification in authentication-service, SMS delivery via notification-service, storage in customer-db, gateway exposure on api-gateway, and login entry points in web-banking and mobile-banking. Review data minimization, purpose limitation and retention for the new OTP artefacts and the verified phone number attribute.",
+            "node_ids": [
+              "authentication-service",
+              "notification-service",
+              "customer-db",
+              "api-gateway",
+              "web-banking",
+              "mobile-banking"
+            ]
+          },
+          {
+            "text": "MFA enrolment and phone-number verification touch customer profile and contact flows through customer-service, crm and branch-portal. Confirm the lawful basis and accuracy controls for the verified phone number, and that staff-facing access remains scoped to authorized servicing purposes.",
+            "node_ids": [
+              "customer-service",
+              "crm",
+              "branch-portal",
+              "customer-db"
+            ]
+          },
+          {
+            "text": "Audit recording of OTP send, success and failure events writes authentication-related personal data to audit-db. Check retention limits, access restrictions and whether audit content captures the OTP value or full destination number in identifiable form.",
+            "node_ids": [
+              "audit-db",
+              "authentication-service",
+              "notification-service"
+            ]
+          }
+        ],
+        "recommendations": [
+          "Review data minimization, purpose and retention for OTP and verified-phone data across authentication-service, notification-service, customer-db, api-gateway, web-banking and mobile-banking.",
+          "Verify that audit-db authentication event entries do not persist the OTP value, and confirm their retention and access scope.",
+          "Confirm that error responses, logs and API contracts for the new api-gateway authentication routes do not expose customer identifiers or phone numbers to unauthorized parties.",
+          "Check how data subject access and erasure requests will be handled for the new MFA enrolment flag and verified phone number held in customer-db."
+        ]
+      },
+      {
+        "framework": "PCI DSS",
+        "applicable": true,
+        "reason": "card-data components are impacted.",
+        "risk_level": "high",
+        "score": 50,
+        "findings": [
+          {
+            "text": "The change does not introduce new card data, but it alters the authentication flow at api-gateway, authentication-service and the login steps of mobile-banking and web-banking, which are control points on paths used to reach card-service and atm. Cardholder-data access boundaries around these entry points require re-verification.",
+            "node_ids": [
+              "api-gateway",
+              "authentication-service",
+              "mobile-banking",
+              "web-banking",
+              "card-service",
+              "atm"
+            ]
+          },
+          {
+            "text": "Card-data components include card-service, atm, fraud-engine and customer-db. Confirm that OTP handling, notification-service SMS delivery and the two new customer-db columns do not draw cardholder data into non-card scopes or non-card audit paths.",
+            "node_ids": [
+              "card-service",
+              "atm",
+              "fraud-engine",
+              "customer-db",
+              "notification-service"
+            ]
+          },
+          {
+            "text": "Token validation, session issuance and step-up behaviour in authentication-service feed the api-gateway route that handles card freeze/unfreeze requests to card-service. Check that tokenization, masking and access restrictions on that path remain effective after the authentication change.",
+            "node_ids": [
+              "authentication-service",
+              "api-gateway",
+              "card-service"
+            ]
+          }
+        ],
+        "recommendations": [
+          "Confirm that OTP values are not stored, logged or transmitted through card-data handling paths in card-service, atm, fraud-engine and customer-db.",
+          "Re-run cardholder-data flow and access tests for api-gateway, mobile-banking, web-banking and authentication-service after the authentication change.",
+          "Verify access restrictions, monitoring and audit coverage for authentication-service and notification-service where they sit adjacent to cardholder-data processes.",
+          "Check that the new gateway routes follow the same token validation and route policy controls applied to existing card-related routes."
+        ]
+      },
+      {
+        "framework": "SOX",
+        "applicable": true,
+        "reason": "financial-data components are impacted; audit-data components are impacted.",
+        "risk_level": "medium",
+        "score": 65,
+        "findings": [
+          {
+            "text": "Financial-data components account-service, payment-service, transaction-db, loan-service and reporting-db are not changed in business logic, but the new OTP login step gates access to them through web-banking, mobile-banking and api-gateway. Assess whether transaction authorization and segregation of duties could be affected by the modified session issuance path.",
+            "node_ids": [
+              "account-service",
+              "payment-service",
+              "transaction-db",
+              "loan-service",
+              "reporting-db",
+              "web-banking",
+              "mobile-banking",
+              "api-gateway"
+            ]
+          },
+          {
+            "text": "audit-db receives new authentication event entries on the existing append-only store without schema change. Verify that records for access to financial processing remain complete, immutable and within the approved retention period.",
+            "node_ids": [
+              "audit-db",
+              "authentication-service",
+              "api-gateway"
+            ]
+          },
+          {
+            "text": "The customer-db schema change adds MFA enrolment and verified phone columns. Assess change-management and reconciliation impacts on downstream financial data consumers such as risk-engine and fraud-engine that rely on customer-linked records.",
+            "node_ids": [
+              "customer-db",
+              "risk-engine",
+              "fraud-engine"
+            ]
+          }
+        ],
+        "recommendations": [
+          "Obtain control-owner approval and evidence of financial and schema change testing for api-gateway, authentication-service, customer-db, audit-db, web-banking and mobile-banking.",
+          "Verify that audit-db authentication event records remain complete, immutable and retained in line with policy for financial-process access.",
+          "Confirm that OTP expiry, attempt and lockout thresholds are configuration-controlled and changed only through approved change procedures.",
+          "Document how the new customer-db columns will be reflected in reconciliation and downstream reporting checks."
+        ]
+      },
+      {
+        "framework": "Internal Governance",
+        "applicable": true,
+        "reason": "directly changed components have criticality >= 8; the authentication flow changes.",
+        "risk_level": "high",
+        "score": 45,
+        "findings": [
+          {
+            "text": "Directly changed components api-gateway, authentication-service, customer-db, notification-service, web-banking and mobile-banking carry tier1 or tier2 criticality. Service-owner approval, dependency review and a tested rollback plan are expected before release.",
+            "node_ids": [
+              "api-gateway",
+              "authentication-service",
+              "customer-db",
+              "notification-service",
+              "web-banking",
+              "mobile-banking"
+            ]
+          },
+          {
+            "text": "The change alters the authentication flow and the external API contract through two new api-gateway routes, and modifies the customer-db schema. Architecture, security and data governance review records for these touchpoints require confirmation.",
+            "node_ids": [
+              "api-gateway",
+              "authentication-service",
+              "customer-db"
+            ]
+          },
+          {
+            "text": "Operational readiness: monitoring, alerting and support runbooks for OTP delivery failures across notification-service and authentication-service, including dependency on audit-db for event capture, need verification before go-live.",
+            "node_ids": [
+              "notification-service",
+              "authentication-service",
+              "audit-db"
+            ]
+          }
+        ],
+        "recommendations": [
+          "Record service-owner change approval and the rollback plan for api-gateway, authentication-service, customer-db, notification-service, web-banking and mobile-banking.",
+          "Verify authorization tests, operational monitoring and release evidence for the new OTP routes in api-gateway and authentication-service.",
+          "Confirm schema-change review and data-owner sign-off for the two new customer-db columns.",
+          "Check that notification-service SMS delivery changes and authentication-service lockout logic have documented runbooks and alert thresholds."
+        ]
+      }
+    ],
+    "overall_score": 45,
+    "summary": "4 of 4 frameworks apply; the minimum compliance score is 45/100. 3 applicable framework(s) have high risk."
+  },
+  "release": {
+    "confidence": 30,
+    "decision": "NO_GO",
+    "triggered_rules": [
+      "NO_GO: security risk is 88 (>= 85)",
+      "NO_GO: highest risk 88 with test coverage 67% (< 70%)",
+      "NO_GO: GDPR risk is high and the change touches authentication",
+      "NO_GO: PCI DSS risk is high and the change touches authentication",
+      "NO_GO: Internal Governance risk is high and the change touches authentication",
+      "GO_WITH_CONDITIONS: highest risk is 88 (>= 60)",
+      "GO_WITH_CONDITIONS: GDPR risk is high",
+      "GO_WITH_CONDITIONS: PCI DSS risk is high",
+      "GO_WITH_CONDITIONS: SOX risk is medium",
+      "GO_WITH_CONDITIONS: Internal Governance risk is high"
+    ],
+    "conditions": [
+      "Reduce security risk below 85 and reassess release readiness",
+      "Increase test coverage to at least 70% and rerun the release assessment",
+      "Run the P1 api tests on mobile-banking before release (TC-002: Mobile card status route requires a valid device session)",
+      "Run the P1 api tests on web-banking before release (TC-004: Web profile update rejects unsupported fields)",
+      "Run the P1 api tests on account-service before release (TC-012: Account limits endpoint rejects unauthorized limit overrides)",
+      "Run the P1 api tests on payment-service before release (TC-014: Payment creation returns the same instruction for a repeated idempotency key)",
+      "Run the P1 api tests on card-service before release (TC-018: Card status update rejects an expired step-up proof)",
+      "Run the P1 api tests on authentication-service before release (TC-022: Token introspection rejects expired and revoked sessions)",
+      "Run the P1 api tests on notification-service before release (TC-024: Notification submission rejects an unsupported delivery channel)",
+      "Run the P1 api tests on api-gateway before release (TC-026: Gateway card status route enforces the required authorization scope)",
+      "Run the P1 api tests on customer-db before release (TC-030: Customer store adapter rejects stale profile versions)",
+      "Run the P1 api tests on fraud-engine before release (TC-038: Fraud screening endpoint returns rule version and decision trace)",
+      "Run the P1 functional tests on mobile-banking before release (TC-001: Mobile payment confirmation shows a single successful submission)",
+      "Run the P1 functional tests on web-banking before release (TC-003: Web dashboard displays only accounts authorized for the current customer)",
+      "Run the P1 functional tests on account-service before release (TC-011: Account daily limits distinguish premium and standard eligibility)",
+      "Run the P1 functional tests on payment-service before release (TC-013: Payments reject amounts exceeding the remaining daily account limit)",
+      "Run the P1 functional tests on card-service before release (TC-017: Card freeze and unfreeze preserve the original cardholder linkage)",
+      "Run the P1 security tests on audit-db, authentication-service, notification-service before release (GEN-1: Security: OTP value is not leaked in audit events)",
+      "Run the P1 functional tests on customer-db before release (GEN-2: Technical: Customer DB schema includes MFA enrolment flag and verified phone number columns)",
+      "Run the P1 api tests on api-gateway, customer-db, mobile-banking, web-banking before release (GEN-3: Compliance: Verified phone number is not returned in customer profile API)",
+      "Run the P1 integration tests on audit-db, notification-service before release (GEN-4: Delivery: Notification service logs OTP send attempts for audit)",
+      "Run the P1 functional tests on authentication-service, mobile-banking, web-banking before release (GEN-5: Operational: OTP failed attempt lockout prevents login for 30 minutes)",
+      "Run the P1 functional tests on atm before release (GEN-6: ATM withdrawal functions normally after MFA OTP feature rollout)",
+      "Run the P1 functional tests on branch-portal before release (GEN-7: Branch portal login unaffected by web/mobile OTP requirement)",
+      "Run the P1 functional tests on transaction-db before release (GEN-8: Transaction ledger records payments without OTP-related fields)",
+      "Review data minimization, purpose and retention for OTP and verified-phone data across authentication-service, notification-service, customer-db, api-gateway, web-banking and mobile-banking.",
+      "Verify that audit-db authentication event entries do not persist the OTP value, and confirm their retention and access scope.",
+      "Confirm that error responses, logs and API contracts for the new api-gateway authentication routes do not expose customer identifiers or phone numbers to unauthorized parties.",
+      "Check how data subject access and erasure requests will be handled for the new MFA enrolment flag and verified phone number held in customer-db.",
+      "Confirm that OTP values are not stored, logged or transmitted through card-data handling paths in card-service, atm, fraud-engine and customer-db.",
+      "Re-run cardholder-data flow and access tests for api-gateway, mobile-banking, web-banking and authentication-service after the authentication change.",
+      "Verify access restrictions, monitoring and audit coverage for authentication-service and notification-service where they sit adjacent to cardholder-data processes.",
+      "Check that the new gateway routes follow the same token validation and route policy controls applied to existing card-related routes.",
+      "Obtain control-owner approval and evidence of financial and schema change testing for api-gateway, authentication-service, customer-db, audit-db, web-banking and mobile-banking.",
+      "Verify that audit-db authentication event records remain complete, immutable and retained in line with policy for financial-process access.",
+      "Confirm that OTP expiry, attempt and lockout thresholds are configuration-controlled and changed only through approved change procedures.",
+      "Document how the new customer-db columns will be reflected in reconciliation and downstream reporting checks.",
+      "Record service-owner change approval and the rollback plan for api-gateway, authentication-service, customer-db, notification-service, web-banking and mobile-banking.",
+      "Verify authorization tests, operational monitoring and release evidence for the new OTP routes in api-gateway and authentication-service.",
+      "Confirm schema-change review and data-owner sign-off for the two new customer-db columns.",
+      "Check that notification-service SMS delivery changes and authentication-service lockout logic have documented runbooks and alert thresholds."
+    ],
+    "complexity": "high",
+    "rollback_plan": [
+      "Halt the release pipeline for the authentication OTP change and stop any further promotion toward production.",
+      "Revert api-gateway routes /auth/otp/send and /auth/otp/verify and redeploy the prior api-gateway version.",
+      "Restore authentication-service, notification-service, web-banking, mobile-banking, and customer-db to their pre-change versions and confirm existing login flows resume."
+    ],
+    "deployment_notes": [
+      "Decision is NO_GO, so do not deploy this release to production or any higher environment.",
+      "Keep the OTP login change gated off for web-banking, mobile-banking, and other customer channels until a new approved change is issued.",
+      "Record the NO_GO decision and audit evidence, then require a revised release plan before any deployment."
+    ]
+  },
+  "providers_used": {
+    "requirement": "tokenharbor:deepseek-v4.1-flash:free",
+    "dependency": "deterministic",
+    "scoring": "deterministic",
+    "testing": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "compliance": "tokenharbor:deepseek-v4.1-flash:free",
+    "release": "tokenharbor:deepseek-v4.1-flash:free"
+  },
+  "duration_ms": 56,
+  "created_at": "2026-10-08T05:07:40.643374Z"
+}

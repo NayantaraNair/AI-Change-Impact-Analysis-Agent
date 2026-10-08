@@ -12,8 +12,8 @@ from pathlib import Path
 from pydantic import BaseModel, ValidationError
 
 from app import config
-from app.architecture import load_demo_sprint
-from app.contracts import SprintAnalysis, SprintRequest, StoryAnalysis, StoryInput
+from app.architecture import demo_backlogs, load_demo_sprint
+from app.contracts import DemoSprint, SprintAnalysis, SprintRequest, StoryAnalysis, StoryInput
 
 
 def _load(path: Path, schema: type[BaseModel]):
@@ -30,15 +30,30 @@ def story_fixture(story: StoryInput) -> StoryAnalysis | None:
     return analysis if analysis and analysis.story == story else None
 
 
+def _fixture_name(backlog: DemoSprint) -> str:
+    return "sprint.json" if backlog.sprint_id == load_demo_sprint().sprint_id else f"{backlog.sprint_id}.json"
+
+
+def demo_backlog_for(request: SprintRequest) -> DemoSprint | None:
+    """The demo backlog a request asks for: by its stories, or by ID with no stories."""
+    for backlog in demo_backlogs():
+        if request.stories == backlog.stories or (
+            not request.stories and request.sprint_id == backlog.sprint_id
+        ):
+            return backlog
+    if not request.stories:
+        return load_demo_sprint()
+    return None
+
+
 def sprint_fixture(request: SprintRequest) -> SprintAnalysis | None:
-    demo = load_demo_sprint()
-    stories = request.stories or demo.stories
-    if stories != demo.stories:
+    backlog = demo_backlog_for(request)
+    if backlog is None:
         return None
-    analysis = _load(Path(config.FIXTURES_DIR) / "sprint.json", SprintAnalysis)
-    if analysis is None or [a.story for a in analysis.stories] != demo.stories:
+    analysis = _load(Path(config.FIXTURES_DIR) / _fixture_name(backlog), SprintAnalysis)
+    if analysis is None or [a.story for a in analysis.stories] != backlog.stories:
         return None
     return analysis.model_copy(update={
-        "sprint_id": request.sprint_id or demo.sprint_id,
-        "name": request.name or demo.name,
+        "sprint_id": request.sprint_id or backlog.sprint_id,
+        "name": request.name or backlog.name,
     })

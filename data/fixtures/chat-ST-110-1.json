@@ -1,18 +1,21 @@
 {
-  "answer": "No risk dimension is rated high in this analysis — the premise doesn't hold.\n\n**Supplied scores (not recalculated):**\n- Overall risk: **39**; highest dimension: **compliance, 50 (medium)**\n- security 34 (low), technical 11 (low), operational 34 (low), performance 30 (low), delivery 18 (low)\n- Release: decision **GO**, confidence **78**, conditions []\n\n**Why compliance is the highest (medium, 50):**\n- `card data` — 30 pts, node `fraud-engine`\n- `financial data` — 20 pts, node `fraud-engine`\n- `baseline` — 5 pts\n\n**Why security is 34 (low):**\n- `card data` — 25 pts, node `fraud-engine`\n- `baseline` — 8 pts\n- `blast radius size` — 6 pts, nodes `fraud-engine`, `risk-engine`, `transaction-db`\n\n**Operational 34 (low)** — driven by `service criticality` 36 pts (`fraud-engine`); **performance 30 (low)** — `transaction path` 20 pts and `payment business rule` 15 pts (`transaction-db`); **technical 11 (low)** and **delivery 18 (low)** are minor.\n\n**Compliance frameworks:** 3 of 4 apply, minimum score **80/100**, and **0 applicable frameworks have high risk** (PCI DSS low 80, SOX low 100, Internal Governance low 100; GDPR not applicable). PCI DSS findings centre on card-token handling/masking in the velocity path, access and audit logging on the screening/velocity/rule-update endpoints, and retention of declined-attempt data (`fraud-engine`, `transaction-db`).\n\nSo the drivers are card-data and financial-data exposure on `fraud-engine`, not a high-rated risk level.",
+  "answer": "Risk is not high — the computed scores show low-to-medium, not high:\n\n- **Overall risk: 39** (from the risk object), which is not a high rating.\n- **Highest dimension: compliance at 50 — level \"medium\"**, not high. Its top factors: `card data` (30 pts, node `fraud-engine`), `financial data` (20 pts, `fraud-engine`), `baseline` (5 pts).\n- All other dimensions are **\"low\"**:\n  - security 34 (top factors: `card data` 25, `baseline` 8, `blast radius size` 6)\n  - operational 34 (`service criticality` 36, `baseline` 5, `downstream systems` 4)\n  - performance 30 (`transaction path` 20, `payment business rule` 15, `baseline` 5)\n  - delivery 18 (`low ambiguity` 10, `owner coordination` 8, `baseline` 5)\n  - technical 11 (`direct services` 6, `baseline` 5, `dependency depth` 5)\n\nCompliance frameworks are also not high: PCI DSS = low (80), SOX = low (100), Internal Governance = low (100); compliance summary states \"0 applicable framework(s) have high risk.\"\n\nSo the closest thing to elevated risk is the **compliance dimension at medium (50)**, driven mainly by card and financial data in `fraud-engine`; nothing in the supplied analysis rates risk as high.",
   "cited_nodes": [
-    "transaction-db",
-    "fraud-engine",
-    "risk-engine"
+    "fraud-engine"
   ],
   "cited_factors": [
     "baseline",
     "card data",
     "blast radius size",
     "financial data",
+    "direct services",
+    "dependency depth",
     "service criticality",
+    "downstream systems",
     "transaction path",
-    "payment business rule"
+    "payment business rule",
+    "low ambiguity",
+    "owner coordination"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

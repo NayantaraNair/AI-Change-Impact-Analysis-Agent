@@ -1,14 +1,13 @@
 {
-  "answer": "Only one story is present in the analysis context: **ST-107** — \"Card freeze/unfreeze in mobile app with step-up authentication.\"\n\n**Risk verdict (as computed)**\n- Overall risk: **85**; highest dimension: **security**\n- Release decision: **NO_GO**, confidence 39\n\n**Risk dimensions (scores as supplied)**\n- security — 93 (high): top factors \"card data\" 25 pts (`atm`, `card-service`, `fraud-engine`), \"auth flow change\" 25 pts (`api-gateway`, `authentication-service`, `card-service`, `mobile-banking`), \"external API contract\" 15 pts (same four)\n- delivery — 87 (high): \"owner coordination\" 32 pts (20 components incl. `api-gateway`, `card-service`, `authentication-service`, `mobile-banking`), \"medium ambiguity\" 30 pts, \"direct services\" 20 pts\n- compliance — 75 (high): \"card data\" 30 pts (`card-service`), \"pii data\" 20 pts, \"financial data\" 20 pts\n- operational — 71 (high): \"service criticality\" 40 pts (`api-gateway`, `authentication-service`), \"downstream systems\" 20 pts, \"deployment groups\" 6 pts\n- technical — 49 (medium): \"direct services\" 24 pts, \"dependency depth\" 10 pts (`reporting-db`), \"new feature\" 10 pts\n- performance — 40 (medium): \"transaction path\" 20 pts (`payment-service`, `transaction-db`), \"channel path\" 15 pts (`api-gateway`, `mobile-banking`, `web-banking`)\n\n**Compliance view**\n- 4 of 4 frameworks apply; minimum compliance score 40/100\n- High: PCI DSS (40) and Internal Governance (45); GDPR medium (70); SOX low (85)\n\n**Key NO_GO triggers (as supplied)**\n- security risk 93 (>= 85)\n- delivery risk 87 (>= 85)\n- PCI DSS risk high and change touches card data and authentication\n- Internal Governance risk high and change touches card data and authentication\n\nNo other stories are included in this context, so I can't compare or list additional risky stories.",
+  "answer": "Only one story is in the analysis context — **ST-107** (\"Card freeze/unfreeze in mobile app with step-up authentication\") — and it is rated risky.\n\n**Release decision (as computed):** NO_GO — overall risk **85**, release confidence **39**.\n\n**Risk dimensions (as supplied):**\n- **security — 93 (high)** (highest): factors *card data* (25 pts; atm, card-service, fraud-engine), *auth flow change* (25 pts; api-gateway, authentication-service, card-service, mobile-banking), *external API contract* (15 pts; same four services).\n- **delivery — 87 (high)**: factors *owner coordination* (32 pts; 20 services incl. account-service, card-service, mobile-banking), *medium ambiguity* (30 pts; api-gateway, authentication-service, card-service, mobile-banking), *direct services* (20 pts).\n- **compliance — 75 (high)**: *card data* (30 pts; card-service), *pii data* (20 pts), *financial data* (20 pts; api-gateway, mobile-banking).\n- **operational — 71 (high)**: *service criticality* (40 pts; api-gateway, authentication-service), *downstream systems* (20 pts; 16 systems incl. account-service, atm, fraud-engine, web-banking).\n- **technical — 49 (medium)**: *direct services* (24 pts), *dependency depth* (10 pts; reporting-db), *new feature* (10 pts).\n- **performance — 40 (medium)**: *transaction path* (20 pts), *channel path* (15 pts).\n\n**Triggered rules (as supplied):** NO_GO because security risk 93 ≥ 85; delivery risk 87 ≥ 85; PCI DSS risk high with card data + auth flow; Internal Governance risk high with card data + auth flow. Also GO_WITH_CONDITIONS triggers for highest risk ≥ 60, GDPR medium, PCI DSS high, Internal Governance high.\n\n**Compliance (as supplied):** 4/4 frameworks apply, minimum score 40/100; PCI DSS (high, 40) and Internal Governance (high, 45) are the high-risk ones; GDPR medium (70); SOX low (85).\n\n**Story blockers noted in the requirement:** PCI DSS review, security sign-off and a rehearsed rollback are outstanding; the prototype permits cross-device proof replay and lacks fail-closed verification evidence.\n\nNo other stories exist in this context to compare against.",
   "cited_nodes": [
     "mobile-banking",
     "web-banking",
     "atm",
-    "payment-service",
+    "account-service",
     "card-service",
     "authentication-service",
     "api-gateway",
-    "transaction-db",
     "reporting-db",
     "fraud-engine"
   ],
@@ -23,7 +22,6 @@
     "new feature",
     "service criticality",
     "downstream systems",
-    "deployment groups",
     "transaction path",
     "channel path",
     "medium ambiguity",

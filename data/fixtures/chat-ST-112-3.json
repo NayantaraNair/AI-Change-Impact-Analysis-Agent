@@ -1,8 +1,7 @@
 {
-  "answer": "Only one story is in the analysis context: **ST-112 (Biometric login for mobile banking)**.\n\n**ST-112 — risky (overall risk 64, highest dimension: security)**\n- **Security — 73 (high):** top factors `auth flow change` (+25, authentication-service, mobile-banking), `customer data` (+20, api-gateway, authentication-service, customer-db, mobile-banking), `critical identity path` (+10, api-gateway, authentication-service).\n- **Operational — 69 (medium):** `service criticality` (+40, authentication-service), `downstream systems` (+18), `deployment groups` (+6).\n- **Delivery — 49 (medium):** `owner coordination` (+24 across 11 services), `low ambiguity` (+10), `direct services` (+10).\n- **Compliance — 45 (medium):** `pii data` (+20, authentication-service, mobile-banking), `financial data` (+20, mobile-banking).\n- **Performance — 40 (medium):** `transaction path` (+20, payment-service), `channel path` (+15, api-gateway, mobile-banking).\n- **Technical — 37 (low):** `direct services` (+12), `dependency depth` (+10), `new feature` (+10).\n\n**Release decision (as supplied):** GO_WITH_CONDITIONS, confidence 57, triggered by \"highest risk is 73 (>= 60)\" plus medium GDPR and Internal Governance risk.\n\n**Compliance frameworks (as supplied):** GDPR applicable, medium, 65; Internal Governance applicable, medium, 70; SOX applicable, low, 85; PCI DSS not applicable. Overall compliance score 65.\n\nNote: **ST-107** is referenced in the requirement/deployment notes as needing coordinated authentication-service release, but no risk analysis for ST-107 is present in this context — so it cannot be scored here.",
+  "answer": "Only **ST-112** has risk data in this context.\n\n**ST-112 (Biometric login for mobile banking)**\n- Overall risk: **64**, decision **GO_WITH_CONDITIONS** (release confidence 57).\n- Highest dimension: **security — 73 (high)**, top factors:\n  - `auth flow change` (+25) → `authentication-service`, `mobile-banking`\n  - `customer data` (+20) → `api-gateway`, `authentication-service`, `customer-db`, `mobile-banking`\n  - `critical identity path` (+10) → `api-gateway`, `authentication-service`\n- Other dimensions: operational 69 (medium; `service criticality` +40 on `authentication-service`), delivery 49, compliance 45, performance 40, technical 37.\n- Compliance: overall 65 — GDPR medium (65), Internal Governance medium (70), SOX low (85); PCI DSS not applicable.\n- Complexity: high; 12 conditions and a 3-step reverse-order rollback plan.\n\n**ST-107**\n- The context references ST-107 as coupled to ST-112 (authentication-service deployment, shared challenge contract and rollback policy must be scheduled jointly), but **no risk score, rating, or decision is supplied for ST-107** in this analysis.\n\nNo other stories are scored in the provided context.",
   "cited_nodes": [
     "mobile-banking",
-    "payment-service",
     "authentication-service",
     "api-gateway",
     "customer-db"
@@ -11,18 +10,7 @@
     "customer data",
     "auth flow change",
     "critical identity path",
-    "pii data",
-    "financial data",
-    "direct services",
-    "dependency depth",
-    "new feature",
-    "service criticality",
-    "downstream systems",
-    "deployment groups",
-    "transaction path",
-    "channel path",
-    "low ambiguity",
-    "owner coordination"
+    "service criticality"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

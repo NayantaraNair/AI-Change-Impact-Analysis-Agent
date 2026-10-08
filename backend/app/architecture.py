@@ -84,3 +84,17 @@ def load_demo_sprint() -> DemoSprint:
     return DemoSprint.model_validate(
         json.loads(config.DEMO_SPRINT_PATH.read_text(encoding="utf-8"))
     )
+
+
+def load_demo_portfolio() -> DemoSprint:
+    """The executive demo: major features and stories that clash on identity."""
+    return DemoSprint.model_validate(
+        json.loads(config.DEMO_PORTFOLIO_PATH.read_text(encoding="utf-8"))
+    )
+
+
+def demo_backlogs() -> list[DemoSprint]:
+    backlogs = [load_demo_sprint()]
+    if config.DEMO_PORTFOLIO_PATH.exists():
+        backlogs.append(load_demo_portfolio())
+    return backlogs

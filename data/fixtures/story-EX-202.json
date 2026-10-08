@@ -1,0 +1,1965 @@
+{
+  "story": {
+    "id": "EX-202",
+    "title": "Self-service password reset",
+    "description": "Let customers reset a forgotten password themselves from web-banking and mobile-banking. The authentication-service issues a single-use reset token that expires in 15 minutes and enforces the password policy; the notification-service sends the reset link by email and SMS; customer-db records the last reset time and failed reset attempts. Reset requests must not reveal whether an account exists.",
+    "type": "story",
+    "acceptance_criteria": [
+      "A customer can request a reset link and set a new password that meets the password policy.",
+      "Reset tokens are single use and expire after 15 minutes.",
+      "The response is identical whether or not the account exists.",
+      "Five reset requests in an hour block further requests for that customer."
+    ]
+  },
+  "requirement": {
+    "business_summary": "Customers will be able to reset a forgotten password themselves from web-banking and mobile-banking instead of relying on assisted servicing. Authentication Service issues a single-use reset token valid for 15 minutes and enforces the password policy; Notification Service delivers the reset link by email and SMS; Customer Database records the last reset time and failed reset attempts. Reset requests return an identical response whether or not the account exists, and five requests in an hour block further requests for that customer.",
+    "technical_summary": "Add a self-service password reset flow: Authentication Service gains reset-token issuance/validation (single use, 15-minute expiry), password-policy enforcement, uniform request responses to prevent account enumeration, and per-customer rate limiting of five reset requests per hour. Web and mobile channels add request-reset and set-new-password UI and call the new endpoints. Notification Service sends the reset link over email and SMS. Customer Database stores the last reset time and failed reset attempt count for the customer. No card or financial/ledger data is involved.",
+    "business_domain": "Identity and Access Management / Retail Banking Self-Service",
+    "affected_capabilities": [
+      "Self-service password reset",
+      "Credential and password-policy management",
+      "Reset token issuance and expiry control",
+      "Account-enumeration-safe request handling",
+      "Reset request rate limiting / abuse prevention",
+      "Email and SMS notification delivery for security events",
+      "Customer identity reset-activity tracking"
+    ],
+    "affected_services": [
+      "mobile-banking",
+      "web-banking",
+      "authentication-service",
+      "notification-service",
+      "customer-db"
+    ],
+    "change_type": "new_feature",
+    "touches_customer_data": true,
+    "touches_card_data": false,
+    "touches_financial_data": false,
+    "changes_auth_flow": true,
+    "changes_external_api_contract": false,
+    "changes_db_schema": true,
+    "ambiguity": "low",
+    "engineering_scope": "Contained, single-flow change. Authentication Service: new reset-token issue/validate logic (single use, 15-minute expiry), password-policy enforcement on the new password, identical responses regardless of account existence, and a per-customer limit of five reset requests per hour. Web Banking and Mobile Banking: add request-reset and set-new-password screens wired to those endpoints. Notification Service: send the reset link via existing email and SMS channels. Customer Database: persist last reset time and failed reset attempt count for the customer record. No changes to payment, card, loan or ledger processing; no changes to existing public contracts beyond adding the new self-service endpoints.",
+    "source": "tokenharbor:deepseek-v4.1-flash:free"
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "account-service",
+        "label": "Account Service",
+        "type": "core",
+        "hop": 1,
+        "severity": "high",
+        "x": -331.0,
+        "y": 264.0,
+        "criticality": 9,
+        "owner_team": "Core Banking",
+        "data_classes": [
+          "financial",
+          "pii"
+        ]
+      },
+      {
+        "id": "api-gateway",
+        "label": "API Gateway",
+        "type": "platform",
+        "hop": 1,
+        "severity": "high",
+        "x": 331.0,
+        "y": -264.0,
+        "criticality": 10,
+        "owner_team": "Identity & Access",
+        "data_classes": [
+          "pii",
+          "financial"
+        ]
+      },
+      {
+        "id": "atm",
+        "label": "ATM Network",
+        "type": "channel",
+        "hop": 1,
+        "severity": "medium",
+        "x": 0.0,
+        "y": 423.4,
+        "criticality": 7,
+        "owner_team": "Assisted Channels",
+        "data_classes": [
+          "card",
+          "financial"
+        ]
+      },
+      {
+        "id": "audit-db",
+        "label": "Audit Database",
+        "type": "database",
+        "hop": 1,
+        "severity": "medium",
+        "x": 183.7,
+        "y": -381.4,
+        "criticality": 8,
+        "owner_team": "Data & Analytics",
+        "data_classes": [
+          "audit"
+        ]
+      },
+      {
+        "id": "authentication-service",
+        "label": "Authentication Service",
+        "type": "platform",
+        "hop": 0,
+        "severity": "high",
+        "x": -122.3,
+        "y": -88.9,
+        "criticality": 10,
+        "owner_team": "Identity & Access",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "branch-portal",
+        "label": "Branch Portal",
+        "type": "channel",
+        "hop": 1,
+        "severity": "medium",
+        "x": -183.7,
+        "y": 381.4,
+        "criticality": 6,
+        "owner_team": "Assisted Channels",
+        "data_classes": [
+          "pii",
+          "financial"
+        ]
+      },
+      {
+        "id": "card-service",
+        "label": "Card Service",
+        "type": "core",
+        "hop": 1,
+        "severity": "high",
+        "x": -412.7,
+        "y": 94.2,
+        "criticality": 9,
+        "owner_team": "Cards Platform",
+        "data_classes": [
+          "card",
+          "pii"
+        ]
+      },
+      {
+        "id": "crm",
+        "label": "Customer Relationship Management",
+        "type": "core",
+        "hop": 1,
+        "severity": "medium",
+        "x": -412.7,
+        "y": -94.2,
+        "criticality": 6,
+        "owner_team": "Customer Platform",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "customer-db",
+        "label": "Customer Database",
+        "type": "database",
+        "hop": 0,
+        "severity": "high",
+        "x": -122.3,
+        "y": 88.9,
+        "criticality": 9,
+        "owner_team": "Customer Platform",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "customer-service",
+        "label": "Customer Service",
+        "type": "core",
+        "hop": 1,
+        "severity": "medium",
+        "x": -331.0,
+        "y": -264.0,
+        "criticality": 8,
+        "owner_team": "Customer Platform",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "document-service",
+        "label": "Document Service",
+        "type": "platform",
+        "hop": 1,
+        "severity": "low",
+        "x": 412.7,
+        "y": -94.2,
+        "criticality": 4,
+        "owner_team": "Document Operations",
+        "data_classes": []
+      },
+      {
+        "id": "fraud-engine",
+        "label": "Fraud Engine",
+        "type": "analytics",
+        "hop": 1,
+        "severity": "high",
+        "x": 412.7,
+        "y": 94.2,
+        "criticality": 9,
+        "owner_team": "Payments Platform",
+        "data_classes": [
+          "financial",
+          "card"
+        ]
+      },
+      {
+        "id": "loan-service",
+        "label": "Loan Service",
+        "type": "core",
+        "hop": 1,
+        "severity": "medium",
+        "x": -183.7,
+        "y": -381.4,
+        "criticality": 8,
+        "owner_team": "Core Banking",
+        "data_classes": [
+          "financial",
+          "pii"
+        ]
+      },
+      {
+        "id": "mobile-banking",
+        "label": "Mobile Banking",
+        "type": "channel",
+        "hop": 0,
+        "severity": "high",
+        "x": 151.2,
+        "y": 0.0,
+        "criticality": 8,
+        "owner_team": "Digital Channels",
+        "data_classes": [
+          "pii",
+          "financial"
+        ]
+      },
+      {
+        "id": "notification-service",
+        "label": "Notification Service",
+        "type": "platform",
+        "hop": 0,
+        "severity": "high",
+        "x": 46.7,
+        "y": -143.8,
+        "criticality": 6,
+        "owner_team": "Customer Platform",
+        "data_classes": [
+          "pii"
+        ]
+      },
+      {
+        "id": "payment-service",
+        "label": "Payment Service",
+        "type": "core",
+        "hop": 1,
+        "severity": "high",
+        "x": -0.0,
+        "y": -423.4,
+        "criticality": 10,
+        "owner_team": "Payments Platform",
+        "data_classes": [
+          "financial"
+        ]
+      },
+      {
+        "id": "reporting-db",
+        "label": "Reporting Database",
+        "type": "database",
+        "hop": null,
+        "severity": null,
+        "x": 763.4,
+        "y": 0.0,
+        "criticality": 6,
+        "owner_team": "Data & Analytics",
+        "data_classes": [
+          "financial"
+        ]
+      },
+      {
+        "id": "reporting-service",
+        "label": "Reporting Service",
+        "type": "analytics",
+        "hop": 1,
+        "severity": "medium",
+        "x": 331.0,
+        "y": 264.0,
+        "criticality": 5,
+        "owner_team": "Data & Analytics",
+        "data_classes": []
+      },
+      {
+        "id": "risk-engine",
+        "label": "Risk Engine",
+        "type": "analytics",
+        "hop": 1,
+        "severity": "medium",
+        "x": 183.7,
+        "y": 381.4,
+        "criticality": 8,
+        "owner_team": "Data & Analytics",
+        "data_classes": [
+          "financial"
+        ]
+      },
+      {
+        "id": "transaction-db",
+        "label": "Transaction Ledger Database",
+        "type": "database",
+        "hop": 3,
+        "severity": "low",
+        "x": -593.4,
+        "y": 0.0,
+        "criticality": 10,
+        "owner_team": "Core Banking",
+        "data_classes": [
+          "financial"
+        ]
+      },
+      {
+        "id": "web-banking",
+        "label": "Web Banking",
+        "type": "channel",
+        "hop": 0,
+        "severity": "high",
+        "x": 46.7,
+        "y": 143.8,
+        "criticality": 8,
+        "owner_team": "Digital Channels",
+        "data_classes": [
+          "pii",
+          "financial"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "id": "account-service->audit-db",
+        "source": "account-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "account-service->authentication-service",
+        "source": "account-service",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "account-service->customer-db",
+        "source": "account-service",
+        "target": "customer-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "account-service->transaction-db",
+        "source": "account-service",
+        "target": "transaction-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->account-service",
+        "source": "api-gateway",
+        "target": "account-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->audit-db",
+        "source": "api-gateway",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->authentication-service",
+        "source": "api-gateway",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->card-service",
+        "source": "api-gateway",
+        "target": "card-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->crm",
+        "source": "api-gateway",
+        "target": "crm",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->customer-service",
+        "source": "api-gateway",
+        "target": "customer-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->document-service",
+        "source": "api-gateway",
+        "target": "document-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->loan-service",
+        "source": "api-gateway",
+        "target": "loan-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "api-gateway->payment-service",
+        "source": "api-gateway",
+        "target": "payment-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "atm->api-gateway",
+        "source": "atm",
+        "target": "api-gateway",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "atm->audit-db",
+        "source": "atm",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "atm->authentication-service",
+        "source": "atm",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "authentication-service->audit-db",
+        "source": "authentication-service",
+        "target": "audit-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "authentication-service->customer-db",
+        "source": "authentication-service",
+        "target": "customer-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "branch-portal->api-gateway",
+        "source": "branch-portal",
+        "target": "api-gateway",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "branch-portal->audit-db",
+        "source": "branch-portal",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "branch-portal->authentication-service",
+        "source": "branch-portal",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "card-service->account-service",
+        "source": "card-service",
+        "target": "account-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "card-service->audit-db",
+        "source": "card-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "card-service->authentication-service",
+        "source": "card-service",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "card-service->customer-db",
+        "source": "card-service",
+        "target": "customer-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "card-service->fraud-engine",
+        "source": "card-service",
+        "target": "fraud-engine",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "card-service->transaction-db",
+        "source": "card-service",
+        "target": "transaction-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "crm->audit-db",
+        "source": "crm",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "crm->authentication-service",
+        "source": "crm",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "crm->customer-db",
+        "source": "crm",
+        "target": "customer-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "crm->notification-service",
+        "source": "crm",
+        "target": "notification-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "customer-service->audit-db",
+        "source": "customer-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "customer-service->authentication-service",
+        "source": "customer-service",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "customer-service->crm",
+        "source": "customer-service",
+        "target": "crm",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "customer-service->customer-db",
+        "source": "customer-service",
+        "target": "customer-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "customer-service->notification-service",
+        "source": "customer-service",
+        "target": "notification-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "document-service->audit-db",
+        "source": "document-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "document-service->authentication-service",
+        "source": "document-service",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "document-service->reporting-service",
+        "source": "document-service",
+        "target": "reporting-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "fraud-engine->audit-db",
+        "source": "fraud-engine",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "fraud-engine->authentication-service",
+        "source": "fraud-engine",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "fraud-engine->risk-engine",
+        "source": "fraud-engine",
+        "target": "risk-engine",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "fraud-engine->transaction-db",
+        "source": "fraud-engine",
+        "target": "transaction-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->account-service",
+        "source": "loan-service",
+        "target": "account-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->audit-db",
+        "source": "loan-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->authentication-service",
+        "source": "loan-service",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->customer-db",
+        "source": "loan-service",
+        "target": "customer-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->risk-engine",
+        "source": "loan-service",
+        "target": "risk-engine",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "loan-service->transaction-db",
+        "source": "loan-service",
+        "target": "transaction-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "mobile-banking->api-gateway",
+        "source": "mobile-banking",
+        "target": "api-gateway",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "mobile-banking->audit-db",
+        "source": "mobile-banking",
+        "target": "audit-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "mobile-banking->authentication-service",
+        "source": "mobile-banking",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "notification-service->audit-db",
+        "source": "notification-service",
+        "target": "audit-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "notification-service->authentication-service",
+        "source": "notification-service",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "notification-service->customer-db",
+        "source": "notification-service",
+        "target": "customer-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->account-service",
+        "source": "payment-service",
+        "target": "account-service",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->audit-db",
+        "source": "payment-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->authentication-service",
+        "source": "payment-service",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->fraud-engine",
+        "source": "payment-service",
+        "target": "fraud-engine",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->notification-service",
+        "source": "payment-service",
+        "target": "notification-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "payment-service->transaction-db",
+        "source": "payment-service",
+        "target": "transaction-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "reporting-service->audit-db",
+        "source": "reporting-service",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "reporting-service->authentication-service",
+        "source": "reporting-service",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "reporting-service->reporting-db",
+        "source": "reporting-service",
+        "target": "reporting-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "risk-engine->audit-db",
+        "source": "risk-engine",
+        "target": "audit-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "risk-engine->authentication-service",
+        "source": "risk-engine",
+        "target": "authentication-service",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "risk-engine->transaction-db",
+        "source": "risk-engine",
+        "target": "transaction-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "transaction-db->reporting-db",
+        "source": "transaction-db",
+        "target": "reporting-db",
+        "on_impact_path": false,
+        "conflict": false
+      },
+      {
+        "id": "web-banking->api-gateway",
+        "source": "web-banking",
+        "target": "api-gateway",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "web-banking->audit-db",
+        "source": "web-banking",
+        "target": "audit-db",
+        "on_impact_path": true,
+        "conflict": false
+      },
+      {
+        "id": "web-banking->authentication-service",
+        "source": "web-banking",
+        "target": "authentication-service",
+        "on_impact_path": false,
+        "conflict": false
+      }
+    ],
+    "impacted_services": [
+      "account-service",
+      "api-gateway",
+      "atm",
+      "audit-db",
+      "authentication-service",
+      "branch-portal",
+      "card-service",
+      "crm",
+      "customer-db",
+      "customer-service",
+      "document-service",
+      "fraud-engine",
+      "loan-service",
+      "mobile-banking",
+      "notification-service",
+      "payment-service",
+      "reporting-service",
+      "risk-engine",
+      "transaction-db",
+      "web-banking"
+    ],
+    "impacted_databases": [
+      "audit-db",
+      "customer-db",
+      "transaction-db"
+    ],
+    "impacted_apis": [
+      "GET /accounts/{id}/balance",
+      "GET /accounts/{id}/limits",
+      "GET /atm/accounts/{id}/balance",
+      "GET /branch/customers",
+      "GET /cards/{id}",
+      "GET /crm/customers/{id}/contacts",
+      "GET /customers/{id}",
+      "GET /documents/templates/{id}",
+      "GET /internal/audit/events",
+      "GET /internal/customer-store/profiles/{id}",
+      "GET /loans/{id}",
+      "GET /notifications/preferences/{customerId}",
+      "GET /notifications/{id}",
+      "GET /payments/limits",
+      "GET /payments/{id}",
+      "GET /reports/monthly-statements/{id}",
+      "GET /reports/statement-template",
+      "GET /risk/policies/{id}",
+      "GET /web/accounts",
+      "PATCH /cards/{id}/status",
+      "PATCH /customers/{id}/profile",
+      "PATCH /mobile/cards/{id}/status",
+      "PATCH /web/profile",
+      "POST /atm/withdrawals",
+      "POST /auth/biometric/challenges",
+      "POST /auth/introspect",
+      "POST /auth/step-up",
+      "POST /auth/token",
+      "POST /branch/service-requests",
+      "POST /cards/{id}/replacement",
+      "POST /customers/{id}/emails/verification",
+      "POST /documents/statements/render",
+      "POST /fraud/screenings",
+      "POST /fraud/velocity-checks",
+      "POST /internal/audit/events",
+      "POST /loans/applications",
+      "POST /loans/{id}/disbursements",
+      "POST /mobile/login",
+      "POST /mobile/payments",
+      "POST /notifications",
+      "POST /payments",
+      "POST /payments/{id}/cancellation",
+      "POST /reports/monthly-statements/jobs",
+      "POST /risk/assessments",
+      "POST /web/login",
+      "PUT /accounts/{id}/limits",
+      "PUT /crm/customers/{id}/contacts",
+      "PUT /documents/templates/{id}",
+      "PUT /fraud/rules/{id}",
+      "PUT /internal/customer-store/profiles/{id}",
+      "PUT /risk/policies/{id}"
+    ],
+    "downstream_systems": [
+      "account-service",
+      "api-gateway",
+      "atm",
+      "audit-db",
+      "branch-portal",
+      "card-service",
+      "crm",
+      "customer-service",
+      "document-service",
+      "fraud-engine",
+      "loan-service",
+      "payment-service",
+      "reporting-service",
+      "risk-engine",
+      "transaction-db"
+    ],
+    "deployment_groups": [
+      "channels-access",
+      "channels-mobile",
+      "core-banking",
+      "core-payments",
+      "customer-platform",
+      "data-platform",
+      "documents",
+      "identity"
+    ]
+  },
+  "risk": {
+    "dimensions": [
+      {
+        "name": "security",
+        "score": 73,
+        "level": "high",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 8,
+            "node_ids": []
+          },
+          {
+            "label": "customer data",
+            "points": 20,
+            "node_ids": [
+              "account-service",
+              "api-gateway",
+              "authentication-service",
+              "branch-portal",
+              "card-service",
+              "crm",
+              "customer-db",
+              "customer-service",
+              "loan-service",
+              "mobile-banking",
+              "notification-service",
+              "web-banking"
+            ]
+          },
+          {
+            "label": "auth flow change",
+            "points": 25,
+            "node_ids": [
+              "authentication-service",
+              "customer-db",
+              "mobile-banking",
+              "notification-service",
+              "web-banking"
+            ]
+          },
+          {
+            "label": "critical identity path",
+            "points": 10,
+            "node_ids": [
+              "api-gateway",
+              "authentication-service"
+            ]
+          },
+          {
+            "label": "blast radius size",
+            "points": 10,
+            "node_ids": [
+              "account-service",
+              "api-gateway",
+              "atm",
+              "audit-db",
+              "authentication-service",
+              "branch-portal",
+              "card-service",
+              "crm",
+              "customer-db",
+              "customer-service",
+              "document-service",
+              "fraud-engine",
+              "loan-service",
+              "mobile-banking",
+              "notification-service",
+              "payment-service",
+              "reporting-service",
+              "risk-engine",
+              "web-banking"
+            ]
+          }
+        ],
+        "explanation": "Security risk is high (73) because auth flow change (+25) on authentication-service, customer-db, mobile-banking and 2 more; customer data (+20) on account-service, api-gateway, authentication-service and 9 more; critical identity path (+10) on api-gateway, authentication-service."
+      },
+      {
+        "name": "compliance",
+        "score": 73,
+        "level": "high",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 5,
+            "node_ids": []
+          },
+          {
+            "label": "pii data",
+            "points": 20,
+            "node_ids": [
+              "authentication-service",
+              "customer-db",
+              "mobile-banking",
+              "notification-service",
+              "web-banking"
+            ]
+          },
+          {
+            "label": "nearby card data",
+            "points": 12,
+            "node_ids": [
+              "atm",
+              "card-service",
+              "fraud-engine"
+            ]
+          },
+          {
+            "label": "financial data",
+            "points": 20,
+            "node_ids": [
+              "mobile-banking",
+              "web-banking"
+            ]
+          },
+          {
+            "label": "nearby audit data",
+            "points": 6,
+            "node_ids": [
+              "audit-db"
+            ]
+          },
+          {
+            "label": "database schema change",
+            "points": 10,
+            "node_ids": [
+              "audit-db",
+              "customer-db",
+              "transaction-db"
+            ]
+          }
+        ],
+        "explanation": "Compliance risk is high (73) because pii data (+20) on authentication-service, customer-db, mobile-banking and 2 more; financial data (+20) on mobile-banking, web-banking; nearby card data (+12) on atm, card-service, fraud-engine."
+      },
+      {
+        "name": "technical",
+        "score": 74,
+        "level": "high",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 5,
+            "node_ids": []
+          },
+          {
+            "label": "database schema change",
+            "points": 20,
+            "node_ids": [
+              "audit-db",
+              "customer-db",
+              "transaction-db"
+            ]
+          },
+          {
+            "label": "direct services",
+            "points": 24,
+            "node_ids": [
+              "authentication-service",
+              "mobile-banking",
+              "notification-service",
+              "web-banking"
+            ]
+          },
+          {
+            "label": "dependency depth",
+            "points": 15,
+            "node_ids": [
+              "transaction-db"
+            ]
+          },
+          {
+            "label": "new feature",
+            "points": 10,
+            "node_ids": [
+              "authentication-service",
+              "customer-db",
+              "mobile-banking",
+              "notification-service",
+              "web-banking"
+            ]
+          }
+        ],
+        "explanation": "Technical risk is high (74) because direct services (+24) on authentication-service, mobile-banking, notification-service and 1 more; database schema change (+20) on audit-db, customer-db, transaction-db; dependency depth (+15) on transaction-db."
+      },
+      {
+        "name": "operational",
+        "score": 71,
+        "level": "high",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 5,
+            "node_ids": []
+          },
+          {
+            "label": "service criticality",
+            "points": 40,
+            "node_ids": [
+              "authentication-service"
+            ]
+          },
+          {
+            "label": "downstream systems",
+            "points": 20,
+            "node_ids": [
+              "account-service",
+              "api-gateway",
+              "atm",
+              "audit-db",
+              "branch-portal",
+              "card-service",
+              "crm",
+              "customer-service",
+              "document-service",
+              "fraud-engine",
+              "loan-service",
+              "payment-service",
+              "reporting-service",
+              "risk-engine",
+              "transaction-db"
+            ]
+          },
+          {
+            "label": "deployment groups",
+            "points": 6,
+            "node_ids": [
+              "account-service",
+              "api-gateway",
+              "atm",
+              "audit-db",
+              "authentication-service",
+              "branch-portal",
+              "card-service",
+              "crm",
+              "customer-db",
+              "customer-service",
+              "document-service",
+              "fraud-engine",
+              "loan-service",
+              "mobile-banking",
+              "notification-service",
+              "payment-service",
+              "reporting-service",
+              "risk-engine",
+              "transaction-db",
+              "web-banking"
+            ]
+          }
+        ],
+        "explanation": "Operational risk is high (71) because service criticality (+40) on authentication-service; downstream systems (+20) on account-service, api-gateway, atm and 12 more; deployment groups (+6) on account-service, api-gateway, atm and 17 more."
+      },
+      {
+        "name": "performance",
+        "score": 40,
+        "level": "medium",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 5,
+            "node_ids": []
+          },
+          {
+            "label": "transaction path",
+            "points": 20,
+            "node_ids": [
+              "payment-service",
+              "transaction-db"
+            ]
+          },
+          {
+            "label": "channel path",
+            "points": 15,
+            "node_ids": [
+              "api-gateway",
+              "mobile-banking",
+              "web-banking"
+            ]
+          }
+        ],
+        "explanation": "Performance risk is medium (40) because transaction path (+20) on payment-service, transaction-db; channel path (+15) on api-gateway, mobile-banking, web-banking."
+      },
+      {
+        "name": "delivery",
+        "score": 67,
+        "level": "medium",
+        "factors": [
+          {
+            "label": "baseline",
+            "points": 5,
+            "node_ids": []
+          },
+          {
+            "label": "low ambiguity",
+            "points": 10,
+            "node_ids": [
+              "authentication-service",
+              "customer-db",
+              "mobile-banking",
+              "notification-service",
+              "web-banking"
+            ]
+          },
+          {
+            "label": "direct services",
+            "points": 20,
+            "node_ids": [
+              "authentication-service",
+              "mobile-banking",
+              "notification-service",
+              "web-banking"
+            ]
+          },
+          {
+            "label": "owner coordination",
+            "points": 32,
+            "node_ids": [
+              "account-service",
+              "api-gateway",
+              "atm",
+              "audit-db",
+              "authentication-service",
+              "branch-portal",
+              "card-service",
+              "crm",
+              "customer-db",
+              "customer-service",
+              "document-service",
+              "fraud-engine",
+              "loan-service",
+              "mobile-banking",
+              "notification-service",
+              "payment-service",
+              "reporting-service",
+              "risk-engine",
+              "transaction-db",
+              "web-banking"
+            ]
+          }
+        ],
+        "explanation": "Delivery risk is medium (67) because owner coordination (+32) on account-service, api-gateway, atm and 17 more; direct services (+20) on authentication-service, mobile-banking, notification-service and 1 more; low ambiguity (+10) on authentication-service, customer-db, mobile-banking and 2 more."
+      }
+    ],
+    "overall": 73,
+    "highest": "technical",
+    "change_size": "large",
+    "change_size_reason": "4 services change"
+  },
+  "tests": {
+    "tests": [
+      {
+        "id": "TC-002",
+        "title": "Mobile card status route requires a valid device session",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "mobile-banking"
+        ],
+        "steps": [
+          "Prepare fixtures for Mobile card status route requires a valid device session.",
+          "Execute the scenario: Mobile card status route requires a valid device session.",
+          "Check the documented outcome for Mobile card status route requires a valid device session."
+        ],
+        "expected": "Mobile card status route requires a valid device session meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-004",
+        "title": "Web profile update rejects unsupported fields",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "web-banking"
+        ],
+        "steps": [
+          "Prepare fixtures for Web profile update rejects unsupported fields.",
+          "Execute the scenario: Web profile update rejects unsupported fields.",
+          "Check the documented outcome for Web profile update rejects unsupported fields."
+        ],
+        "expected": "Web profile update rejects unsupported fields meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-012",
+        "title": "Account limits endpoint rejects unauthorized limit overrides",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "account-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Account limits endpoint rejects unauthorized limit overrides.",
+          "Execute the scenario: Account limits endpoint rejects unauthorized limit overrides.",
+          "Check the documented outcome for Account limits endpoint rejects unauthorized limit overrides."
+        ],
+        "expected": "Account limits endpoint rejects unauthorized limit overrides meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-014",
+        "title": "Payment creation returns the same instruction for a repeated idempotency key",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "payment-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Payment creation returns the same instruction for a repeated idempotency key.",
+          "Execute the scenario: Payment creation returns the same instruction for a repeated idempotency key.",
+          "Check the documented outcome for Payment creation returns the same instruction for a repeated idempotency key."
+        ],
+        "expected": "Payment creation returns the same instruction for a repeated idempotency key meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-018",
+        "title": "Card status update rejects an expired step-up proof",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "card-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Card status update rejects an expired step-up proof.",
+          "Execute the scenario: Card status update rejects an expired step-up proof.",
+          "Check the documented outcome for Card status update rejects an expired step-up proof."
+        ],
+        "expected": "Card status update rejects an expired step-up proof meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-022",
+        "title": "Token introspection rejects expired and revoked sessions",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "authentication-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Token introspection rejects expired and revoked sessions.",
+          "Execute the scenario: Token introspection rejects expired and revoked sessions.",
+          "Check the documented outcome for Token introspection rejects expired and revoked sessions."
+        ],
+        "expected": "Token introspection rejects expired and revoked sessions meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-024",
+        "title": "Notification submission rejects an unsupported delivery channel",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "notification-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Notification submission rejects an unsupported delivery channel.",
+          "Execute the scenario: Notification submission rejects an unsupported delivery channel.",
+          "Check the documented outcome for Notification submission rejects an unsupported delivery channel."
+        ],
+        "expected": "Notification submission rejects an unsupported delivery channel meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-026",
+        "title": "Gateway card status route enforces the required authorization scope",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "api-gateway"
+        ],
+        "steps": [
+          "Prepare fixtures for Gateway card status route enforces the required authorization scope.",
+          "Execute the scenario: Gateway card status route enforces the required authorization scope.",
+          "Check the documented outcome for Gateway card status route enforces the required authorization scope."
+        ],
+        "expected": "Gateway card status route enforces the required authorization scope meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-030",
+        "title": "Customer store adapter rejects stale profile versions",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "customer-db"
+        ],
+        "steps": [
+          "Prepare fixtures for Customer store adapter rejects stale profile versions.",
+          "Execute the scenario: Customer store adapter rejects stale profile versions.",
+          "Check the documented outcome for Customer store adapter rejects stale profile versions."
+        ],
+        "expected": "Customer store adapter rejects stale profile versions meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-038",
+        "title": "Fraud screening endpoint returns rule version and decision trace",
+        "type": "api",
+        "priority": "P1",
+        "covers": [
+          "fraud-engine"
+        ],
+        "steps": [
+          "Prepare fixtures for Fraud screening endpoint returns rule version and decision trace.",
+          "Execute the scenario: Fraud screening endpoint returns rule version and decision trace.",
+          "Check the documented outcome for Fraud screening endpoint returns rule version and decision trace."
+        ],
+        "expected": "Fraud screening endpoint returns rule version and decision trace meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-001",
+        "title": "Mobile payment confirmation shows a single successful submission",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "mobile-banking"
+        ],
+        "steps": [
+          "Prepare fixtures for Mobile payment confirmation shows a single successful submission.",
+          "Execute the scenario: Mobile payment confirmation shows a single successful submission.",
+          "Check the documented outcome for Mobile payment confirmation shows a single successful submission."
+        ],
+        "expected": "Mobile payment confirmation shows a single successful submission meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-003",
+        "title": "Web dashboard displays only accounts authorized for the current customer",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "web-banking"
+        ],
+        "steps": [
+          "Prepare fixtures for Web dashboard displays only accounts authorized for the current customer.",
+          "Execute the scenario: Web dashboard displays only accounts authorized for the current customer.",
+          "Check the documented outcome for Web dashboard displays only accounts authorized for the current customer."
+        ],
+        "expected": "Web dashboard displays only accounts authorized for the current customer meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-011",
+        "title": "Account daily limits distinguish premium and standard eligibility",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "account-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Account daily limits distinguish premium and standard eligibility.",
+          "Execute the scenario: Account daily limits distinguish premium and standard eligibility.",
+          "Check the documented outcome for Account daily limits distinguish premium and standard eligibility."
+        ],
+        "expected": "Account daily limits distinguish premium and standard eligibility meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-013",
+        "title": "Payments reject amounts exceeding the remaining daily account limit",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "payment-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Payments reject amounts exceeding the remaining daily account limit.",
+          "Execute the scenario: Payments reject amounts exceeding the remaining daily account limit.",
+          "Check the documented outcome for Payments reject amounts exceeding the remaining daily account limit."
+        ],
+        "expected": "Payments reject amounts exceeding the remaining daily account limit meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "TC-017",
+        "title": "Card freeze and unfreeze preserve the original cardholder linkage",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "card-service"
+        ],
+        "steps": [
+          "Prepare fixtures for Card freeze and unfreeze preserve the original cardholder linkage.",
+          "Execute the scenario: Card freeze and unfreeze preserve the original cardholder linkage.",
+          "Check the documented outcome for Card freeze and unfreeze preserve the original cardholder linkage."
+        ],
+        "expected": "Card freeze and unfreeze preserve the original cardholder linkage meets its documented acceptance criteria.",
+        "source": "catalog",
+        "automation_candidate": true
+      },
+      {
+        "id": "GEN-1",
+        "title": "Security risk dimension: Password reset request returns identical response for existing and non-existing accounts",
+        "type": "security",
+        "priority": "P1",
+        "covers": [
+          "api-gateway",
+          "authentication-service",
+          "mobile-banking",
+          "web-banking"
+        ],
+        "steps": [
+          "From Web Banking, submit a password reset request for a known existing customer account.",
+          "Capture the HTTP status, response body and user-visible message.",
+          "From Mobile Banking, submit a password reset request for an account identifier that does not exist.",
+          "Capture the HTTP status, response body and user-visible message.",
+          "Compare both responses for content and shape."
+        ],
+        "expected": "Both requests return an identical response regardless of account existence; no message or status reveals whether the account exists.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-2",
+        "title": "Security risk dimension: Reset token is single-use and expires after 15 minutes",
+        "type": "security",
+        "priority": "P1",
+        "covers": [
+          "authentication-service",
+          "customer-db"
+        ],
+        "steps": [
+          "Request a password reset for an existing customer from Web Banking.",
+          "Obtain the reset link delivered by Notification Service.",
+          "Use the reset token once to set a new password that satisfies the password policy.",
+          "Attempt to reuse the same reset token to set another password.",
+          "Request a new reset token, wait 16 minutes, then attempt to use it."
+        ],
+        "expected": "The first token sets the password once; reuse is rejected as invalid; the second token is rejected after its 15-minute expiry; the Customer Database records reset activity.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-3",
+        "title": "Compliance risk dimension: Password reset events are recorded in Audit Database without secrets",
+        "type": "integration",
+        "priority": "P1",
+        "covers": [
+          "audit-db",
+          "authentication-service",
+          "customer-db"
+        ],
+        "steps": [
+          "Perform a successful self-service password reset from Web Banking.",
+          "Query Audit Database for the reset event using the customer identifier and correlation identifier.",
+          "Inspect the stored event fields for customer identifier, event type, outcome, timestamp and correlation identifier.",
+          "Verify no password, reset token or token secret is present in the audit event."
+        ],
+        "expected": "Audit Database contains an immutable reset event with the required compliance fields; no credential or token secret is stored.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-4",
+        "title": "Technical risk dimension: Customer Database persists last reset time and failed reset attempt count",
+        "type": "integration",
+        "priority": "P1",
+        "covers": [
+          "authentication-service",
+          "customer-db"
+        ],
+        "steps": [
+          "Trigger three failed set-new-password attempts for a customer using passwords that violate the password policy.",
+          "Perform one successful password reset for the same customer.",
+          "Read the customer record through the internal customer-store profile endpoint."
+        ],
+        "expected": "Customer Database stores the last reset time and failed reset attempt count; the failed count reflects the three rejected attempts before the successful reset.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-5",
+        "title": "Operational risk dimension: Sixth password reset request in one hour is blocked for the same customer",
+        "type": "functional",
+        "priority": "P1",
+        "covers": [
+          "authentication-service",
+          "customer-db",
+          "web-banking"
+        ],
+        "steps": [
+          "From Web Banking, submit five password reset requests for the same customer within one hour.",
+          "Submit a sixth password reset request for the same customer.",
+          "Check whether Notification Service sends another reset link."
+        ],
+        "expected": "The first five requests are accepted with uniform responses; the sixth request is blocked by per-customer rate limiting and no additional reset link is delivered.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-6",
+        "title": "Password reset notification uses verified email and SMS preferences from Customer Service and CRM",
+        "type": "integration",
+        "priority": "P1",
+        "covers": [
+          "authentication-service",
+          "crm",
+          "customer-service",
+          "notification-service"
+        ],
+        "steps": [
+          "Ensure the customer has a verified email address and verified mobile number in Customer Service and CRM.",
+          "Request a password reset from Mobile Banking.",
+          "Verify Notification Service sends the reset link by both email and SMS.",
+          "Mark the email address as unverified in CRM and request another password reset."
+        ],
+        "expected": "The first reset delivers to both verified email and SMS; the second reset does not deliver to the unverified email and still uses the verified SMS destination.",
+        "source": "generated",
+        "automation_candidate": false
+      },
+      {
+        "id": "GEN-7",
+        "title": "Password reset does not create card, payment, or ledger activity",
+        "type": "regression",
+        "priority": "P1",
+        "covers": [
+          "authentication-service",
+          "card-service",
+          "payment-service",
+          "transaction-db"
+        ],
+        "steps": [
+          "Capture baseline card status, payment instruction count and transaction ledger entries for a customer.",
+          "Perform a successful self-service password reset from Web Banking.",
+          "Re-query card status, payment records and transaction ledger entries for the same customer."
+        ],
+        "expected": "Card status, payment records and transaction ledger remain unchanged; the password reset flow creates no card, payment or ledger posting.",
+        "source": "generated",
+        "automation_candidate": true
+      },
+      {
+        "id": "GEN-8",
+        "title": "Password reset rollout leaves assisted, lending, reporting, document, and risk nodes unchanged",
+        "type": "regression",
+        "priority": "P1",
+        "covers": [
+          "atm",
+          "authentication-service",
+          "branch-portal",
+          "document-service",
+          "loan-service",
+          "reporting-service",
+          "risk-engine"
+        ],
+        "steps": [
+          "Capture baseline behavior for ATM withdrawal, Branch Portal service request, Loan Service application, Reporting Service monthly statement job, Risk Engine assessment and Document Service template rendering.",
+          "Perform a successful self-service password reset from Web Banking.",
+          "Re-run the ATM, Branch Portal, Loan Service, Reporting Service, Risk Engine and Document Service checks."
+        ],
+        "expected": "Assisted, lending, reporting, risk and document behaviors remain unchanged; the password reset rollout does not alter their existing public contracts or processing.",
+        "source": "generated",
+        "automation_candidate": true
+      }
+    ],
+    "coverage_estimate": 1.0,
+    "effort_hours": 13.166666666666666,
+    "automation_candidates": 17,
+    "summary": "Selected 15 catalog tests and 8 new tests, covering 20 of 20 impacted nodes (100%); estimated effort is 13.2 hours."
+  },
+  "compliance": {
+    "frameworks": [
+      {
+        "framework": "GDPR",
+        "applicable": true,
+        "reason": "PII-bearing components are impacted; the change touches customer data.",
+        "risk_level": "high",
+        "score": 55,
+        "findings": [
+          {
+            "text": "The change adds processing of personal data such as password reset tokens, reset timestamps, and failed attempt counts in authentication-service, web-banking, mobile-banking, notification-service, and customer-db, which are PII-bearing components.",
+            "node_ids": [
+              "authentication-service",
+              "web-banking",
+              "mobile-banking",
+              "notification-service",
+              "customer-db"
+            ]
+          },
+          {
+            "text": "Schema updates to customer-db to persist last reset time and failed reset attempt count affect data retention and purpose limitation obligations under GDPR.",
+            "node_ids": [
+              "customer-db"
+            ]
+          },
+          {
+            "text": "Authentication flow modifications may impact data minimization and consent requirements, necessitating verification that only necessary personal data is collected for the reset flow.",
+            "node_ids": [
+              "authentication-service",
+              "web-banking",
+              "mobile-banking",
+              "notification-service",
+              "customer-db"
+            ]
+          }
+        ],
+        "recommendations": [
+          "Review data minimization, purpose, and retention for the password reset personal data in authentication-service, web-banking, mobile-banking, notification-service, and customer-db to ensure compliance with GDPR principles.",
+          "Verify that access controls and privacy regression tests are updated for authentication-service, web-banking, mobile-banking, notification-service, and customer-db to protect the new personal data fields.",
+          "Ensure that the reset token expiry and single-use enforcement are documented and tested to limit unnecessary retention of personal data.",
+          "Confirm that customer-db updates include appropriate data retention schedules and that deletion or anonymization mechanisms are in place for reset-related fields."
+        ]
+      },
+      {
+        "framework": "PCI DSS",
+        "applicable": true,
+        "reason": "card-data components are impacted.",
+        "risk_level": "medium",
+        "score": 65,
+        "findings": [
+          {
+            "text": "The change modifies authentication-service, which is involved in authentication for card-related transactions, though no cardholder data is directly stored or transmitted in the password reset flow.",
+            "node_ids": [
+              "authentication-service"
+            ]
+          },
+          {
+            "text": "Components that handle card data (atm, card-service, fraud-engine, mobile-banking, web-banking, notification-service) remain in scope; any changes to authentication could affect card data security controls.",
+            "node_ids": [
+              "atm",
+              "card-service",
+              "fraud-engine",
+              "mobile-banking",
+              "web-banking",
+              "notification-service"
+            ]
+          },
+          {
+            "text": "Database schema changes to customer-db do not involve card data, but ensure that any linkage between customer records and card data is not inadvertently altered.",
+            "node_ids": [
+              "customer-db"
+            ]
+          }
+        ],
+        "recommendations": [
+          "Verify that authentication-service changes do not weaken card data protection controls, including token handling and session management for atm, card-service, fraud-engine, mobile-banking, web-banking, and notification-service.",
+          "Review encryption, masking, and access restrictions for card data in atm, card-service, fraud-engine, mobile-banking, web-banking, and notification-service to ensure they remain effective after the authentication flow updates.",
+          "Run card-data security tests focused on authentication and API controls for atm, authentication-service, card-service, fraud-engine, mobile-banking, notification-service, and web-banking.",
+          "Confirm that any updates to customer-db preserve the separation between personal data and cardholder data fields."
+        ]
+      },
+      {
+        "framework": "SOX",
+        "applicable": true,
+        "reason": "financial-data components are impacted; audit-data components are impacted.",
+        "risk_level": "medium",
+        "score": 65,
+        "findings": [
+          {
+            "text": "The change modifies authentication-service, web-banking, mobile-banking, notification-service, and customer-db, which support access to financial applications but do not directly process financial data.",
+            "node_ids": [
+              "authentication-service",
+              "web-banking",
+              "mobile-banking",
+              "notification-service",
+              "customer-db"
+            ]
+          },
+          {
+            "text": "Financial data processing components such as account-service, payment-service, transaction-db, loan-service, and risk-engine rely on authentication; changes to authentication could affect financial reporting controls.",
+            "node_ids": [
+              "account-service",
+              "payment-service",
+              "transaction-db",
+              "loan-service",
+              "risk-engine"
+            ]
+          },
+          {
+            "text": "Audit database (audit-db) captures authentication events; ensure that audit logging remains complete and immutable for SOX compliance.",
+            "node_ids": [
+              "audit-db"
+            ]
+          }
+        ],
+        "recommendations": [
+          "Reconcile that financial reporting controls remain effective by verifying that authentication changes do not alter access to financial systems like account-service, payment-service, transaction-db, loan-service, and risk-engine.",
+          "Document control-owner approval and test financial and schema changes for audit-db to ensure immutable audit records of authentication events.",
+          "Verify that audit-db continues to capture complete, immutable audit events for authentication-related activities supporting SOX requirements.",
+          "Ensure that any changes to customer-db do not affect financial data integrity or the ability to trace financial transactions."
+        ]
+      },
+      {
+        "framework": "Internal Governance",
+        "applicable": true,
+        "reason": "directly changed components have criticality >= 8; the authentication flow changes.",
+        "risk_level": "high",
+        "score": 55,
+        "findings": [
+          {
+            "text": "Directly changed components include high-criticality services authentication-service (criticality 10), customer-db (9), mobile-banking (8), web-banking (8), and notification-service (6), triggering internal governance review.",
+            "node_ids": [
+              "authentication-service",
+              "customer-db",
+              "mobile-banking",
+              "web-banking",
+              "notification-service"
+            ]
+          },
+          {
+            "text": "The authentication flow changes introduce new reset-token issuance, validation, and rate‑limiting logic, which may affect operational stability and require governance oversight.",
+            "node_ids": [
+              "authentication-service"
+            ]
+          },
+          {
+            "text": "Database schema updates to customer-db to store reset timestamps and failed attempt counts alter critical data and need change‑management controls.",
+            "node_ids": [
+              "customer-db"
+            ]
+          }
+        ],
+        "recommendations": [
+          "Obtain service‑owner change approval and record a detailed rollback plan for authentication-service, customer-db, mobile-banking, web-banking, and notification-service.",
+          "Verify authorization tests, operational monitoring, and release evidence for authentication-service, customer-db, mobile-banking, web-banking, and notification-service.",
+          "Confirm that the new reset-token logic includes appropriate unit and integration tests, and that monitoring alerts are in place for anomalous reset‑request patterns.",
+          "Ensure that the customer-db schema changes are reviewed by data‑ownership and that backup and recovery procedures cover the new fields."
+        ]
+      }
+    ],
+    "overall_score": 55,
+    "summary": "4 of 4 frameworks apply; the minimum compliance score is 55/100. 2 applicable framework(s) have high risk."
+  },
+  "release": {
+    "confidence": 47,
+    "decision": "NO_GO",
+    "triggered_rules": [
+      "NO_GO: GDPR risk is high and the change touches authentication",
+      "NO_GO: Internal Governance risk is high and the change touches authentication",
+      "GO_WITH_CONDITIONS: highest risk is 74 (>= 60)",
+      "GO_WITH_CONDITIONS: GDPR risk is high",
+      "GO_WITH_CONDITIONS: PCI DSS risk is medium",
+      "GO_WITH_CONDITIONS: SOX risk is medium",
+      "GO_WITH_CONDITIONS: Internal Governance risk is high"
+    ],
+    "conditions": [
+      "Run the P1 api tests on mobile-banking before release (TC-002: Mobile card status route requires a valid device session)",
+      "Run the P1 api tests on web-banking before release (TC-004: Web profile update rejects unsupported fields)",
+      "Run the P1 api tests on account-service before release (TC-012: Account limits endpoint rejects unauthorized limit overrides)",
+      "Run the P1 api tests on payment-service before release (TC-014: Payment creation returns the same instruction for a repeated idempotency key)",
+      "Run the P1 api tests on card-service before release (TC-018: Card status update rejects an expired step-up proof)",
+      "Run the P1 api tests on authentication-service before release (TC-022: Token introspection rejects expired and revoked sessions)",
+      "Run the P1 api tests on notification-service before release (TC-024: Notification submission rejects an unsupported delivery channel)",
+      "Run the P1 api tests on api-gateway before release (TC-026: Gateway card status route enforces the required authorization scope)",
+      "Run the P1 api tests on customer-db before release (TC-030: Customer store adapter rejects stale profile versions)",
+      "Run the P1 api tests on fraud-engine before release (TC-038: Fraud screening endpoint returns rule version and decision trace)",
+      "Run the P1 functional tests on mobile-banking before release (TC-001: Mobile payment confirmation shows a single successful submission)",
+      "Run the P1 functional tests on web-banking before release (TC-003: Web dashboard displays only accounts authorized for the current customer)",
+      "Run the P1 functional tests on account-service before release (TC-011: Account daily limits distinguish premium and standard eligibility)",
+      "Run the P1 functional tests on payment-service before release (TC-013: Payments reject amounts exceeding the remaining daily account limit)",
+      "Run the P1 functional tests on card-service before release (TC-017: Card freeze and unfreeze preserve the original cardholder linkage)",
+      "Run the P1 security tests on api-gateway, authentication-service, mobile-banking, web-banking before release (GEN-1: Security risk dimension: Password reset request returns identical response for existing and non-existing accounts)",
+      "Run the P1 security tests on authentication-service, customer-db before release (GEN-2: Security risk dimension: Reset token is single-use and expires after 15 minutes)",
+      "Run the P1 integration tests on audit-db, authentication-service, customer-db before release (GEN-3: Compliance risk dimension: Password reset events are recorded in Audit Database without secrets)",
+      "Run the P1 integration tests on authentication-service, customer-db before release (GEN-4: Technical risk dimension: Customer Database persists last reset time and failed reset attempt count)",
+      "Run the P1 functional tests on authentication-service, customer-db, web-banking before release (GEN-5: Operational risk dimension: Sixth password reset request in one hour is blocked for the same customer)",
+      "Run the P1 integration tests on authentication-service, crm, customer-service, notification-service before release (GEN-6: Password reset notification uses verified email and SMS preferences from Customer Service and CRM)",
+      "Run the P1 regression tests on authentication-service, card-service, payment-service, transaction-db before release (GEN-7: Password reset does not create card, payment, or ledger activity)",
+      "Run the P1 regression tests on atm, authentication-service, branch-portal, document-service, loan-service, reporting-service, risk-engine before release (GEN-8: Password reset rollout leaves assisted, lending, reporting, document, and risk nodes unchanged)",
+      "Review data minimization, purpose, and retention for the password reset personal data in authentication-service, web-banking, mobile-banking, notification-service, and customer-db to ensure compliance with GDPR principles.",
+      "Verify that access controls and privacy regression tests are updated for authentication-service, web-banking, mobile-banking, notification-service, and customer-db to protect the new personal data fields.",
+      "Ensure that the reset token expiry and single-use enforcement are documented and tested to limit unnecessary retention of personal data.",
+      "Confirm that customer-db updates include appropriate data retention schedules and that deletion or anonymization mechanisms are in place for reset-related fields.",
+      "Verify that authentication-service changes do not weaken card data protection controls, including token handling and session management for atm, card-service, fraud-engine, mobile-banking, web-banking, and notification-service.",
+      "Review encryption, masking, and access restrictions for card data in atm, card-service, fraud-engine, mobile-banking, web-banking, and notification-service to ensure they remain effective after the authentication flow updates.",
+      "Run card-data security tests focused on authentication and API controls for atm, authentication-service, card-service, fraud-engine, mobile-banking, notification-service, and web-banking.",
+      "Confirm that any updates to customer-db preserve the separation between personal data and cardholder data fields.",
+      "Reconcile that financial reporting controls remain effective by verifying that authentication changes do not alter access to financial systems like account-service, payment-service, transaction-db, loan-service, and risk-engine.",
+      "Document control-owner approval and test financial and schema changes for audit-db to ensure immutable audit records of authentication events.",
+      "Verify that audit-db continues to capture complete, immutable audit events for authentication-related activities supporting SOX requirements.",
+      "Ensure that any changes to customer-db do not affect financial data integrity or the ability to trace financial transactions.",
+      "Obtain service‑owner change approval and record a detailed rollback plan for authentication-service, customer-db, mobile-banking, web-banking, and notification-service.",
+      "Verify authorization tests, operational monitoring, and release evidence for authentication-service, customer-db, mobile-banking, web-banking, and notification-service.",
+      "Confirm that the new reset-token logic includes appropriate unit and integration tests, and that monitoring alerts are in place for anomalous reset‑request patterns.",
+      "Ensure that the customer-db schema changes are reviewed by data‑ownership and that backup and recovery procedures cover the new fields."
+    ],
+    "complexity": "high",
+    "rollback_plan": [
+      "Roll back in reverse deployment order, starting with channels-mobile (mobile-banking) then channels-access (atm, branch-portal, web-banking), and disable any configured reset-flow feature flags.",
+      "Continue with identity (api-gateway, authentication-service), documents (document-service) and data-platform (audit-db, reporting-service), pausing on any monitoring anomaly and notifying the release owner and stakeholders.",
+      "Finish with customer-platform (crm, customer-db, customer-service, notification-service), core-payments and core-banking, restoring the database groups from verified backups, running the rehearsed DB migration rollback and reconciling reset-activity data."
+    ],
+    "deployment_notes": [
+      "Hold production deployment for this NO_GO decision; these notes are preparation for a later approved release only and no rollout may begin without a new go decision.",
+      "Before any approved rollout, verify backups, rehearse the Customer Database migration rollback and data reconciliation, and apply backward-compatible migrations ahead of services in the fixed order core-banking, core-payments, customer-platform, data-platform, documents, identity, channels-access, channels-mobile.",
+      "On an approved release, enable the reset-flow feature flags where configured, monitor token issuance, rate-limit blocks, notification delivery and failed reset attempts, and have the release owner send stakeholder updates at each gate."
+    ]
+  },
+  "providers_used": {
+    "requirement": "tokenharbor:deepseek-v4.1-flash:free",
+    "dependency": "deterministic",
+    "scoring": "deterministic",
+    "testing": "tokenharbor:deepseek-v4.1-flash:free",
+    "compliance": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "release": "tokenharbor:deepseek-v4.1-flash:free"
+  },
+  "duration_ms": 64,
+  "created_at": "2026-10-08T05:07:40.721333Z"
+}

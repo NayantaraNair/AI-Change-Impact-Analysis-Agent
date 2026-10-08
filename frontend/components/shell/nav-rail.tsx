@@ -2,23 +2,28 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bot, Bug, FileSearch, GitMerge } from "lucide-react";
+import { BarChart3, Bot, Bug, FileSearch, GitMerge } from "lucide-react";
+import { useWorkspace } from "@/lib/workspace";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAppContext } from "./app-context";
 
-const destinations = [
-  { href: "/story", label: "Story or epic", icon: FileSearch },
-  { href: "/sprint", label: "Sprint backlog", icon: GitMerge },
-];
+const destinations = {
+  executive: [{ href: "/executive", label: "Portfolio view", icon: BarChart3 }],
+  engineering: [
+    { href: "/story", label: "Story or epic", icon: FileSearch },
+    { href: "/sprint", label: "Sprint backlog", icon: GitMerge },
+  ],
+};
 
 export function NavRail() {
   const pathname = usePathname();
+  const { workspace } = useWorkspace();
   const { copilotOpen, toggleCopilot, debugOpen, setDebugOpen, run } = useAppContext();
   return (
     <nav aria-label="Main navigation" className="fixed inset-y-0 left-0 z-30 flex w-14 flex-col items-center gap-2 border-r border-line bg-surface py-3">
-      {destinations.map(({ href, label, icon: Icon }) => {
+      {destinations[workspace ?? (pathname.startsWith("/executive") ? "executive" : "engineering")].map(({ href, label, icon: Icon }) => {
         const active = pathname === href || pathname.startsWith(`${href}/`);
         return (
           <Tooltip key={href}>

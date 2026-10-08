@@ -22,7 +22,7 @@ from pydantic import BaseModel  # noqa: E402
 
 from app import config  # noqa: E402
 from app.agents import chat  # noqa: E402
-from app.architecture import load_demo_sprint  # noqa: E402
+from app.architecture import load_demo_portfolio, load_demo_sprint  # noqa: E402
 from app.contracts import ChatRequest  # noqa: E402
 from app.engine.sprint import analyze_sprint  # noqa: E402
 from app.pipeline import analyze_story  # noqa: E402
@@ -50,7 +50,19 @@ async def build_fixtures(
         demo.sprint_id, demo.name, demo.stories, refresh=refresh,
     )
     fixtures: dict[str, BaseModel] = {"demo-sprint.json": demo, "sprint.json": sprint}
-    for story in demo.stories:
+    stories = list(demo.stories)
+    portfolio_analysis = None
+    if config.DEMO_PORTFOLIO_PATH.exists():
+        portfolio = load_demo_portfolio()
+        _check_id(portfolio.sprint_id)
+        portfolio_analysis = await analyze_sprint(
+            portfolio.sprint_id, portfolio.name, portfolio.stories, refresh=refresh,
+        )
+        fixtures[f"{portfolio.sprint_id}.json"] = portfolio_analysis
+        fixtures["demo-portfolio.json"] = portfolio
+        stories += [story for story in portfolio.stories if story not in stories]
+    for story in stories:
+        _check_id(story.id)
         # The Story page analyses one story on its own, so its saved result must
         # not cite clashes with other sprint stories. Cached stages from the
         # sprint run are reused; only the release decision is recomputed.
@@ -95,6 +107,10 @@ async def build_fixtures(
         f"{analysis.story.id}={analysis.release.decision}" for analysis in sprint.stories
     ))
     print(f"Conflicts: {len(sprint.conflicts)}")
+    if portfolio_analysis is not None:
+        print("Portfolio: " + ", ".join(
+            f"{analysis.story.id}={analysis.release.decision}" for analysis in portfolio_analysis.stories
+        ) + f"; conflicts {len(portfolio_analysis.conflicts)}")
     if config.llm_disabled() or any(
         provider.endswith("fallback") for counts in providers.values() for provider in counts
     ) or "template" in chat_providers:

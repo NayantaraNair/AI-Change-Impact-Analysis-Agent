@@ -18,6 +18,7 @@ DB_PATH = Path(os.getenv("DB_PATH", DATA_DIR / "app.db"))
 ARCHITECTURE_PATH = DATA_DIR / "architecture.json"
 TEST_CATALOG_PATH = DATA_DIR / "test_catalog.json"
 DEMO_SPRINT_PATH = DATA_DIR / "demo_sprint.json"
+DEMO_PORTFOLIO_PATH = DATA_DIR / "demo_portfolio.json"
 
 CORS_ORIGINS = [
     o.strip()

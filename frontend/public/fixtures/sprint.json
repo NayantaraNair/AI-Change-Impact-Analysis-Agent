@@ -1422,8 +1422,8 @@
         "compliance": "tokenharbor:deepseek-v4.1-flash:free",
         "release": "tokenharbor:deepseek-v4.1-flash:free"
       },
-      "duration_ms": 73666,
-      "created_at": "2026-10-07T15:32:30.779506Z"
+      "duration_ms": 361,
+      "created_at": "2026-10-08T05:04:26.279345Z"
     },
     {
       "story": {
@@ -3047,8 +3047,8 @@
         "compliance": "tokenharbor:deepseek-v4.1-flash:free",
         "release": "tokenharbor:deepseek-v4.1-flash:free"
       },
-      "duration_ms": 70519,
-      "created_at": "2026-10-07T15:32:27.661951Z"
+      "duration_ms": 308,
+      "created_at": "2026-10-08T05:04:26.299076Z"
     },
     {
       "story": {
@@ -4920,8 +4920,8 @@
         "compliance": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
         "release": "tokenharbor:deepseek-v4.1-flash:free"
       },
-      "duration_ms": 335,
-      "created_at": "2026-10-07T15:31:17.494242Z"
+      "duration_ms": 278,
+      "created_at": "2026-10-08T05:04:26.314210Z"
     },
     {
       "story": {
@@ -6317,8 +6317,8 @@
         "compliance": "tokenharbor:deepseek-v4.1-flash:free",
         "release": "tokenharbor:deepseek-v4.1-flash:free"
       },
-      "duration_ms": 83566,
-      "created_at": "2026-10-07T15:32:40.741279Z"
+      "duration_ms": 264,
+      "created_at": "2026-10-08T05:04:26.326535Z"
     },
     {
       "story": {
@@ -7918,8 +7918,8 @@
         "compliance": "tokenharbor:deepseek-v4.1-flash:free",
         "release": "tokenharbor:deepseek-v4.1-flash:free"
       },
-      "duration_ms": 80146,
-      "created_at": "2026-10-07T15:32:37.331623Z"
+      "duration_ms": 258,
+      "created_at": "2026-10-08T05:04:26.344291Z"
     },
     {
       "story": {
@@ -9135,8 +9135,8 @@
         "compliance": "deterministic",
         "release": "tokenharbor:deepseek-v4.1-flash:free"
       },
-      "duration_ms": 61034,
-      "created_at": "2026-10-07T15:32:18.238261Z"
+      "duration_ms": 245,
+      "created_at": "2026-10-08T05:04:26.349601Z"
     }
   ],
   "conflicts": [
@@ -10123,5 +10123,5 @@
       "identity"
     ]
   },
-  "summary": "This banking sprint has 6 stories impacting 17 applications and 19 dependencies, with 3 conflicts, 3 compliance issues, 36.7 testing hours, a health score of 49, release confidence of 58, and ST-107 flagged as high risk; the fixed release decisions are 4 GO_WITH_CONDITIONS, 1 NO_GO, and 1 GO. The main conflicts are three high-risk deployment collisions: ST-101 vs ST-107 on account-service (risk_score 100), ST-101 vs ST-110 on payment-service (80), and ST-107 vs ST-112 on authentication-service (100). The recommended sequencing is to deploy ST-112 before ST-107, ST-107 before ST-101, and ST-110 before ST-101, using feature flags where available and running the shared regression suites for authentication-service, account-service, and payment-service before the dependent releases; this yields constraints ST-112 → ST-107 → ST-101 and ST-110 → ST-101 without changing the computed decisions."
+  "summary": "This banking sprint comprises 6 stories impacting 17 applications and 19 dependencies, with 36.7 testing hours, 3 compliance issues, a health score of 49, and release confidence of 58; release decisions are 1 GO, 4 GO_WITH_CONDITIONS, and 1 NO_GO, with ST-107 flagged as high risk. The main conflicts are three high-risk deployment collisions: ST-101 vs ST-107 on account-service (risk score 100), ST-101 vs ST-110 on payment-service (80), and ST-107 vs ST-112 on authentication-service (100). The recommended sequencing is ST-112 before ST-107, ST-107 before ST-101, and ST-110 before ST-101, deploying ahead items behind feature flags where available and running the shared regression suites for authentication-service, account-service, and payment-service before the dependent releases."
 }

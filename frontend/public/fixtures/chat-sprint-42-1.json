@@ -1,32 +1,12 @@
 {
-  "answer": "**\"High risk\" appears at two levels in this analysis — both are supplied by the computed scores.**\n\n**Sprint level (health_score 49, release_confidence 58)**\n- 3 high-risk deployment collisions, all flagged `\"risk\":\"high\"`:\n  - C-ST-101-ST-107-account-service — risk_score 100\n  - C-ST-101-ST-110-payment-service — risk_score 80\n  - C-ST-107-ST-112-authentication-service — risk_score 100\n- 17 applications impacted, 19 dependencies impacted, 3 compliance issues, ST-107 flagged as the high-risk story.\n\n**Story level — ST-107 is the driver (risk.overall 85, highest = security)**\n- **security 93 (high)** — top factors: `card data` 25 pts (atm, card-service, fraud-engine); `auth flow change` 25 pts (api-gateway, authentication-service, card-service, mobile-banking); `external API contract` 15 pts on the same four components.\n- **delivery 87 (high)** — `owner coordination` 32 pts (20 components incl. account-service, payment-service, reporting-db, risk-engine, web-banking…); `medium ambiguity` 30 pts (api-gateway, authentication-service, card-service, mobile-banking); `direct services` 20 pts.\n- **compliance 75 (high)** — `card data` 30 (card-service), `pii data` 20 (api-gateway, authentication-service, card-service, mobile-banking), `financial data` 20 (api-gateway, mobile-banking).\n- **operational 71 (high)** — `service criticality` 40 (api-gateway, authentication-service), `downstream systems` 20, `deployment groups` 6.\n- Resulting decision: **NO_GO**, triggered by `security risk is 93 (>= 85)`, `delivery risk is 87 (>= 85)`, `PCI DSS risk is high and the change touches card data and authentication`, `Internal Governance risk is high and the change touches card data and authentication`.\n\n**Secondary contributor**\n- **ST-112** security dimension is also `high` at 73 (`auth flow change` 25, `customer data` 20, `critical identity path` 10), with overall risk 64 — hence 5 security-related GO_WITH_CONDITIONS conditions.\n\n**Not high elsewhere:** ST-101 (overall 39), ST-104 (overall 57, highest compliance 61 medium), ST-110 (overall 39), ST-115 (overall 12, GO).\n\nNote: the NO_GO conditions for ST-107 state \"Reduce security risk below 85\" and \"Reduce delivery risk below 85\" — the analysis does not contain a plan for how those reductions would be achieved.",
+  "answer": "The sprint’s high risk is driven mainly by **ST-107** and by three high-risk deployment collisions.\n\n- **ST-107 is the flagged high-risk story**: risk overall **85**; highest dimension is **security**; release decision **NO_GO** with confidence **23**.\n  - **Security = 93 (high)**: `card data` 25 (`atm`, `card-service`, `fraud-engine`",
   "cited_nodes": [
-    "mobile-banking",
-    "web-banking",
     "atm",
-    "account-service",
-    "payment-service",
     "card-service",
-    "authentication-service",
-    "api-gateway",
-    "reporting-db",
-    "fraud-engine",
-    "risk-engine"
+    "fraud-engine"
   ],
   "cited_factors": [
-    "customer data",
-    "pii data",
-    "financial data",
-    "direct services",
-    "service criticality",
-    "downstream systems",
-    "deployment groups",
-    "owner coordination",
-    "card data",
-    "auth flow change",
-    "external API contract",
-    "critical identity path",
-    "medium ambiguity"
+    "card data"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }

@@ -1,0 +1,66 @@
+{
+  "sprint_id": "portfolio-q4",
+  "name": "Q4 portfolio: digital identity and payments",
+  "stories": [
+    {
+      "id": "EX-201",
+      "title": "OTP multi-factor login for web and mobile banking",
+      "description": "Add a one-time passcode (OTP) step to customer login on web-banking and mobile-banking. The authentication-service generates, sends and verifies six-digit codes with a five-minute expiry; the notification-service delivers each code by SMS to the customer's verified mobile number; customer-db stores the MFA enrolment flag and verified phone number in two new columns. The API gateway exposes new /auth/otp/send and /auth/otp/verify endpoints. Lock the login after five failed codes and record every attempt for audit.",
+      "type": "epic",
+      "acceptance_criteria": [
+        "Customers enrolled in MFA must enter a valid six-digit OTP after their password before a session is issued.",
+        "Codes expire after five minutes and five failed attempts lock the login for 30 minutes.",
+        "OTP SMS messages are delivered within 30 seconds through the notification service.",
+        "Every OTP send, success and failure is recorded for audit."
+      ]
+    },
+    {
+      "id": "EX-202",
+      "title": "Self-service password reset",
+      "description": "Let customers reset a forgotten password themselves from web-banking and mobile-banking. The authentication-service issues a single-use reset token that expires in 15 minutes and enforces the password policy; the notification-service sends the reset link by email and SMS; customer-db records the last reset time and failed reset attempts. Reset requests must not reveal whether an account exists.",
+      "type": "story",
+      "acceptance_criteria": [
+        "A customer can request a reset link and set a new password that meets the password policy.",
+        "Reset tokens are single use and expire after 15 minutes.",
+        "The response is identical whether or not the account exists.",
+        "Five reset requests in an hour block further requests for that customer."
+      ]
+    },
+    {
+      "id": "ST-101",
+      "title": "Increase daily payment limits for premium customers",
+      "description": "Increase daily payment limits for premium customers from AED 25,000 to AED 50,000 for domestic transfers. The payment-service must obtain premium eligibility and the effective account limit from account-service before accepting each payment. Keep fraud screening active through fraud-engine and use the transaction ledger in transaction-db to calculate the remaining daily allowance, including concurrent requests. Roll out the business rule behind an approved feature flag during the payments release window. Operations must confirm threshold monitoring and rollback readiness before enabling the higher limit; standard customer limits remain unchanged.",
+      "type": "story",
+      "acceptance_criteria": [
+        "A premium account can submit domestic payments totaling AED 50,000 per bank-local calendar day; the next payment is declined.",
+        "A standard account retains its AED 25,000 daily limit and existing per-payment checks.",
+        "Concurrent payment submissions cannot exceed the account daily limit, and retries create one transaction ledger posting.",
+        "Every accepted payment passes fraud screening; operations approves monitoring and can restore the previous limit with the feature flag."
+      ]
+    },
+    {
+      "id": "ST-110",
+      "title": "Fraud rule update: velocity check for card-not-present payments",
+      "description": "Update the fraud rule in fraud-engine to add a rolling velocity check for card-not-present payments. The payment-service must supply the existing payment event attributes and apply the returned screening decision before posting. The risk engine provides the current policy signal used when the threshold is exceeded. Block the sixth attempt for the same card token within a rolling sixty-second window, including declined attempts. This change shares the payment screening path and core-payments deployment with ST-101, so both stories must agree on rule ordering, combined regression coverage and rollout timing.",
+      "type": "story",
+      "acceptance_criteria": [
+        "The first five card-not-present attempts for one card token inside sixty seconds are evaluated normally; the sixth is blocked by the velocity rule.",
+        "Declined attempts count toward the velocity window, while distinct card tokens maintain independent counters.",
+        "fraud-engine includes the active risk-engine policy signal and rule version in its screening decision.",
+        "Combined ST-101 and ST-110 regression evidence confirms premium payment limits cannot bypass fraud screening; their core-payments release order is agreed."
+      ]
+    },
+    {
+      "id": "ST-115",
+      "title": "Update the footer text on monthly statement PDFs",
+      "description": "Update the monthly statement PDF footer text rendered by the document service to read: Thank you for banking with us. Apply the approved sentence to the English statement template and retain the existing font, alignment and page margins. The reporting service continues selecting the same template family and supplying the existing render payload. This is a presentation-only template update with fixed wording and a versioned layout asset. The existing rendering workflow remains unchanged. Publish a versioned template after preview approval; rollback consists of selecting the previous template version for subsequent statement rendering.",
+      "type": "story",
+      "acceptance_criteria": [
+        "Every page of newly rendered English monthly statement PDFs shows exactly: Thank you for banking with us.",
+        "Footer font, alignment, margins, page numbering and all other template content remain unchanged, including multi-page statements.",
+        "document-service and reporting-service use the existing render payload and template selection interfaces without modification.",
+        "An approved PDF preview confirms the footer fits the existing layout, and selecting the previous template version restores the prior footer."
+      ]
+    }
+  ]
+}

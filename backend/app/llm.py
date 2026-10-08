@@ -200,7 +200,7 @@ async def _complete_provider(
             raise NoLLM("Provider cooling down")
         headers = None
         if provider.name == "openrouter":
-            headers = {"X-Title": "Change Impact Copilot"}
+            headers = {"X-Title": "ImpactIQ"}
             referer = os.getenv("OPENROUTER_HTTP_REFERER")
             if referer:
                 headers["HTTP-Referer"] = referer

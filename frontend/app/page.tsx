@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { WorkspaceChooser } from "@/components/shell/workspace-chooser";
 
 export default function HomePage() {
-  redirect("/story");
+  return <WorkspaceChooser />;
 }

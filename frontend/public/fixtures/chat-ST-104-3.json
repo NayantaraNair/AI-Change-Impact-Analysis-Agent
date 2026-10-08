@@ -1,5 +1,5 @@
 {
-  "answer": "- **ST-104** — “Customer profile: add preferred name and secondary email” is the only story in the analysis context, and it is flagged as risky.\n  - **Overall risk:** 57; highest dimension: **compliance** (61, medium).\n  - **Compliance top factors:** “pii data” (20 pts) → `crm`, `customer-db`, `customer-service`, `notification-service`; “nearby card data” (12 pts) → `card-service`; “database schema change” (10 pts) → `audit-db`, `customer-db`.\n  - **Release decision:** `GO_WITH_CONDITIONS`, confidence 58. Triggered rules include “highest risk is 61 (>= 60)”, “GDPR risk is high”, “PCI DSS risk is medium”, “SOX risk is medium”.\n  - **Technical risk:** 58; top factors: “database schema change” (20 pts) → `audit-db`, `customer-db`; “direct services” (18 pts) → `crm`, `customer-service`, `notification-service`; “new feature” (10 pts) → `crm`, `customer-db`, `customer-service`, `notification-service`.\n  - **Operational risk:** 53; top factor: “service criticality” (32 pts) → `customer-service`; “downstream systems” (10 pts) → `account-service`, `audit-db`, `card-service`, `loan-service`, `payment-service`.\n  - **Security risk:** 38; top factor: “customer data” (20 pts) → `account-service`, `card-service`, `crm`, `customer-db`, `customer-service`, `loan-service`, `notification-service`.\n  - **Compliance frameworks:** 4 of 4 apply; overall compliance score 55. **GDPR** high (55) with PII-bearing nodes `crm`, `customer-db`, `customer-service`, `notification-service`, `audit-db`; **PCI DSS** medium (75) with `card-service`, `customer-db`, `customer-service`, `notification-service`; **SOX** medium (75) with `account-service`, `payment-service`, `loan-service`, `audit-db`, `customer-db`; **Internal Governance** low (85) with `customer-service`, `customer-db`, `crm`, `notification-service`, `audit-db`.\n\nNo other stories are present in the supplied analysis context.",
+  "answer": "The analysis context contains only **one** story — I can't compare across a portfolio.\n\n- **ST-104** — \"Customer profile: add preferred name and secondary email\"\n  - Overall risk: **57** (highest dimension: **compliance**)\n  - Release decision: **GO_WITH_CONDITIONS**, confidence **58**, 10 triggered conditions\n\nRisk by dimension (as supplied):\n- Compliance — **61** (medium); top factors: pii data (20, `crm`,`customer-db`,`customer-service`,`notification-service`), nearby card data (12, `card-service`), database schema change (10, `audit-db`,`customer-db`)\n- Technical — **58** (medium); database schema change (20, `audit-db`,`customer-db`), direct services (18, `crm`,`customer-service`,`notification-service`), new feature (10, `crm`,`customer-db`,`customer-service`,`notification-service`)\n- Operational — **53** (medium); service criticality (32, `customer-service`), downstream systems (10, `account-service`,`audit-db`,`card-service`,`loan-service`,`payment-service`), deployment groups (6)\n- Delivery — **46** (medium); owner coordination (16), direct services (15), low ambiguity (10)\n- Security — **38** (low); customer data (20), blast radius size (10), baseline (8)\n- Performance — **25** (low); transaction path (20, `payment-service`), baseline (5)\n\nCompliance frameworks: GDPR **high** (55), PCI DSS **medium** (75), SOX **medium** (75), Internal Governance **low** (85); overall compliance score **55**.\n\nNote: whether other stories exist is not in the provided context.",
   "cited_nodes": [
     "customer-service",
     "account-service",
@@ -12,14 +12,20 @@
     "audit-db"
   ],
   "cited_factors": [
+    "baseline",
     "customer data",
+    "blast radius size",
     "pii data",
     "nearby card data",
     "database schema change",
     "direct services",
     "new feature",
     "service criticality",
-    "downstream systems"
+    "downstream systems",
+    "deployment groups",
+    "transaction path",
+    "low ambiguity",
+    "owner coordination"
   ],
   "provider": "tokenharbor:deepseek-v4.1-flash:free"
 }
