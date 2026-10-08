@@ -2,6 +2,10 @@
 
 **Understand every change before it happens.**
 
+> 🎬 **Demo video:** the link is in [`Video/demo-video-link.md`](Video/demo-video-link.md).
+>
+> 📁 **The project:** all the code (backend, frontend, data and docs) is in the [`Project/`](Project) folder.
+
 ImpactIQ is an AI assistant for banks that answers one question before a change is built: *what will this change break, how risky is it, and is it safe to release?*
 
 You give it a user story (for example "Add OTP login for mobile banking"), a sprint backlog, or a story plus a link to a GitHub repository. It tells you which systems and code the change touches, scores the risk, checks banking regulations (GDPR, PCI DSS, SOX), plans the tests and gives a clear **Go / Go with conditions / No go** call, with the reason behind every number.
@@ -12,6 +16,7 @@ You give it a user story (for example "Add OTP login for mobile banking"), a spr
 
 | Folder | Contents |
 |---|---|
+| [`Video/`](Video) | The link to the demo video |
 | [`Project/`](Project) | The full application: backend, frontend, demo data, the demo bank codebase and these screenshots |
 
 ---
@@ -299,6 +304,7 @@ The backend is a FastAPI service with interactive Swagger documentation at **`/d
 ## Project structure
 
 ```
+Video/                demo-video-link.md
 Project/
   backend/app/
     agents/        AI steps: read the story, compliance, tests, release text (each with a rule fallback)
