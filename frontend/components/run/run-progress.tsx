@@ -1,21 +1,19 @@
 "use client";
 
-import { Activity, Bug, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Activity, Loader2 } from "lucide-react";
 import { Explained, InfoTip } from "@/components/ui/info-tip";
-import { useAppContext } from "@/components/shell/app-context";
 import { explain, providerName } from "@/lib/explain";
 import { cn } from "@/lib/utils";
 import type { Run } from "@/lib/types";
 import {
   activeAttempts, attemptsFor, findStage, formatElapsed, shortStageLabel, SPRINT_STAGE_ORDER,
-  stageCounts, stageExplain, STORY_STAGE_ORDER,
+  stageExplain, STORY_STAGE_ORDER,
 } from "./model";
 import { SourceBadge, StageIcon } from "./parts";
 
 /** Live, step-by-step view of a run, so a slow model never leaves a blank wait. */
-export function RunProgress({ run, title }: { run: Run | null; title: string }) {
-  const { setDebugOpen } = useAppContext();
+/** `hide` drops stages a page does not show (the executive view hides test planning). */
+export function RunProgress({ run, title, hide = [] }: { run: Run | null; title: string; hide?: string[] }) {
   if (!run) {
     return (
       <section aria-label="Analysis progress" className="rounded-lg border border-line bg-surface p-5">
@@ -23,9 +21,11 @@ export function RunProgress({ run, title }: { run: Run | null; title: string }) 
       </section>
     );
   }
-  const { done, total } = stageCounts(run);
-  const active = activeAttempts(run);
-  const running = run.stages.filter((stage) => stage.status === "running");
+  const visible = run.stages.filter((stage) => !hide.includes(stage.stage));
+  const total = visible.length;
+  const done = visible.filter((stage) => stage.status === "done").length;
+  const active = activeAttempts(run).filter((attempt) => !hide.includes(attempt.stage ?? ""));
+  const running = visible.filter((stage) => stage.status === "running");
   return (
     <section aria-label="Analysis progress" aria-busy={run.status === "running"} className="space-y-5 rounded-lg border border-line bg-surface p-5">
       <header className="flex flex-wrap items-start justify-between gap-3">
@@ -35,13 +35,12 @@ export function RunProgress({ run, title }: { run: Run | null; title: string }) 
             {formatElapsed(run.elapsed_ms)} · {done} of {total} steps done
           </p>
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={() => setDebugOpen(true)}><Bug aria-hidden="true" className="size-4" />Details</Button>
       </header>
       <div className="h-1 w-full overflow-hidden rounded-full bg-line" role="progressbar" aria-label="Steps done" aria-valuemin={0} aria-valuemax={total} aria-valuenow={done}>
         <div className="h-full rounded-full bg-model transition-[width] duration-500" style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
       </div>
       <NowPanel run={run} active={active} running={running.map((stage) => stage.label + (stage.story_id && run.kind === "sprint" ? ` (${stage.story_id})` : ""))} />
-      {run.kind === "sprint" ? <SprintMatrix run={run} /> : <StoryTimeline run={run} />}
+      {run.kind === "sprint" ? <SprintMatrix run={run} hide={hide} /> : <StoryTimeline run={run} hide={hide} />}
     </section>
   );
 }
@@ -74,11 +73,11 @@ function NowPanel({ run, active, running }: { run: Run; active: ReturnType<typeo
   );
 }
 
-function StoryTimeline({ run }: { run: Run }) {
+function StoryTimeline({ run, hide }: { run: Run; hide: string[] }) {
   const storyId = run.story_ids[0] ?? null;
   return (
     <ol className="divide-y divide-line border-y border-line">
-      {run.stages.filter((item) => item.story_id === storyId).map((item) => item.stage).map((name, index) => {
+      {run.stages.filter((item) => item.story_id === storyId && !hide.includes(item.stage)).map((item) => item.stage).map((name, index) => {
         const stage = findStage(run, name, storyId);
         if (!stage) return null;
         const attempts = attemptsFor(run, name, storyId);
@@ -102,7 +101,8 @@ function StoryTimeline({ run }: { run: Run }) {
   );
 }
 
-function SprintMatrix({ run }: { run: Run }) {
+function SprintMatrix({ run, hide }: { run: Run; hide: string[] }) {
+  const columns = STORY_STAGE_ORDER.filter((name) => !hide.includes(name));
   return (
     <div className="space-y-4">
       <div className="overflow-x-auto rounded-md border border-line">
@@ -110,7 +110,7 @@ function SprintMatrix({ run }: { run: Run }) {
           <thead className="bg-canvas/60 text-meta text-muted">
             <tr>
               <th scope="col" className="px-3 py-2 font-medium">Story</th>
-              {STORY_STAGE_ORDER.map((name) => (
+              {columns.map((name) => (
                 <th key={name} scope="col" className="px-2 py-2 font-medium">
                   <span className="inline-flex items-center gap-1">{shortStageLabel[name]}<InfoTip label={shortStageLabel[name]}>{stageExplain[name]}</InfoTip></span>
                 </th>
@@ -121,7 +121,7 @@ function SprintMatrix({ run }: { run: Run }) {
             {run.story_ids.map((storyId) => (
               <tr key={storyId} className="border-t border-line">
                 <th scope="row" className="px-3 py-2 font-medium whitespace-nowrap">{storyId}</th>
-                {STORY_STAGE_ORDER.map((name) => {
+                {columns.map((name) => {
                   const stage = findStage(run, name, storyId);
                   if (!stage) return <td key={name} />;
                   const attempts = attemptsFor(run, name, storyId).filter((a) => a.outcome !== "skipped");

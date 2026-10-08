@@ -6,7 +6,8 @@ import {
   affectedCustomers, affectedSystems, businessImpact, conflictPairs, heatmap, levelChip, levelTone,
   levelWord, portfolioKpis, riskLevel, type Level,
 } from "@/lib/business";
-import type { SprintAnalysis, StoryAnalysis } from "@/lib/types";
+import { decisionLabel } from "@/lib/format";
+import type { ReleaseDecision, SprintAnalysis, StoryAnalysis } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export const tips = {
@@ -14,13 +15,24 @@ export const tips = {
   systems: "Distinct systems any of these changes reaches.",
   risk: "Average overall risk, 0 to 100. Under 40 low, 40–69 medium, 70+ high.",
   compliance: "Regulations at medium or high risk across these changes.",
-  confidence: "Average release confidence: how ready these changes are to ship.",
+  confidence: "Average release confidence, with how many changes are Go, Go with conditions or No go.",
   business: "How much the business relies on what changes: the most critical changed system, scaled down for small changes.",
   customers: "High: a customer app or channel itself changes. Medium: customer data or a channel is affected. Low: back-office only.",
-  readiness: "Release confidence from the release rules: risk, test coverage, compliance and clashes.",
+  readiness: "Release confidence and the release call (Go, Go with conditions or No go), both set by the release rules from risk, test coverage, compliance and clashes.",
   heatmap: "Each row is a change; each column a system it reaches. Darker means harder hit; an outlined cell means that change edits the system itself.",
   conflict: "70% weight on how much of what the two changes edit is the same, 30% on how much of what they reach overlaps. 80%+ means plan them together.",
 };
+
+const decisionChip: Record<ReleaseDecision, string> = {
+  GO: "border-impact-low/50 bg-impact-low/10 text-impact-low",
+  GO_WITH_CONDITIONS: "border-impact-med/50 bg-impact-med/10 text-impact-med",
+  NO_GO: "border-impact-high/50 bg-impact-high/10 text-impact-high",
+};
+
+/** The release call, decided by the release rules: Go, Go with conditions or No go. */
+export function Decision({ decision }: { decision: ReleaseDecision }) {
+  return <span className={cn("inline-flex whitespace-nowrap rounded-full border px-2 py-0.5 text-meta font-semibold", decisionChip[decision])}>{decisionLabel[decision]}</span>;
+}
 
 function Chip({ level }: { level: Level }) {
   return <span className={cn("inline-flex rounded-full border px-2 py-0.5 text-meta font-medium", levelChip[level])}>{levelWord[level]}</span>;
@@ -33,7 +45,7 @@ export function PortfolioKpis({ analyses }: { analyses: StoryAnalysis[] }) {
     { label: "Impacted systems", value: String(kpis.systems), tip: tips.systems },
     { label: "Risk score", value: String(kpis.riskScore), tip: tips.risk, tone: levelTone[kpis.riskLevel], detail: levelWord[kpis.riskLevel] },
     { label: "Compliance impact", value: kpis.compliance.length ? String(kpis.compliance.length) : "None", tip: tips.compliance, detail: kpis.compliance.join(", ") || "No review needed", tone: kpis.compliance.length ? "text-impact-med" : "" },
-    { label: "Release confidence", value: `${kpis.confidence}%`, tip: tips.confidence, tone: kpis.confidence >= 70 ? "text-impact-low" : kpis.confidence >= 45 ? "text-impact-med" : "text-impact-high" },
+    { label: "Release confidence", value: `${kpis.confidence}%`, tip: tips.confidence, tone: kpis.confidence >= 70 ? "text-impact-low" : kpis.confidence >= 45 ? "text-impact-med" : "text-impact-high", decisions: true },
   ];
   return (
     <div className="rounded-xl border border-line bg-surface py-5">
@@ -43,6 +55,10 @@ export function PortfolioKpis({ analyses }: { analyses: StoryAnalysis[] }) {
             <dt className="flex items-center gap-1 text-dense text-muted">{item.label}<InfoTip label={item.label.toLowerCase()} side="bottom">{item.tip}</InfoTip></dt>
             <dd className={cn("mt-1 text-hero numeral", item.tone)}>{item.value}</dd>
             {item.detail && <dd className="mt-1 truncate text-meta text-muted" title={item.detail}>{item.detail}</dd>}
+            {"decisions" in item && <dd className="mt-1.5 flex flex-wrap gap-1">{(["GO", "GO_WITH_CONDITIONS", "NO_GO"] as const).map((decision) => {
+              const count = analyses.filter((analysis) => analysis.release.decision === decision).length;
+              return count ? <span key={decision} className="flex items-center gap-1"><Decision decision={decision} />{analyses.length > 1 && <span className="text-meta tabular-nums text-muted">{count}</span>}</span> : null;
+            })}</dd>}
           </div>
         ))}
       </dl>
@@ -84,7 +100,7 @@ export function ChangeTable({ analyses, selectedId, onSelect }: { analyses: Stor
                 <td className="px-4 py-3 text-muted"><span className="text-text">{systems.slice(0, 3).join(", ")}</span>{systems.length > 3 ? ` +${systems.length - 3}` : ""}</td>
                 <td className="px-4 py-3"><Chip level={risk} /> <span className="ml-1 text-meta text-muted tabular-nums">{analysis.risk.overall}</span></td>
                 <td className="px-4 py-3">
-                  <span className={cn("font-semibold tabular-nums", readiness >= 70 ? "text-impact-low" : readiness >= 45 ? "text-impact-med" : "text-impact-high")}>{readiness}%</span>
+                  <span className="flex items-center gap-2"><span className={cn("font-semibold tabular-nums", readiness >= 70 ? "text-impact-low" : readiness >= 45 ? "text-impact-med" : "text-impact-high")}>{readiness}%</span><Decision decision={analysis.release.decision} /></span>
                   <span className="mt-1.5 block h-1.5 w-28 overflow-hidden rounded-full bg-line" aria-hidden="true"><span className={cn("block h-full rounded-full", readiness >= 70 ? "bg-impact-low" : readiness >= 45 ? "bg-impact-med" : "bg-impact-high")} style={{ width: `${readiness}%` }} /></span>
                 </td>
               </tr>

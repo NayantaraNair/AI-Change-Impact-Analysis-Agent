@@ -13,11 +13,11 @@ import { ThemeToggle } from "./theme-toggle";
 const options: { id: Workspace; icon: typeof BarChart3; who: string; points: string[] }[] = [
   {
     id: "executive", icon: BarChart3, who: "For product, release and delivery leads",
-    points: ["Sprint backlogs and major features in business terms", "Business impact, customers reached and release readiness", "Clashes between stories, with what to do"],
+    points: ["Analyse a sprint backlog or a new major feature", "Business impact, customers reached, risk and a go / no-go call for each change", "Impact heatmap, story clashes and the dependency graph"],
   },
   {
     id: "engineering", icon: Wrench, who: "For tech leads, engineers and testers",
-    points: ["Dependency graph and risk by area", "Top tests to run and compliance checks", "Release rules, rollback and deployment steps"],
+    points: ["Point at a GitHub repository and a user story", "Services, files, classes, APIs and databases the story changes", "A step-by-step AI flow and 5 to 7 developer tests"],
   },
 ];
 
@@ -79,7 +79,7 @@ export function WorkspaceChooser() {
             </label>
             <Button type="submit" size="lg">Enter {selected === "executive" ? "portfolio view" : "technical analysis"}</Button>
           </div>
-          <p className="text-center text-meta text-muted">Demo workspace. No account needed; your choice is remembered in this browser.</p>
+          <p className="text-center text-meta text-muted">Demo workspace. No account needed.</p>
         </form>
       </main>
     </div>

@@ -1,4 +1,4 @@
-# ImpactIQ: Every Change Before It Happens
+# ImpactIQ: Understand Every Change Before It Happens
 
 Paste a story or epic, or attach a sprint backlog. See what it affects, how risky it is and whether it can ship, before you plan the sprint.
 
@@ -13,8 +13,8 @@ When a change request lands, developers, leads, testers and business analysts sp
 ImpactIQ opens with a workspace choice:
 
 - **Executive workspace (Portfolio view)** for product, release and delivery leads. Analyse a whole sprint backlog or a single major feature, and see the answers in business terms:
-  - **Five KPIs:** stories analysed, impacted systems, risk score, compliance impact and release confidence.
-  - **One row per change:** business impact, affected customers, affected systems, risk and release readiness, all derived by rules from the engineering analysis. For example: *OTP MFA login: business impact High, affected customers High, affected systems Authentication Service, API Gateway, Customer Database, Notification Service and more, risk High (80), release readiness 14%: no go until security risk (88) drops below 85.*
+  - **Five KPIs:** stories analysed, impacted systems, risk score, compliance impact and release confidence, with how many changes are Go, Go with conditions or No go.
+  - **One row per change:** business impact, affected customers, affected systems, risk, and release readiness with its Go / Go with conditions / No go call, all derived by rules from the engineering analysis. For example: *OTP MFA login: business impact High, affected customers High, affected systems Authentication Service, API Gateway, Customer Database, Notification Service and more, risk High (80), release readiness 14%: no go until security risk (88) drops below 85.*
   - **Impact heatmap:** changes against the systems they hit, coloured by how hard.
   - **Conflict engine:** for each pair of stories, a conflict %, the systems they share, and a recommendation. For example: *OTP login ↔ Password reset: 99% conflict, shared Authentication Service, Customer Database, Notification Service, Mobile and Web Banking: "Merge sprint planning".*
   - **Dependency graph and AI reasoning timeline** for the selected change: what the AI read, what the rules computed, and how the decision was reached.
@@ -23,7 +23,7 @@ ImpactIQ opens with a workspace choice:
   - **A split view:** a codebase explorer (the repository tree, with changed files and folders marked) next to an architecture impact panel with one card per service, e.g. *auth-service: affected classes User, LoginAttempt, LoginAttemptTracker…; affected APIs POST /auth/login, POST /auth/token/refresh…; databases users, login_attempts.*
   - **A developer test plan** of 5 to 7 tests, categorised as functional, API, unit, integration, security or regression.
 
-  The repository is downloaded as an archive and read in memory; nothing in it is run. Classes, routes and tables are extracted by code (Python, Java, Kotlin, TypeScript/JavaScript, Go, C#, SQL and more); the AI only chooses among services, files and classes that exist, and code drops anything it invents. A demo bank codebase lives in [`examples/demo-bank`](examples/demo-bank) and the example (OTP login) ships with saved live results. Story-by-story and sprint analysis are still there too.
+  The repository is downloaded as an archive and read in memory; nothing in it is run. Classes, routes and tables are extracted by code (Python, Java, Kotlin, TypeScript/JavaScript, Go, C#, SQL and more); the AI only chooses among services, files and classes that exist, and code drops anything it invents. A demo bank codebase lives in [`examples/demo-bank`](examples/demo-bank) and the example (OTP login) ships with saved live results.
 
 | Choose a workspace | Executive portfolio view |
 |---|---|

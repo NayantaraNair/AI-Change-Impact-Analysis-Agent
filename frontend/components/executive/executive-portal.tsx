@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { Paperclip } from "lucide-react";
 import { DependencyGraph } from "@/components/graph";
 import { RunProgress } from "@/components/run/run-progress";
 import { useAppContext } from "@/components/shell/app-context";
@@ -12,11 +11,10 @@ import { InfoTip } from "@/components/ui/info-tip";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { getDemoPortfolio, runSprint, runStory } from "@/lib/api";
-import { ATTACH_ACCEPT, readAttachment } from "@/lib/attach";
 import { affectedCustomers, businessImpact, levelChip, levelWord, riskLevel } from "@/lib/business";
 import type { DemoSprint, Run, SprintAnalysis, StoryAnalysis, StoryInput } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { ChangeTable, ConflictEngine, ImpactHeatmap, PortfolioKpis, tips } from "./portfolio-views";
+import { ChangeTable, ConflictEngine, Decision, ImpactHeatmap, PortfolioKpis, tips } from "./portfolio-views";
 import { ReasoningTimeline } from "./reasoning-timeline";
 
 type Mode = "backlog" | "feature";
@@ -50,7 +48,6 @@ export function ExecutivePortal() {
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const token = useRef(0);
-  const fileInput = useRef<HTMLInputElement>(null);
 
   const show = useCallback((next: Result) => {
     setResult(next);
@@ -123,11 +120,6 @@ export function ExecutivePortal() {
     }, `Analysing ${feature.title}`);
   }
 
-  async function attach(file: File) {
-    try { setBacklog(JSON.stringify(await readAttachment(file), null, 2)); setError(null); }
-    catch (reason) { setError(reason instanceof Error ? reason.message : "Couldn't read that file."); }
-  }
-
   const analyses = result ? (result.kind === "sprint" ? result.sprint.stories : [result.story]) : [];
   const selected = analyses.find((analysis) => analysis.story.id === selectedId) ?? analyses[0];
   const featureExamples = examples?.stories.filter((story) => story.id.startsWith("EX-")) ?? [];
@@ -149,11 +141,8 @@ export function ExecutivePortal() {
         {mode === "backlog" ? (
           <form onSubmit={submitBacklog} className="space-y-3 p-5" aria-label="Sprint backlog">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-dense text-muted">Paste or attach the stories planned for the sprint (JSON, CSV, or one per line: ID | title | description).</p>
+              <p className="text-dense text-muted">Paste the stories planned for the sprint: JSON, CSV, or one per line as ID | title | description.</p>
               <div className="flex gap-2">
-                <input ref={fileInput} type="file" accept={ATTACH_ACCEPT} className="sr-only" tabIndex={-1} aria-hidden="true"
-                  onChange={(event) => { const file = event.target.files?.[0]; if (file) void attach(file); event.target.value = ""; }} />
-                <Button type="button" variant="outline" size="sm" disabled={Boolean(busy)} onClick={() => fileInput.current?.click()}><Paperclip aria-hidden="true" />Attach</Button>
                 <Button type="button" variant="outline" size="sm" disabled={Boolean(busy)} onClick={() => analyseBacklog(null)}>Example portfolio</Button>
               </div>
             </div>
@@ -183,7 +172,7 @@ export function ExecutivePortal() {
       </div>
 
       {error && <p role="alert" className="rounded-xl border border-impact-high/40 bg-surface p-4 text-body">{error}</p>}
-      {busy && (running ? <RunProgress run={progress} title={busy} /> : <p role="status" className="text-body text-muted">{busy}</p>)}
+      {busy && (running ? <RunProgress run={progress} title={busy} hide={["testing"]} /> : <p role="status" className="text-body text-muted">{busy}</p>)}
 
       {result && analyses.length > 0 && (
         <div className="space-y-8" aria-busy={Boolean(busy)}>
@@ -235,7 +224,7 @@ function FeatureSummary({ analysis }: { analysis: StoryAnalysis }) {
     ["Affected customers", <Chip key="c" level={affectedCustomers(analysis)} />, tips.customers],
     ["Affected systems", <span key="s">{systems.slice(0, 6).map((node) => node.label).join(", ")}{systems.length > 6 ? ` +${systems.length - 6} more` : ""}</span>],
     ["Risk", <span key="r" className="flex items-center gap-2"><Chip level={riskLevel(analysis.risk.overall)} /><span className="text-dense text-muted tabular-nums">{analysis.risk.overall}/100</span></span>],
-    ["Release readiness", <span key="rr" className="text-section numeral">{analysis.release.confidence}%</span>, tips.readiness],
+    ["Release readiness", <span key="rr" className="flex items-center gap-3"><span className="text-section numeral">{analysis.release.confidence}%</span><Decision decision={analysis.release.decision} /></span>, tips.readiness],
   ];
   return (
     <section aria-label="Feature summary" className="rounded-xl border border-line bg-surface">
