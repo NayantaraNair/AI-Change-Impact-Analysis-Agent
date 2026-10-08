@@ -281,9 +281,87 @@ export interface ChatResponse {
   provider: string;
 }
 
+// ---------------------------------------------------------------- codebase impact
+
+export type TestCategory = "functional" | "api" | "integration" | "unit" | "regression" | "security";
+
+export interface CodeFile {
+  path: string;
+  service: string;
+  language: string;
+  classes: string[];
+  functions: string[];
+  apis: string[];
+  tables: string[];
+}
+
+export interface CodeService {
+  name: string;
+  path: string;
+  languages: string[];
+  files: number;
+  classes: number;
+  apis: number;
+  tables: string[];
+}
+
+export interface RepoIndex {
+  repo_url: string;
+  ref: string;
+  root: string;
+  tree: string[];
+  files: CodeFile[];
+  services: CodeService[];
+  truncated: boolean;
+}
+
+export interface ImpactedFile {
+  path: string;
+  service: string;
+  reason: string;
+  classes: string[];
+  apis: string[];
+  tables: string[];
+}
+
+export interface ServiceImpact {
+  service: string;
+  reason: string;
+  files: string[];
+  classes: string[];
+  apis: string[];
+  tables: string[];
+}
+
+export interface DevTest {
+  id: string;
+  title: string;
+  category: TestCategory;
+  target: string;
+  steps: string[];
+  expected: string;
+}
+
+export interface CodebaseRequest {
+  repo_url: string;
+  story: StoryInput;
+}
+
+export interface CodebaseAnalysis {
+  story: StoryInput;
+  repo: RepoIndex;
+  summary: string;
+  services: ServiceImpact[];
+  files: ImpactedFile[];
+  tests: DevTest[];
+  providers_used: Record<string, string>;
+  duration_ms: number;
+  created_at: string;
+}
+
 // ---------------------------------------------------------------- runs (live progress)
 
-export type RunKind = "story" | "sprint" | "chat";
+export type RunKind = "story" | "sprint" | "chat" | "codebase";
 export type RunStatus = "running" | "succeeded" | "failed";
 export type StageStatus = "pending" | "running" | "done" | "failed";
 export type AttemptOutcome =
@@ -352,6 +430,7 @@ export interface Run {
   error: string | null;
   story_result: StoryAnalysis | null;
   sprint_result: SprintAnalysis | null;
+  codebase_result: CodebaseAnalysis | null;
 }
 
 export interface RunStarted {

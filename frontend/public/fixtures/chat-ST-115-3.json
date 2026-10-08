@@ -1,12 +1,6 @@
 {
-  "answer": "The context contains only one story, so I can only speak to that one.\n\n- **ST-115** — \"Update the footer text on monthly statement PDFs\": **not risky**. Overall risk score **12** (decision **GO**, confidence **94**).\n- Highest dimension: **delivery = 14** (low). Top factors: \"low ambiguity\" (+10, `document-service`), \"baseline\" (+5), \"direct services\" (+5, `document-service`).\n- All other dimensions are low: operational 12, technical 11, security 7, compliance 0, performance 0.\n- No blocking or conditional release rules fired; no compliance framework applies (overall compliance score 100/100).\n\nNo other stories are present in the analysis context, so I can't identify risky stories beyond this one.",
-  "cited_nodes": [
-    "document-service"
-  ],
-  "cited_factors": [
-    "baseline",
-    "direct services",
-    "low ambiguity"
-  ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "answer": "No stories are risky in the provided context. The only story (ST‑115) has an overall risk score of 12 (low), with all risk dimensions rated as low.",
+  "cited_nodes": [],
+  "cited_factors": [],
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

@@ -1,5 +1,5 @@
 {
-  "answer": "The analysis context contains only **one** story — I can't compare across a portfolio.\n\n- **ST-104** — \"Customer profile: add preferred name and secondary email\"\n  - Overall risk: **57** (highest dimension: **compliance**)\n  - Release decision: **GO_WITH_CONDITIONS**, confidence **58**, 10 triggered conditions\n\nRisk by dimension (as supplied):\n- Compliance — **61** (medium); top factors: pii data (20, `crm`,`customer-db`,`customer-service`,`notification-service`), nearby card data (12, `card-service`), database schema change (10, `audit-db`,`customer-db`)\n- Technical — **58** (medium); database schema change (20, `audit-db`,`customer-db`), direct services (18, `crm`,`customer-service`,`notification-service`), new feature (10, `crm`,`customer-db`,`customer-service`,`notification-service`)\n- Operational — **53** (medium); service criticality (32, `customer-service`), downstream systems (10, `account-service`,`audit-db`,`card-service`,`loan-service`,`payment-service`), deployment groups (6)\n- Delivery — **46** (medium); owner coordination (16), direct services (15), low ambiguity (10)\n- Security — **38** (low); customer data (20), blast radius size (10), baseline (8)\n- Performance — **25** (low); transaction path (20, `payment-service`), baseline (5)\n\nCompliance frameworks: GDPR **high** (55), PCI DSS **medium** (75), SOX **medium** (75), Internal Governance **low** (85); overall compliance score **55**.\n\nNote: whether other stories exist is not in the provided context.",
+  "answer": "Only one story is present in the analysis context: **ST-104 — “Customer profile: add preferred name and secondary email.”** It is classified as risky.\n\n- **Decision:** `GO_WITH_CONDITIONS`\n- **Overall risk:** `57`\n- **Highest risk dimension:** `compliance` (`61`, medium)\n- **Triggered rules:**\n  - highest risk is 61 (>= 60)\n  - GDPR risk is high\n  - PCI DSS risk is medium\n  - SOX risk is medium\n\n**Risk dimensions (ST-104):**\n- `compliance` 61 medium — top factors: `pii data` (`crm`, `customer-db`, `customer-service`, `notification-service`), `nearby card data` (`card-service`), `database schema change` (`audit-db`, `customer-db`)\n- `technical` 58 medium — `database schema change` (`audit-db`, `customer-db`), `direct services` (`crm`, `customer-service`, `notification-service`), `new feature` (`crm`, `customer-db`, `customer-service`, `notification-service`)\n- `operational` 53 medium — `service criticality` (`customer-service`), `downstream systems` (`account-service`, `audit-db`, `card-service`, `loan-service`, `payment-service`)\n- `delivery` 46 medium — `owner coordination`, `direct services`, `low ambiguity`\n- `security` 38 low — `customer data`, `blast radius size`\n- `performance` 25 low — `transaction path` (`payment-service`)\n\n**Compliance frameworks:**\n- `GDPR` applicable, risk `high`, score `55`\n- `PCI DSS` applicable, risk `medium`, score `75`\n- `SOX` applicable, risk `medium`, score `75`\n- `Internal Governance` applicable, risk `low`, score `85`\n\nNo other stories are included in the context, so I cannot compare risk across additional stories.",
   "cited_nodes": [
     "customer-service",
     "account-service",
@@ -12,7 +12,6 @@
     "audit-db"
   ],
   "cited_factors": [
-    "baseline",
     "customer data",
     "blast radius size",
     "pii data",
@@ -22,7 +21,6 @@
     "new feature",
     "service criticality",
     "downstream systems",
-    "deployment groups",
     "transaction path",
     "low ambiguity",
     "owner coordination"

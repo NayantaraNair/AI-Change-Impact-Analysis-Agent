@@ -1,8 +1,10 @@
 {
-  "answer": "**Overall risk 85 (highest dimension: security 93)** — several dimensions are rated high:\n\n- **Security — 93 (high)**: `card data` (+25, atm / card-service / fraud-engine), `auth flow change` (+25, api-gateway / authentication-service / card-service / mobile-banking), `external API contract` (+15, api-gateway / authentication-service / card-service / mobile-banking).\n- **Delivery — 87 (high)**: `owner coordination` (+32, all 20 services), `medium ambiguity` (+30, api-gateway / authentication-service / card-service / mobile-banking), `direct services` (+20, same four).\n- **Compliance — 75 (high)**: `card data` (+30, card-service), `pii data` (+20, api-gateway / authentication-service / card-service / mobile-banking), `financial data` (+20, api-gateway / mobile-banking).\n- **Operational — 71 (high)**: `service criticality` (+40, api-gateway / authentication-service), `downstream systems` (+20, 16 downstream components), `deployment groups` (+6).\n- **Technical — 49 (medium)** and **Performance — 40 (medium)** are the lower contributors.\n\nRelease decision supplied by code: **NO_GO**, confidence 39, triggered by `NO_GO: security risk is 93 (>= 85)`, `NO_GO: delivery risk is 87 (>= 85)`, plus PCI DSS and Internal Governance high-risk rules (change touches card data and authentication).\n\nCompliance context: 4 of 4 frameworks apply; minimum compliance score 40/100; 2 applicable frameworks rated high (PCI DSS high, Internal Governance high).",
+  "answer": "- **Security risk is high (score 93)** – driven by:\n  - **Card data** (25 pts) – impacts `atm`, `card-service`, `fraud-engine`.\n  - **Auth flow change** (25 pts) – impacts `api-gateway`, `authentication-service`, `card-service`, `mobile-banking`.\n  - **External API contract** (15 pts) – impacts `api-gateway`, `authentication-service`, `card-service`, `mobile-banking`.\n\n- **Compliance risk is high (score 75)** – driven by:\n  - **Card data** (30 pts) – impacts `card-service`.\n  - **PII data** (20 pts) – impacts `api-gateway`, `authentication-service`, `card-service`, `mobile-banking`.\n  - **Financial data** (20 pts) – impacts `api-gateway`, `mobile-banking`.\n\n- **Operational risk is high (score 71)** – driven by:\n  - **Service criticality** (40 pts) – impacts `api-gateway`, `authentication-service`.\n  - **Downstream systems** (20 pts) – impacts many services (e.g., `account-service`, `atm`, `branch-portal`, …).\n  - **Deployment groups** (6 pts) – impacts the same broad set of services.\n\nThese high‑scoring dimensions push the overall risk to 85, triggering the NO‑GO release decision.",
   "cited_nodes": [
     "mobile-banking",
     "atm",
+    "branch-portal",
+    "account-service",
     "card-service",
     "authentication-service",
     "api-gateway",
@@ -14,12 +16,9 @@
     "external API contract",
     "pii data",
     "financial data",
-    "direct services",
     "service criticality",
     "downstream systems",
-    "deployment groups",
-    "medium ambiguity",
-    "owner coordination"
+    "deployment groups"
   ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

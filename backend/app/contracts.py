@@ -317,9 +317,90 @@ class ChatResponse(BaseModel):
     provider: str
 
 
+# ---------------------------------------------------------------- codebase impact
+
+TestCategory = Literal["functional", "api", "integration", "unit", "regression", "security"]
+
+
+class CodeFile(BaseModel):
+    """What the indexer found in one source file (regex extraction, no execution)."""
+
+    path: str  # relative to the analysed root, forward slashes
+    service: str
+    language: str
+    classes: list[str] = []
+    functions: list[str] = []
+    apis: list[str] = []  # "POST /auth/login"
+    tables: list[str] = []  # tables defined or used
+
+
+class CodeService(BaseModel):
+    name: str
+    path: str
+    languages: list[str]
+    files: int
+    classes: int
+    apis: int
+    tables: list[str]
+
+
+class RepoIndex(BaseModel):
+    repo_url: str
+    ref: str
+    root: str  # subfolder analysed, "" for the whole repository
+    tree: list[str]  # every file path in the analysed root (capped)
+    files: list[CodeFile]  # indexed source files
+    services: list[CodeService]
+    truncated: bool = False
+
+
+class ImpactedFile(BaseModel):
+    path: str
+    service: str
+    reason: str
+    classes: list[str]
+    apis: list[str]
+    tables: list[str]
+
+
+class ServiceImpact(BaseModel):
+    service: str
+    reason: str
+    files: list[str]
+    classes: list[str]
+    apis: list[str]
+    tables: list[str]
+
+
+class DevTest(BaseModel):
+    id: str
+    title: str
+    category: TestCategory
+    target: str  # the class, API or table it exercises
+    steps: list[str]
+    expected: str
+
+
+class CodebaseRequest(BaseModel):
+    repo_url: str
+    story: StoryInput
+
+
+class CodebaseAnalysis(BaseModel):
+    story: StoryInput
+    repo: RepoIndex
+    summary: str
+    services: list[ServiceImpact]
+    files: list[ImpactedFile]
+    tests: list[DevTest]
+    providers_used: dict[str, str]
+    duration_ms: int
+    created_at: datetime
+
+
 # ---------------------------------------------------------------- runs (live progress)
 
-RunKind = Literal["story", "sprint", "chat"]
+RunKind = Literal["story", "sprint", "chat", "codebase"]
 RunStatus = Literal["running", "succeeded", "failed"]
 StageStatus = Literal["pending", "running", "done", "failed"]
 AttemptOutcome = Literal[
@@ -393,6 +474,7 @@ class Run(BaseModel):
     error: str | None = None
     story_result: StoryAnalysis | None = None
     sprint_result: SprintAnalysis | None = None
+    codebase_result: CodebaseAnalysis | None = None
 
 
 class RunStarted(BaseModel):

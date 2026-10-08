@@ -78,7 +78,7 @@ function StoryTimeline({ run }: { run: Run }) {
   const storyId = run.story_ids[0] ?? null;
   return (
     <ol className="divide-y divide-line border-y border-line">
-      {STORY_STAGE_ORDER.map((name, index) => {
+      {run.stages.filter((item) => item.story_id === storyId).map((item) => item.stage).map((name, index) => {
         const stage = findStage(run, name, storyId);
         if (!stage) return null;
         const attempts = attemptsFor(run, name, storyId);

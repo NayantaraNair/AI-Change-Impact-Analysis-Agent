@@ -1,16 +1,6 @@
 {
-  "answer": "Only **ST-112** has risk data in this context.\n\n**ST-112 (Biometric login for mobile banking)**\n- Overall risk: **64**, decision **GO_WITH_CONDITIONS** (release confidence 57).\n- Highest dimension: **security — 73 (high)**, top factors:\n  - `auth flow change` (+25) → `authentication-service`, `mobile-banking`\n  - `customer data` (+20) → `api-gateway`, `authentication-service`, `customer-db`, `mobile-banking`\n  - `critical identity path` (+10) → `api-gateway`, `authentication-service`\n- Other dimensions: operational 69 (medium; `service criticality` +40 on `authentication-service`), delivery 49, compliance 45, performance 40, technical 37.\n- Compliance: overall 65 — GDPR medium (65), Internal Governance medium (70), SOX low (85); PCI DSS not applicable.\n- Complexity: high; 12 conditions and a 3-step reverse-order rollback plan.\n\n**ST-107**\n- The context references ST-107 as coupled to ST-112 (authentication-service deployment, shared challenge contract and rollback policy must be scheduled jointly), but **no risk score, rating, or decision is supplied for ST-107** in this analysis.\n\nNo other stories are scored in the provided context.",
-  "cited_nodes": [
-    "mobile-banking",
-    "authentication-service",
-    "api-gateway",
-    "customer-db"
-  ],
-  "cited_factors": [
-    "customer data",
-    "auth flow change",
-    "critical identity path",
-    "service criticality"
-  ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "answer": "- ST-112 (Biometric login for mobile banking) – overall risk score 64, decision GO_WITH_CONDITIONs, indicating it is considered risky and requires mitigation conditions.【{\"id\":\"ST-112\",\"risk\":{\"overall\":64},\"release\":{\"decision\":\"GO_WITH_CONDITIONS\"}}】",
+  "cited_nodes": [],
+  "cited_factors": [],
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

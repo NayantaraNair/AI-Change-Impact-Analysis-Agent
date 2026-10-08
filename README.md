@@ -18,11 +18,18 @@ ImpactIQ opens with a workspace choice:
   - **Impact heatmap:** changes against the systems they hit, coloured by how hard.
   - **Conflict engine:** for each pair of stories, a conflict %, the systems they share, and a recommendation. For example: *OTP login ↔ Password reset: 99% conflict, shared Authentication Service, Customer Database, Notification Service, Mobile and Web Banking: "Merge sprint planning".*
   - **Dependency graph and AI reasoning timeline** for the selected change: what the AI read, what the rules computed, and how the decision was reached.
-- **Engineering workspace (Technical analysis)** for tech leads, engineers and testers: everything below, story by story and sprint by sprint.
+- **Engineering workspace (Technical analysis)** for tech leads, engineers and testers. Its home is **Codebase impact**: give it a public GitHub repository URL (optionally `/tree/<branch>/<folder>`) and a user story, and it shows:
+  - **The AI flow**, step by step: read the repository, map the story to services, find the files to change, list their classes, API routes and database tables, plan the tests.
+  - **A split view:** a codebase explorer (the repository tree, with changed files and folders marked) next to an architecture impact panel with one card per service, e.g. *auth-service: affected classes User, LoginAttempt, LoginAttemptTracker…; affected APIs POST /auth/login, POST /auth/token/refresh…; databases users, login_attempts.*
+  - **A developer test plan** of 5 to 7 tests, categorised as functional, API, unit, integration, security or regression.
+
+  The repository is downloaded as an archive and read in memory; nothing in it is run. Classes, routes and tables are extracted by code (Python, Java, Kotlin, TypeScript/JavaScript, Go, C#, SQL and more); the AI only chooses among services, files and classes that exist, and code drops anything it invents. A demo bank codebase lives in [`examples/demo-bank`](examples/demo-bank) and the example (OTP login) ships with saved live results. Story-by-story and sprint analysis are still there too.
 
 | Choose a workspace | Executive portfolio view |
 |---|---|
 | ![Workspace screen](docs/workspaces.png) | ![Portfolio view](docs/portfolio.png) |
+
+![Codebase impact: the AI flow, codebase explorer, architecture impact and developer tests](docs/engineering.png)
 
 An example portfolio (`data/demo_portfolio.json`) with OTP MFA login and self-service password reset ships with saved live results, so it opens instantly without API keys.
 
@@ -38,12 +45,11 @@ Paste a Jira-style story or epic, or attach a sprint backlog (JSON, CSV, Markdow
 - **Compliance**: GDPR, PCI DSS, SOX and internal governance, each with findings, a score and recommendations.
 - **Release decision**: GO / GO_WITH_CONDITIONS / NO_GO with the rules that fired, a confidence score, and rollback and deployment plans of at most three steps each.
 - **Sprint simulator**: all stories analysed in parallel, with conflict detection (two stories changing the same service, database, API or deployment group) and a sprint health score.
-- **Copilot**: a side drawer that answers questions about the current analysis and cites the components it talks about.
 - **Live progress and a debug pane**: every analysis runs as a tracked job. The page shows each step as it happens, which model is working on it and for how long, and every fallback with its reason (timed out, rate limited, cut off at the token limit). A slide-over debug pane on both pages shows the full run, every model call with token counts, the log, the provider chain and limits, and the raw JSON. Tooltips explain how each number is worked out. Light and dark modes.
 
-| Risk factors drive the graph | Sprint conflicts | Copilot |
-|---|---|---|
-| ![Risk tab](docs/risk.png) | ![Sprint page](docs/sprint.png) | ![Copilot drawer](docs/copilot.png) |
+| Risk factors drive the graph | Sprint conflicts |
+|---|---|
+| ![Risk tab](docs/risk.png) | ![Sprint page](docs/sprint.png) |
 
 ## How it works
 
@@ -65,7 +71,7 @@ Testing and compliance run in parallel, and the stories in a sprint run in paral
 
 ## The LLM reads; code scores
 
-The core design decision: **the LLM never produces a score or a decision.** It reads the story and extracts categorical facts — which services from a fixed catalog, the change type, and yes/no flags such as "touches card data" or "changes the authentication flow". Everything numeric is computed in Python from those facts plus the architecture map (`data/architecture.json`), using weights in [`scoring_config.yaml`](backend/app/scoring_config.yaml). The LLM comes back at the end only to write prose: summaries, generated test cases, compliance findings, rollback plans and copilot answers.
+The core design decision: **the LLM never produces a score or a decision.** It reads the story and extracts categorical facts — which services from a fixed catalog, the change type, and yes/no flags such as "touches card data" or "changes the authentication flow". Everything numeric is computed in Python from those facts plus the architecture map (`data/architecture.json`), using weights in [`scoring_config.yaml`](backend/app/scoring_config.yaml). The LLM comes back at the end only to write prose: summaries, generated test cases, compliance findings and rollback plans.
 
 Every point in a score is a named factor tied to the components that caused it. Security risk for ST-107 (card freeze/unfreeze with step-up authentication):
 
@@ -137,10 +143,12 @@ Regenerate the demo fixtures after changing scoring or data: `cd backend && uv r
 | GET | `/report/{story_id}` | latest saved story analysis |
 | GET | `/dependency-graph/{story_id}` | latest `ImpactGraph` for a story |
 | GET | `/architecture` | the component catalog |
-| POST | `/chat` | copilot answer with cited components and factors |
+| POST | `/chat` | question answering over an analysis (API only; the app no longer shows a copilot) |
 | POST | `/runs/story`, `/runs/sprint` | start an analysis in the background and return a run ID |
 | GET | `/runs/{run_id}` | live progress: stages, every model call and fallback, the log, then the result |
 | GET | `/runs` | recent runs (kept in memory) |
+| POST | `/runs/codebase`, `/codebase/analyze` | map a story onto a GitHub repository: services, files, classes, APIs, tables, developer tests |
+| GET | `/demo-codebase` | the example repository URL and story |
 | GET | `/debug` | provider chain, timeouts, token caps and cooldowns (never keys) |
 
 Interactive docs at http://localhost:8000/docs. All request and response shapes are defined once in [`backend/app/contracts.py`](backend/app/contracts.py) and mirrored in [`frontend/lib/types.ts`](frontend/lib/types.ts).
@@ -152,6 +160,7 @@ backend/app/
   contracts.py          shared Pydantic models
   llm.py                provider fallback chain
   agents/               requirement, testing, compliance, release, chat (LLM + fallback)
+  codebase/             repository fetch, indexer, story-to-code agent
   engine/               dependency graph, scoring, sprint, conflicts (no LLM)
   pipeline.py           stage orchestration and caching
   runs.py               live run tracking: stages, model calls, log
@@ -165,7 +174,8 @@ frontend/
   app/story, app/sprint pages
   components/graph      dependency graph (React Flow)
   components/analysis   story tabs, stat strip, factor bars
-  components/copilot    copilot drawer
+  components/engineering codebase impact: explorer, impact panel, test plan
+  components/executive  portfolio view
   components/run        live progress and provenance
   components/debug      debug slide-over
 scripts/                data validation, LLM smoke test, fixture builder

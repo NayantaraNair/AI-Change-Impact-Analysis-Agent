@@ -1,5 +1,5 @@
 {
-  "answer": "**Overall risk is 64 (medium), not high — the highest *dimension* risk is high: `security` = 73.**\n\nWhy `security` is high (score 73), by top factor:\n- `auth flow change` (+25) — `authentication-service`, `mobile-banking`\n- `customer data` (+20) — `api-gateway`, `authentication-service`, `customer-db`, `mobile-banking`\n- `critical identity path` (+10) — `api-gateway`, `authentication-service`\n\nOther dimensions for contrast:\n- `operational` 69 — medium (`service criticality` 40 on `authentication-service`)\n- `compliance` 45, `delivery` 49, `performance` 40 — medium\n- `technical` 37 — low\n\nRelease decision: `GO_WITH_CONDITIONS` (confidence 57), triggered by \"highest risk is 73 (>= 60)\" plus GDPR and Internal Governance risk being medium.",
+  "answer": "Risk is high because the **security** dimension scores **73 (high)**, driven by the following top factors:\n\n- **auth flow change** – +25 points (affects `authentication-service`, `mobile-banking`)  \n- **customer data** – +20 points (affects `api-gateway`, `authentication-service`, `customer-db`, `mobile-banking`)  \n- **critical identity path** – +10 points (affects `api-gateway`, `authentication-service`)  \n\nThese factors push the overall risk score to 64, with security being the highest‑scoring dimension.",
   "cited_nodes": [
     "mobile-banking",
     "authentication-service",
@@ -9,8 +9,7 @@
   "cited_factors": [
     "customer data",
     "auth flow change",
-    "critical identity path",
-    "service criticality"
+    "critical identity path"
   ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

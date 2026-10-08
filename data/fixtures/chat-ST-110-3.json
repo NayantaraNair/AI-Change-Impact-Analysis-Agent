@@ -1,23 +1,6 @@
 {
-  "answer": "The context contains only one story: **ST-110**.\n\n- **Overall risk for ST-110: 39** — highest dimension is **compliance**.\n- **Compliance risk: 50 / medium**\n  - Top factors: **card data** (30 points) on `fraud-engine`; **financial data** (20 points) on `fraud-engine`; **baseline** (5 points).\n- Other dimensions are low:\n  - **Security: 34 / low** — top factors: **card data** (25) on `fraud-engine`; **baseline** (8); **blast radius size** (6) on `fraud-engine`, `risk-engine`, `transaction-db`.\n  - **Technical: 11 / low** — **direct services** (6) on `fraud-engine`; **baseline** (5); **dependency depth** (5) on `risk-engine`, `transaction-db`.\n  - **Operational: 34 / low** — **service criticality** (36) on `fraud-engine`; **baseline** (5); **downstream systems** (4) on `risk-engine`, `transaction-db`.\n  - **Performance: 30 / low** — **transaction path** (20) on `transaction-db`; **payment business rule** (15) on `transaction-db`; **baseline** (5).\n  - **Delivery: 18 / low** — **low ambiguity** (10) on `fraud-engine`; **owner coordination** (8) on `fraud-engine`, `risk-engine`, `transaction-db`; **baseline** (5).\n- **Release decision: GO** with **confidence 78**; no blocking or conditional release rules fired.\n- **Compliance frameworks:**\n  - **PCI DSS: applicable, low risk, score 80** — card-data components impacted, especially `fraud-engine`.\n  - **SOX: applicable, low risk, score 100** — financial-data components impacted, especially `fraud-engine`, `transaction-db`.\n  - **Internal Governance: applicable, low risk, score 100** — directly changed `fraud-engine` has criticality 9.\n  - **GDPR: not applicable** — no impacted PII-bearing component and no customer-data touch.\n\nNo other stories are present in the analysis context to compare.",
-  "cited_nodes": [
-    "transaction-db",
-    "fraud-engine",
-    "risk-engine"
-  ],
-  "cited_factors": [
-    "baseline",
-    "card data",
-    "blast radius size",
-    "financial data",
-    "direct services",
-    "dependency depth",
-    "service criticality",
-    "downstream systems",
-    "transaction path",
-    "payment business rule",
-    "low ambiguity",
-    "owner coordination"
-  ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "answer": "- **ST-110** – overall risk score **39** (with the highest‑scoring dimension being **compliance** at **50 / 100**, medium risk). This indicates the story carries notable risk, primarily from compliance considerations.",
+  "cited_nodes": [],
+  "cited_factors": [],
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

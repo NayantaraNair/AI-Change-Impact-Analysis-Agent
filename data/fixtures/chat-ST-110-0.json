@@ -1,23 +1,13 @@
 {
-  "answer": "**Impacted components (ST-110)**\n\n- **Directly changed:** `fraud-engine`\n- **Services:** `fraud-engine`, `risk-engine`, `transaction-db`\n- **Databases:** `transaction-db`\n- **Downstream:** `risk-engine`, `transaction-db`\n- **Deployment groups:** `core-banking`, `core-payments`\n\n**Impacted APIs**\n- `POST /fraud/screenings`\n- `POST /fraud/velocity-checks`\n- `PUT /fraud/rules/{id}`\n- `POST /risk/assessments`\n- `GET /risk/policies/{id}`\n- `PUT /risk/policies/{id}`\n- `POST /internal/ledger/entries`\n- `GET /internal/ledger/accounts/{id}/daily-total`\n- `GET /internal/ledger/entries/{id}`\n\n**Risk dimensions with top impact factors**\n- **Security (34, low):** *card data* (25 pts) → `fraud-engine`; *blast radius size* (6 pts) → `fraud-engine`, `risk-engine`, `transaction-db`\n- **Compliance (50, medium — highest):** *card data* (30 pts) and *financial data* (20 pts) → `fraud-engine`\n- **Technical (11, low):** *direct services* (6 pts) → `fraud-engine`; *dependency depth* (5 pts) → `risk-engine`, `transaction-db`\n- **Operational (34, low):** *service criticality* (36 pts) → `fraud-engine`; *downstream systems* (4 pts) → `risk-engine`, `transaction-db`\n- **Performance (30, low):** *transaction path* (20 pts) and *payment business rule* (15 pts) → `transaction-db`\n- **Delivery (18, low):** *low ambiguity* (10 pts) → `fraud-engine`; *owner coordination* (8 pts) → `fraud-engine`, `risk-engine`, `transaction-db`\n\nNote: `changes_db_schema` is false, `touches_customer_data` is false, but `touches_card_data` and `touches_financial_data` are true. Overall risk 39; release decision **GO** (confidence 78).",
+  "answer": "- **Directly changed component:** fraud-engine【impact.directly_changed】  \n- **Services impacted:** fraud-engine, risk-engine, transaction-db【impact.services】  \n- **Databases impacted:** transaction-db【impact.databases】  \n- **APIs impacted:**  \n  - GET /internal/ledger/accounts/{id}/daily-total  \n  - GET /internal/ledger/entries/{id}  \n  - GET /risk/policies/{id}  \n  - POST /fraud/screenings  \n  - POST /fraud/velocity-checks  \n  - POST /internal/ledger/entries  \n  - POST /risk/assessments  \n  - PUT /fraud/rules/{id}  \n  - PUT /risk/policies/{id}【impact.apis】  \n- **Downstream systems impacted:** risk-engine, transaction-db【impact.downstream】  \n- **Deployment groups impacted:** core-banking, core-payments【impact.deployment_groups】",
   "cited_nodes": [
     "transaction-db",
     "fraud-engine",
     "risk-engine"
   ],
   "cited_factors": [
-    "card data",
-    "blast radius size",
-    "financial data",
-    "direct services",
-    "dependency depth",
-    "service criticality",
     "downstream systems",
-    "deployment groups",
-    "transaction path",
-    "payment business rule",
-    "low ambiguity",
-    "owner coordination"
+    "deployment groups"
   ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

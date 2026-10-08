@@ -2018,8 +2018,8 @@
         "compliance": "tokenharbor:deepseek-v4.1-flash:free",
         "release": "tokenharbor:deepseek-v4.1-flash:free"
       },
-      "duration_ms": 162423,
-      "created_at": "2026-10-08T05:07:27.518955Z"
+      "duration_ms": 146,
+      "created_at": "2026-10-08T07:29:31.728806Z"
     },
     {
       "story": {
@@ -3989,8 +3989,8 @@
         "compliance": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
         "release": "tokenharbor:deepseek-v4.1-flash:free"
       },
-      "duration_ms": 159764,
-      "created_at": "2026-10-08T05:07:24.861565Z"
+      "duration_ms": 134,
+      "created_at": "2026-10-08T07:29:31.748998Z"
     },
     {
       "story": {
@@ -5409,8 +5409,8 @@
         "compliance": "tokenharbor:deepseek-v4.1-flash:free",
         "release": "tokenharbor:deepseek-v4.1-flash:free"
       },
-      "duration_ms": 51,
-      "created_at": "2026-10-08T05:04:45.155609Z"
+      "duration_ms": 120,
+      "created_at": "2026-10-08T07:29:31.748998Z"
     },
     {
       "story": {
@@ -6806,8 +6806,8 @@
         "compliance": "tokenharbor:deepseek-v4.1-flash:free",
         "release": "tokenharbor:deepseek-v4.1-flash:free"
       },
-      "duration_ms": 39,
-      "created_at": "2026-10-08T05:04:45.157236Z"
+      "duration_ms": 109,
+      "created_at": "2026-10-08T07:29:31.748998Z"
     },
     {
       "story": {
@@ -8023,8 +8023,8 @@
         "compliance": "deterministic",
         "release": "tokenharbor:deepseek-v4.1-flash:free"
       },
-      "duration_ms": 26,
-      "created_at": "2026-10-08T05:04:45.158318Z"
+      "duration_ms": 97,
+      "created_at": "2026-10-08T07:29:31.748998Z"
     }
   ],
   "conflicts": [
@@ -9004,5 +9004,5 @@
       "identity"
     ]
   },
-  "summary": "This banking sprint covers 5 stories across 17 impacted applications and 18 impacted dependencies, with 5 compliance issues, about 32.63 testing hours, a health score of 35, and release confidence of 54; the fixed release decisions are 2 NO_GO, 2 GO_WITH_CONDITIONS, and 1 GO, with EX-201 and EX-202 flagged as high risk. The main conflicts are the EX-201/EX-202 deployment collision on authentication-service (high risk, score 100), the EX-201/EX-202 schema contention on customer-db (high risk, score 100), and the ST-101/ST-110 deployment collision on payment-service (high risk, score 80). Recommended sequencing is to deploy EX-202 first behind a feature flag where available and run the shared authentication-service regression suite before EX-201; sequence the EX-201/EX-202 customer-db migrations by agreeing a backward-compatible schema, rehearsing rollback, and running combined migration and data-integrity tests; and deploy ST-110 first behind a feature flag where available and run the shared payment-service regression suite before ST-101."
+  "summary": "Across 5 stories affecting 17 applications and 18 dependencies, the sprint shows 3 conflicts, 5 compliance issues, 32.63 testing hours, a health score of 35, release confidence of 54, high-risk stories EX-201 and EX-202, and release decisions of 2 NO_GO, 2 GO_WITH_CONDITIONS, and 1 GO. The main conflicts are EX-201/EX-202 deployment collision on authentication-service (high risk, score 100), EX-201/EX-202 schema contention on customer-db (high risk, score 100), and ST-101/ST-110 deployment collision on payment-service (high risk, score 80); the supplied sequencing is to deploy EX-202 first behind a feature flag where available and run the authentication-service shared regression suite before EX-201, sequence the EX-201/EX-202 customer-db migrations with a backward-compatible schema, rollback rehearsal, and combined migration/data-integrity tests, and deploy ST-110 first behind a feature flag where available and run the payment-service shared regression suite before ST-101."
 }

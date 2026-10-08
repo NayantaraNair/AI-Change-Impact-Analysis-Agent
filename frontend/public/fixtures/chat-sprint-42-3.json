@@ -1,10 +1,6 @@
 {
-  "answer": "**Flagged high risk**\n- **ST-107** (Card freeze/unfreeze with step-up auth) — listed in `kpis.high_risk_stories`; risk overall 85, highest dimension **security 93 (high)**, also delivery 87 (high), compliance 75 (high), operational 71 (high). Release decision **NO_GO**, confidence 23.\n\n**Elevated risk (medium/high dimensions, GO_WITH_CONDITIONS)**\n- **ST-112** (Biometric login) — overall 64, highest **security 73 (high)**; compliance 45, operational 69 medium. Decision GO_WITH_CONDITIONS (confidence 49).\n- **ST-104** (Preferred name & secondary email) — overall 57, highest **compliance 61 (medium)**; technical 58, operational 53. Decision GO_WITH_CONDITIONS (confidence 58).\n- **ST-101** (Premium daily limits) — overall 39, highest **operational 44 (medium)**; compliance 40. Decision GO_WITH_CONDITIONS (confidence 54).\n- **ST-110** (Fraud velocity rule) — overall 39, highest **compliance 50 (medium)**. Decision GO_WITH_CONDITIONS (confidence 70).\n\n**Low risk**\n- **ST-115** (Statement footer text) — overall 12, all dimensions low. Decision **GO**, confidence 94.\n\nThe sprint-level conflicts that concentrate among the riskier stories: ST-101×ST-107 on account-service (risk 100), ST-107×ST-112 on authentication-service (risk 100), ST-101×ST-110 on payment-service (risk 80).",
-  "cited_nodes": [
-    "account-service",
-    "payment-service",
-    "authentication-service"
-  ],
+  "answer": "- **ST-107** – listed as a high‑risk story in the sprint KPIs (“high_risk_stories”: [“ST‑107”])【{\"id\":\"sprint-42\",\"kpis\":{\"high_risk_stories\":[\"ST-107\"]}}】.",
+  "cited_nodes": [],
   "cited_factors": [],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

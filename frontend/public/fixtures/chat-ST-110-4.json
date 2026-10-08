@@ -1,14 +1,6 @@
 {
-  "answer": "The context does not describe release confidence as low.\n\n- Supplied values: `release.confidence` = **78**, `release.decision` = **GO**, `release.complexity` = **medium**, `release.conditions` = **[]**.\n- Triggered rules: `\"GO: no blocking or conditional release rules fired\"` — so no conditional or blocking rule lowered the outcome.\n- Related signals that are also not \"high\": `risk.overall` = 39; delivery dimension = 18 (low), with top factors \"low ambiguity\" (10 pts, `fraud-engine`) and \"owner coordination\" (8 pts, `fraud-engine`, `risk-engine`, `transaction-db`).\n- Requirement-level `ambiguity` = \"low\"; `engineering_scope` is described as a small, contained change to `fraud-engine`.\n\nSo the stated posture is GO at confidence 78. The context contains no explanation of confidence being low; if you expected a lower figure, it isn't in this analysis JSON (scores and decisions are reported as supplied, not recalculated).",
-  "cited_nodes": [
-    "transaction-db",
-    "fraud-engine",
-    "risk-engine"
-  ],
-  "cited_factors": [
-    "small, contained change",
-    "low ambiguity",
-    "owner coordination"
-  ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "answer": "The release confidence is 78 / 100, which is considered moderate/low because:\n\n- **Medium complexity** – the release.complexity field is set to “medium”.  \n- **Coordination dependencies** – the release notes require ordering with ST‑101 (core‑payments deployment group) and verification of rule ordering, combined ST‑101/ST‑110 regression evidence, and agreed release timing.  \n- **Deployment sequencing** – the core‑banking group must be deployed first (transaction‑db), then the core‑payments group (risk‑engine before fraud‑engine), adding operational steps that increase uncertainty.  \n- **Risk profile** – overall risk score is 39, with a medium‑level compliance risk (score 50) and other risk dimensions (security, operational, performance) contributing to uncertainty.  \n\nThese factors together lower the confidence despite the “GO” decision.",
+  "cited_nodes": [],
+  "cited_factors": [],
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

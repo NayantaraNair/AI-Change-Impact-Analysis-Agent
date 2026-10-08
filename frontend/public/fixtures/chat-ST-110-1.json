@@ -1,21 +1,6 @@
 {
-  "answer": "Risk is not high — the computed scores show low-to-medium, not high:\n\n- **Overall risk: 39** (from the risk object), which is not a high rating.\n- **Highest dimension: compliance at 50 — level \"medium\"**, not high. Its top factors: `card data` (30 pts, node `fraud-engine`), `financial data` (20 pts, `fraud-engine`), `baseline` (5 pts).\n- All other dimensions are **\"low\"**:\n  - security 34 (top factors: `card data` 25, `baseline` 8, `blast radius size` 6)\n  - operational 34 (`service criticality` 36, `baseline` 5, `downstream systems` 4)\n  - performance 30 (`transaction path` 20, `payment business rule` 15, `baseline` 5)\n  - delivery 18 (`low ambiguity` 10, `owner coordination` 8, `baseline` 5)\n  - technical 11 (`direct services` 6, `baseline` 5, `dependency depth` 5)\n\nCompliance frameworks are also not high: PCI DSS = low (80), SOX = low (100), Internal Governance = low (100); compliance summary states \"0 applicable framework(s) have high risk.\"\n\nSo the closest thing to elevated risk is the **compliance dimension at medium (50)**, driven mainly by card and financial data in `fraud-engine`; nothing in the supplied analysis rates risk as high.",
-  "cited_nodes": [
-    "fraud-engine"
-  ],
-  "cited_factors": [
-    "baseline",
-    "card data",
-    "blast radius size",
-    "financial data",
-    "direct services",
-    "dependency depth",
-    "service criticality",
-    "downstream systems",
-    "transaction path",
-    "payment business rule",
-    "low ambiguity",
-    "owner coordination"
-  ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "answer": "The analysis does **not** indicate a high risk level.  \n\n- Overall risk score: **39** (low)【context: risk.overall】.  \n- The highest‑scoring risk dimension is **compliance** with a score of **50** (medium)【context: risk.dimensions[1].score】.  \n- All other dimensions (security, technical, operational, performance, delivery) are rated low (scores ≤ 34)【context: risk.dimensions】.  \n\nThus, the risk is not high; it is low overall, with the only moderate concern being compliance. If a higher risk were expected, the context does not provide any basis for that claim.",
+  "cited_nodes": [],
+  "cited_factors": [],
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

@@ -1,0 +1,932 @@
+{
+  "story": {
+    "id": "EX-201",
+    "title": "OTP multi-factor login for web and mobile banking",
+    "description": "Add a one-time passcode (OTP) step to customer login. After the password is accepted, the auth service sends a six-digit code by SMS through the notification service and only issues a session once the code is verified. Customers must have a verified mobile number and an MFA enrolment flag on their profile. Lock the login after five failed codes and record every attempt.",
+    "type": "epic",
+    "acceptance_criteria": [
+      "Enrolled customers must enter a valid six-digit OTP after their password before a session is issued.",
+      "Codes expire after five minutes; five failed codes lock the login for 30 minutes.",
+      "The OTP SMS is sent through the notification service within 30 seconds.",
+      "Every OTP send, success and failure is recorded."
+    ]
+  },
+  "repo": {
+    "repo_url": "https://github.com/NayantaraNair/AI-Change-Impact-Analysis-Agent/tree/main/examples/demo-bank",
+    "ref": "main",
+    "root": "examples/demo-bank",
+    "tree": [
+      "db/migrations/001_create_users.sql",
+      "db/migrations/002_create_customers.sql",
+      "db/migrations/003_create_payments.sql",
+      "db/migrations/004_create_cards.sql",
+      "README.md",
+      "services/auth-service/app/auth/lockout.py",
+      "services/auth-service/app/auth/password.py",
+      "services/auth-service/app/auth/session.py",
+      "services/auth-service/app/clients/notification.py",
+      "services/auth-service/app/main.py",
+      "services/auth-service/app/models.py",
+      "services/auth-service/pyproject.toml",
+      "services/auth-service/tests/test_login.py",
+      "services/card-service/build.gradle.kts",
+      "services/card-service/src/main/kotlin/com/demobank/cards/Card.kt",
+      "services/card-service/src/main/kotlin/com/demobank/cards/CardController.kt",
+      "services/card-service/src/main/kotlin/com/demobank/cards/CardRepository.kt",
+      "services/card-service/src/main/kotlin/com/demobank/cards/CardService.kt",
+      "services/customer-service/package.json",
+      "services/customer-service/src/database.ts",
+      "services/customer-service/src/entities/contact-preference.ts",
+      "services/customer-service/src/entities/customer.ts",
+      "services/customer-service/src/repositories/customer-repository.ts",
+      "services/customer-service/src/routes/customers.ts",
+      "services/customer-service/src/services/profile-service.ts",
+      "services/notification-service/cmd/server/main.go",
+      "services/notification-service/go.mod",
+      "services/notification-service/internal/email/sender.go",
+      "services/notification-service/internal/sms/sender.go",
+      "services/notification-service/internal/templates/templates.go",
+      "services/payment-service/pom.xml",
+      "services/payment-service/src/main/java/com/demobank/payments/DailyLimitPolicy.java",
+      "services/payment-service/src/main/java/com/demobank/payments/DailyLimitUsage.java",
+      "services/payment-service/src/main/java/com/demobank/payments/DailyLimitUsageRepository.java",
+      "services/payment-service/src/main/java/com/demobank/payments/FraudScreeningClient.java",
+      "services/payment-service/src/main/java/com/demobank/payments/Payment.java",
+      "services/payment-service/src/main/java/com/demobank/payments/PaymentController.java",
+      "services/payment-service/src/main/java/com/demobank/payments/PaymentRepository.java",
+      "services/payment-service/src/main/java/com/demobank/payments/PaymentService.java"
+    ],
+    "files": [
+      {
+        "path": "db/migrations/001_create_users.sql",
+        "service": "database",
+        "language": "sql",
+        "classes": [],
+        "functions": [],
+        "apis": [],
+        "tables": [
+          "users",
+          "login_attempts",
+          "refresh_tokens"
+        ]
+      },
+      {
+        "path": "db/migrations/002_create_customers.sql",
+        "service": "database",
+        "language": "sql",
+        "classes": [],
+        "functions": [],
+        "apis": [],
+        "tables": [
+          "customers",
+          "contact_preferences"
+        ]
+      },
+      {
+        "path": "db/migrations/003_create_payments.sql",
+        "service": "database",
+        "language": "sql",
+        "classes": [],
+        "functions": [],
+        "apis": [],
+        "tables": [
+          "payments",
+          "daily_limit_usage"
+        ]
+      },
+      {
+        "path": "db/migrations/004_create_cards.sql",
+        "service": "database",
+        "language": "sql",
+        "classes": [],
+        "functions": [],
+        "apis": [],
+        "tables": [
+          "cards"
+        ]
+      },
+      {
+        "path": "services/auth-service/app/auth/lockout.py",
+        "service": "auth-service",
+        "language": "python",
+        "classes": [
+          "LoginAttemptTracker"
+        ],
+        "functions": [
+          "__init__",
+          "is_locked",
+          "record"
+        ],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/auth-service/app/auth/password.py",
+        "service": "auth-service",
+        "language": "python",
+        "classes": [
+          "PasswordHasher",
+          "PasswordPolicy"
+        ],
+        "functions": [
+          "__init__",
+          "hash",
+          "verify",
+          "needs_rehash",
+          "validate"
+        ],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/auth-service/app/auth/session.py",
+        "service": "auth-service",
+        "language": "python",
+        "classes": [
+          "TokenIssuer",
+          "SessionManager"
+        ],
+        "functions": [
+          "__init__",
+          "issue",
+          "decode_refresh",
+          "create",
+          "_find_active",
+          "refresh",
+          "revoke"
+        ],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/auth-service/app/clients/notification.py",
+        "service": "auth-service",
+        "language": "python",
+        "classes": [
+          "NotificationClient"
+        ],
+        "functions": [
+          "__init__",
+          "send_sms",
+          "send_email",
+          "login_alert"
+        ],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/auth-service/app/main.py",
+        "service": "auth-service",
+        "language": "python",
+        "classes": [
+          "LoginRequest",
+          "RefreshRequest",
+          "PasswordResetRequest",
+          "TokenResponse"
+        ],
+        "functions": [
+          "get_database",
+          "login",
+          "logout",
+          "refresh_token",
+          "reset_password"
+        ],
+        "apis": [
+          "POST /auth/login",
+          "POST /auth/logout",
+          "POST /auth/token/refresh",
+          "POST /auth/password/reset"
+        ],
+        "tables": []
+      },
+      {
+        "path": "services/auth-service/app/models.py",
+        "service": "auth-service",
+        "language": "python",
+        "classes": [
+          "Base",
+          "User",
+          "LoginAttempt",
+          "RefreshToken"
+        ],
+        "functions": [
+          "utc_now"
+        ],
+        "apis": [],
+        "tables": [
+          "users",
+          "login_attempts",
+          "refresh_tokens"
+        ]
+      },
+      {
+        "path": "services/auth-service/tests/test_login.py",
+        "service": "auth-service",
+        "language": "python",
+        "classes": [
+          "AttemptDatabase"
+        ],
+        "functions": [
+          "__init__",
+          "scalars",
+          "test_correct_password_matches_stored_hash",
+          "test_password_policy_rejects_email_account_name",
+          "test_five_failed_logins_lock_the_account",
+          "test_successful_login_breaks_the_failure_sequence"
+        ],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/card-service/build.gradle.kts",
+        "service": "card-service",
+        "language": "kotlin",
+        "classes": [],
+        "functions": [],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/card-service/src/main/kotlin/com/demobank/cards/Card.kt",
+        "service": "card-service",
+        "language": "kotlin",
+        "classes": [
+          "CardStatus",
+          "Card"
+        ],
+        "functions": [],
+        "apis": [],
+        "tables": [
+          "cards"
+        ]
+      },
+      {
+        "path": "services/card-service/src/main/kotlin/com/demobank/cards/CardController.kt",
+        "service": "card-service",
+        "language": "kotlin",
+        "classes": [
+          "CardController",
+          "CardView"
+        ],
+        "functions": [
+          "freeze",
+          "get",
+          "customerId",
+          "view"
+        ],
+        "apis": [
+          "POST /cards/{cardId}/freeze",
+          "GET /cards/{cardId}"
+        ],
+        "tables": []
+      },
+      {
+        "path": "services/card-service/src/main/kotlin/com/demobank/cards/CardRepository.kt",
+        "service": "card-service",
+        "language": "kotlin",
+        "classes": [
+          "CardRepository"
+        ],
+        "functions": [
+          "findByIdAndCustomerId",
+          "findOwnedForUpdate",
+          "countByCustomerIdAndStatus"
+        ],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/card-service/src/main/kotlin/com/demobank/cards/CardService.kt",
+        "service": "card-service",
+        "language": "kotlin",
+        "classes": [
+          "CardService"
+        ],
+        "functions": [
+          "get",
+          "freeze"
+        ],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/customer-service/src/database.ts",
+        "service": "customer-service",
+        "language": "typescript",
+        "classes": [],
+        "functions": [
+          "databaseUrl"
+        ],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/customer-service/src/entities/contact-preference.ts",
+        "service": "customer-service",
+        "language": "typescript",
+        "classes": [
+          "ContactPreference"
+        ],
+        "functions": [],
+        "apis": [],
+        "tables": [
+          "contact_preferences"
+        ]
+      },
+      {
+        "path": "services/customer-service/src/entities/customer.ts",
+        "service": "customer-service",
+        "language": "typescript",
+        "classes": [
+          "Customer"
+        ],
+        "functions": [],
+        "apis": [],
+        "tables": [
+          "customers"
+        ]
+      },
+      {
+        "path": "services/customer-service/src/repositories/customer-repository.ts",
+        "service": "customer-service",
+        "language": "typescript",
+        "classes": [
+          "ProfilePatch",
+          "ProfileConflictError",
+          "CustomerRepository"
+        ],
+        "functions": [
+          "findById",
+          "updateProfile",
+          "verifyPhone"
+        ],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/customer-service/src/routes/customers.ts",
+        "service": "customer-service",
+        "language": "typescript",
+        "classes": [
+          "AuthenticatedRequest"
+        ],
+        "functions": [
+          "authorize"
+        ],
+        "apis": [
+          "GET /customers/:id",
+          "PUT /customers/:id/profile",
+          "POST /customers/:id/phone/verify"
+        ],
+        "tables": []
+      },
+      {
+        "path": "services/customer-service/src/services/profile-service.ts",
+        "service": "customer-service",
+        "language": "typescript",
+        "classes": [
+          "ProfileService"
+        ],
+        "functions": [
+          "getProfile",
+          "updateProfile",
+          "verifyPhone"
+        ],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/notification-service/cmd/server/main.go",
+        "service": "notification-service",
+        "language": "go",
+        "classes": [
+          "deliveryRequest"
+        ],
+        "functions": [
+          "deliveryHandler",
+          "main"
+        ],
+        "apis": [
+          "ANY /notify/sms",
+          "ANY /notify/email"
+        ],
+        "tables": []
+      },
+      {
+        "path": "services/notification-service/internal/email/sender.go",
+        "service": "notification-service",
+        "language": "go",
+        "classes": [
+          "EmailSender"
+        ],
+        "functions": [
+          "Send"
+        ],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/notification-service/internal/sms/sender.go",
+        "service": "notification-service",
+        "language": "go",
+        "classes": [
+          "SmsSender"
+        ],
+        "functions": [
+          "Send"
+        ],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/notification-service/internal/templates/templates.go",
+        "service": "notification-service",
+        "language": "go",
+        "classes": [
+          "TemplateStore"
+        ],
+        "functions": [
+          "NewTemplateStore",
+          "Render"
+        ],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/payment-service/src/main/java/com/demobank/payments/DailyLimitPolicy.java",
+        "service": "payment-service",
+        "language": "java",
+        "classes": [
+          "DailyLimitPolicy",
+          "LimitSnapshot"
+        ],
+        "functions": [
+          "businessDate",
+          "validateTransfer",
+          "requireAvailable",
+          "snapshot"
+        ],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/payment-service/src/main/java/com/demobank/payments/DailyLimitUsage.java",
+        "service": "payment-service",
+        "language": "java",
+        "classes": [
+          "DailyLimitUsage"
+        ],
+        "functions": [
+          "key",
+          "reserve",
+          "getUsedAmount"
+        ],
+        "apis": [],
+        "tables": [
+          "daily_limit_usage"
+        ]
+      },
+      {
+        "path": "services/payment-service/src/main/java/com/demobank/payments/DailyLimitUsageRepository.java",
+        "service": "payment-service",
+        "language": "java",
+        "classes": [
+          "DailyLimitUsageRepository"
+        ],
+        "functions": [],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/payment-service/src/main/java/com/demobank/payments/FraudScreeningClient.java",
+        "service": "payment-service",
+        "language": "java",
+        "classes": [
+          "FraudScreeningClient",
+          "FraudRequest",
+          "FraudDecision"
+        ],
+        "functions": [
+          "requireApproval"
+        ],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/payment-service/src/main/java/com/demobank/payments/Payment.java",
+        "service": "payment-service",
+        "language": "java",
+        "classes": [
+          "Payment"
+        ],
+        "functions": [
+          "matches",
+          "getId",
+          "getAccountId",
+          "getAmount",
+          "getCurrency",
+          "getStatus"
+        ],
+        "apis": [],
+        "tables": [
+          "payments"
+        ]
+      },
+      {
+        "path": "services/payment-service/src/main/java/com/demobank/payments/PaymentController.java",
+        "service": "payment-service",
+        "language": "java",
+        "classes": [
+          "PaymentController",
+          "PaymentRequest",
+          "PaymentReceipt"
+        ],
+        "functions": [
+          "create",
+          "get",
+          "requireAccount",
+          "receipt"
+        ],
+        "apis": [
+          "POST /payments",
+          "GET /payments/{id}",
+          "GET /accounts/{accountId}/limits"
+        ],
+        "tables": []
+      },
+      {
+        "path": "services/payment-service/src/main/java/com/demobank/payments/PaymentRepository.java",
+        "service": "payment-service",
+        "language": "java",
+        "classes": [
+          "PaymentRepository"
+        ],
+        "functions": [],
+        "apis": [],
+        "tables": []
+      },
+      {
+        "path": "services/payment-service/src/main/java/com/demobank/payments/PaymentService.java",
+        "service": "payment-service",
+        "language": "java",
+        "classes": [
+          "PaymentService"
+        ],
+        "functions": [
+          "submit",
+          "get"
+        ],
+        "apis": [],
+        "tables": []
+      }
+    ],
+    "services": [
+      {
+        "name": "auth-service",
+        "path": "services/auth-service",
+        "languages": [
+          "python"
+        ],
+        "files": 7,
+        "classes": 15,
+        "apis": 4,
+        "tables": [
+          "users",
+          "login_attempts",
+          "refresh_tokens"
+        ]
+      },
+      {
+        "name": "card-service",
+        "path": "services/card-service",
+        "languages": [
+          "kotlin"
+        ],
+        "files": 5,
+        "classes": 6,
+        "apis": 2,
+        "tables": [
+          "cards"
+        ]
+      },
+      {
+        "name": "customer-service",
+        "path": "services/customer-service",
+        "languages": [
+          "typescript"
+        ],
+        "files": 6,
+        "classes": 7,
+        "apis": 3,
+        "tables": [
+          "contact_preferences",
+          "customers"
+        ]
+      },
+      {
+        "name": "database",
+        "path": "db",
+        "languages": [
+          "sql"
+        ],
+        "files": 4,
+        "classes": 0,
+        "apis": 0,
+        "tables": [
+          "users",
+          "login_attempts",
+          "refresh_tokens",
+          "customers",
+          "contact_preferences",
+          "payments",
+          "daily_limit_usage",
+          "cards"
+        ]
+      },
+      {
+        "name": "notification-service",
+        "path": "services/notification-service",
+        "languages": [
+          "go"
+        ],
+        "files": 4,
+        "classes": 4,
+        "apis": 2,
+        "tables": []
+      },
+      {
+        "name": "payment-service",
+        "path": "services/payment-service",
+        "languages": [
+          "java"
+        ],
+        "files": 8,
+        "classes": 13,
+        "apis": 3,
+        "tables": [
+          "daily_limit_usage",
+          "payments"
+        ]
+      }
+    ],
+    "truncated": false
+  },
+  "summary": "Changes 3 services (auth-service, customer-service, database): 7 files, 9 classes, 4 APIs and 5 database tables.",
+  "services": [
+    {
+      "service": "auth-service",
+      "reason": "The login flow must add OTP generation, SMS dispatch via the notification client, code verification, session gating, lockout after five failed codes, and attempt recording.",
+      "files": [
+        "services/auth-service/app/models.py",
+        "services/auth-service/app/main.py",
+        "services/auth-service/app/auth/lockout.py",
+        "services/auth-service/tests/test_login.py"
+      ],
+      "classes": [
+        "User",
+        "LoginAttempt",
+        "LoginRequest",
+        "RefreshRequest",
+        "PasswordResetRequest",
+        "TokenResponse",
+        "LoginAttemptTracker",
+        "AttemptDatabase"
+      ],
+      "apis": [
+        "POST /auth/login",
+        "POST /auth/logout",
+        "POST /auth/token/refresh",
+        "POST /auth/password/reset"
+      ],
+      "tables": [
+        "users",
+        "login_attempts",
+        "refresh_tokens"
+      ]
+    },
+    {
+      "service": "customer-service",
+      "reason": "It must persist and expose the MFA enrolment flag and ensure the verified mobile number is available for OTP eligibility checks.",
+      "files": [
+        "services/customer-service/src/entities/customer.ts"
+      ],
+      "classes": [
+        "Customer"
+      ],
+      "apis": [],
+      "tables": [
+        "customers"
+      ]
+    },
+    {
+      "service": "database",
+      "reason": "Schema changes are needed to store OTP codes, expiry and attempt records, and the customer MFA enrolment flag.",
+      "files": [
+        "db/migrations/001_create_users.sql",
+        "db/migrations/002_create_customers.sql"
+      ],
+      "classes": [],
+      "apis": [],
+      "tables": [
+        "users",
+        "login_attempts",
+        "refresh_tokens",
+        "customers",
+        "contact_preferences"
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "db/migrations/001_create_users.sql",
+      "service": "database",
+      "reason": "Add columns for MFA enrollment, verified mobile, OTP secret/expiry and OTP attempt tracking to users and login_attempts tables.",
+      "classes": [],
+      "apis": [],
+      "tables": [
+        "users",
+        "login_attempts",
+        "refresh_tokens"
+      ]
+    },
+    {
+      "path": "db/migrations/002_create_customers.sql",
+      "service": "database",
+      "reason": "Add verified_mobile flag to customers table to store whether the customer's phone number is verified.",
+      "classes": [],
+      "apis": [],
+      "tables": [
+        "customers",
+        "contact_preferences"
+      ]
+    },
+    {
+      "path": "services/auth-service/app/models.py",
+      "service": "auth-service",
+      "reason": "Update User and LoginAttempt ORM models to reflect the new MFA/OTP columns in the database.",
+      "classes": [
+        "User",
+        "LoginAttempt"
+      ],
+      "apis": [],
+      "tables": [
+        "users",
+        "login_attempts",
+        "refresh_tokens"
+      ]
+    },
+    {
+      "path": "services/auth-service/app/main.py",
+      "service": "auth-service",
+      "reason": "Extend the login endpoint to issue an OTP after password verification, send it via the notification client, verify the OTP, enforce lockout, and only then issue a session.",
+      "classes": [
+        "LoginRequest",
+        "RefreshRequest",
+        "PasswordResetRequest",
+        "TokenResponse"
+      ],
+      "apis": [
+        "POST /auth/login",
+        "POST /auth/logout",
+        "POST /auth/token/refresh",
+        "POST /auth/password/reset"
+      ],
+      "tables": []
+    },
+    {
+      "path": "services/auth-service/app/auth/lockout.py",
+      "service": "auth-service",
+      "reason": "Enhance LoginAttemptTracker to record OTP failures, check OTP-based lockout after five failed codes, and reset on success.",
+      "classes": [
+        "LoginAttemptTracker"
+      ],
+      "apis": [],
+      "tables": []
+    },
+    {
+      "path": "services/auth-service/tests/test_login.py",
+      "service": "auth-service",
+      "reason": "Add test cases for OTP send, verification, expiry, and lockout behavior.",
+      "classes": [
+        "AttemptDatabase"
+      ],
+      "apis": [],
+      "tables": []
+    },
+    {
+      "path": "services/customer-service/src/entities/customer.ts",
+      "service": "customer-service",
+      "reason": "Add verified_mobile and mfa_enrolled properties to the Customer entity to match the updated database schema.",
+      "classes": [
+        "Customer"
+      ],
+      "apis": [],
+      "tables": [
+        "customers"
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "id": "DT-1",
+      "title": "Enrolled customer completes web and mobile login with OTP",
+      "category": "functional",
+      "target": "POST /auth/login end-to-end login journey",
+      "steps": [
+        "Log in on the web client as an enrolled customer with email, password and verified mobile.",
+        "Enter the OTP received by SMS and submit.",
+        "Repeat the same journey on the mobile client with the same enrolled account.",
+        "Call POST /auth/logout from each session."
+      ],
+      "expected": "Both clients reach the authenticated home view only after the correct OTP, the received code matches the one sent by SMS, and logout invalidates each session."
+    },
+    {
+      "id": "DT-2",
+      "title": "Password-only login returns an OTP challenge, valid OTP returns a session",
+      "category": "api",
+      "target": "POST /auth/login (auth-service)",
+      "steps": [
+        "Call POST /auth/login for an enrolled user with a verified mobile and the correct password.",
+        "Inspect the response body and headers.",
+        "Reuse the challenge identifier and POST /auth/login with a valid six-digit code before expiry.",
+        "Inspect the returned payload."
+      ],
+      "expected": "First call returns an OTP-required challenge with no session token or refresh token; second call returns a TokenResponse with session credentials."
+    },
+    {
+      "id": "DT-3",
+      "title": "Five bad OTP codes lock the login for 30 minutes",
+      "category": "unit",
+      "target": "LoginAttemptTracker (services/auth-service/app/auth/lockout.py)",
+      "steps": [
+        "Instantiate LoginAttemptTracker with a fixed clock.",
+        "Record five failed code verifications for one user in a row.",
+        "Call the is_locked / can_attempt check immediately.",
+        "Advance the clock 29 minutes and re-check.",
+        "Advance to 30 minutes and re-check.",
+        "Verify a code issued more than five minutes earlier is rejected as expired."
+      ],
+      "expected": "Tracker reports locked after the fifth failure, still locked at 29 minutes, unlocked at 30 minutes, and rejects OTPs older than five minutes."
+    },
+    {
+      "id": "DT-4",
+      "title": "OTP SMS is delivered through the notification service within 30 seconds",
+      "category": "integration",
+      "target": "auth-service notification client → notification service",
+      "steps": [
+        "Trigger POST /auth/login for an enrolled user against a stubbed SMS provider.",
+        "Record the timestamp of the password-accepted response and the timestamp the notification service receives the send request.",
+        "Assert the SMS payload contains a six-digit code and the user's verified mobile number, not a full account number or balance."
+      ],
+      "expected": "Notification service receives the OTP SMS request in under 30 seconds with a six-digit code and a masked destination; no timeout or retry-exhausted error is logged."
+    },
+    {
+      "id": "DT-5",
+      "title": "OTP eligibility reads the customer MFA flag and verified mobile number",
+      "category": "integration",
+      "target": "customers table / Customer entity (customer-service)",
+      "steps": [
+        "Insert a customer row with mfa_enrolled true and a verified mobile in contact_preferences.",
+        "Insert a second customer with mfa_enrolled false, and a third with an unverified mobile.",
+        "Call the eligibility check used by POST /auth/login for each customer.",
+        "Attempt a full login for each."
+      ],
+      "expected": "Only the customer with mfa_enrolled true and a verified mobile is offered the OTP step; the other two are rejected without an OTP being sent or a session issued."
+    },
+    {
+      "id": "DT-6",
+      "title": "OTP brute force is blocked and every attempt is recorded",
+      "category": "security",
+      "target": "POST /auth/login / login_attempts table",
+      "steps": [
+        "Call POST /auth/login with the correct password for an enrolled user.",
+        "Submit five incorrect six-digit codes.",
+        "Query login_attempts for that user and inspect the HTTP responses and service logs.",
+        "Attempt a sixth code submission with the correct OTP."
+      ],
+      "expected": "Each OTP send, success and failure is persisted in login_attempts; the sixth attempt is rejected with the lockout response; no OTP value appears in the response body or logs."
+    },
+    {
+      "id": "DT-7",
+      "title": "Non-enrolled login and token refresh still behave as before",
+      "category": "regression",
+      "target": "POST /auth/login and POST /auth/token/refresh",
+      "steps": [
+        "Call POST /auth/login for a customer with mfa_enrolled false and the correct password.",
+        "Assert the legacy session response is returned without an OTP challenge.",
+        "Use the issued refresh token against POST /auth/token/refresh.",
+        "Call POST /auth/login with a wrong password for an enrolled user."
+      ],
+      "expected": "Non-enrolled users still receive a session directly, refresh returns a new TokenResponse, and wrong passwords are rejected before any OTP is generated or sent."
+    }
+  ],
+  "providers_used": {
+    "fetch_repo": "deterministic",
+    "map_services": "tokenharbor:deepseek-v4.1-flash:free",
+    "map_files": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "map_classes": "deterministic",
+    "plan_tests": "tokenharbor:deepseek-v4.1-flash:free"
+  },
+  "duration_ms": 153056,
+  "created_at": "2026-10-08T07:32:22.727722Z"
+}

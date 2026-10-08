@@ -1,12 +1,10 @@
 {
-  "answer": "The supplied sprint `release_confidence` is **58**. The context attributes the drag to story-level decisions and collisions, not to a single score:\n\n- **ST-107 is NO_GO** with confidence **23**, the lowest in the sprint. Triggered rules: `NO_GO: security risk is 93 (>= 85)`, `NO_GO: delivery risk is 87 (>= 85)`, plus PCI DSS and Internal Governance high risk on a card-data + authentication change. It is also the flagged `high_risk_stories` entry. Outstanding blockers: PCI DSS review, security sign-off, no rehearsed rollback.\n- **Four of six stories are GO_WITH_CONDITIONS**, adding unresolved conditions: ST-101 (54), ST-104 (58), ST-110 (70), ST-112 (49). ST-112 carries `highest risk is 73 (>= 60)` on security (auth flow change).\n- **Three high-risk deployment collisions** remain: ST-101 vs ST-107 on `account-service` (risk 100), ST-101 vs ST-110 on `payment-service` (80), ST-107 vs ST-112 on `authentication-service` (100) — all requiring enforced sequencing.\n- **Sprint health score is 49** with 3 compliance issues, 19 dependencies impacted, and 36.7 testing hours of P1 work.\n- **ST-115 is the only GO** (confidence 94), and it is a presentation-only change with no compliance framework applying — it does not offset the others.\n\nIn short: confidence is pulled down by the ST-107 NO_GO on security/delivery risk, the number of conditional releases, and the unfired-but-unresolved sequencing constraints across `account-service`, `payment-service` and `authentication-service`.",
+  "answer": "Release confidence is low (58) because the sprint carries several risk‑inducing factors:\n\n- **High‑risk story**: ST‑107 is flagged as the sole high‑risk story [high_risk_stories: [\"ST‑107\"]].\n- **Deployment collisions** (high‑risk conflicts):\n  - ST‑101 vs ST‑107 on **account‑service** (risk_score 100) [conflicts.id: C-ST-101-ST-107-account-service].\n  - ST‑101 vs ST‑110 on **payment‑service** (risk_score 80) [conflicts.id: C-ST-101-ST-110-payment-service].\n  - ST‑107 vs ST‑112 on **authentication‑service** (risk_score 100) [conflicts.id: C-ST-107-ST-112-authentication-service].\n- **Compliance issues**: 3 frameworks show medium/high risk (GDPR, PCI DSS, SOX) across multiple stories [compliance.issues: 3].\n- **Health score**: Overall sprint health is only 49 [health_score: 49].\n- **Testing effort**: Limited testing coverage (36.7 h) and modest test coverage estimates reduce confidence [testing_effort_hours: 36.7].\n\nThese combined risks drive the low release confidence.",
   "cited_nodes": [
     "account-service",
     "payment-service",
     "authentication-service"
   ],
-  "cited_factors": [
-    "auth flow change"
-  ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "cited_factors": [],
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

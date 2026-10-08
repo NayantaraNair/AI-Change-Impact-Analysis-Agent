@@ -1,12 +1,18 @@
 {
-  "answer": "The sprint’s high risk is driven mainly by **ST-107** and by three high-risk deployment collisions.\n\n- **ST-107 is the flagged high-risk story**: risk overall **85**; highest dimension is **security**; release decision **NO_GO** with confidence **23**.\n  - **Security = 93 (high)**: `card data` 25 (`atm`, `card-service`, `fraud-engine`",
+  "answer": "Risk is high mainly because story **ST‑107** (card freeze/unfreeze) drives several risk dimensions to high levels:\n\n- **Security (score 93, high)**  \n  - *Card data* – 25 pts [node_ids: atm, card‑service, fraud‑engine]  \n  - *Auth flow change* – 25 pts [node_ids: api‑gateway, authentication‑service, card‑service, mobile‑banking]  \n  - *External API contract* – 15 pts [node_ids: api‑gateway, authentication‑service, card‑service, mobile‑banking]\n\n- **Delivery (score 87, high)**  \n  - *Owner coordination* – 32 pts [node_ids: account‑service, api‑gateway, atm, authentication‑service, branch‑portal, card‑service, crm, customer‑db, customer‑service, document‑service, fraud‑engine, loan‑service, mobile‑banking, notification‑service, payment‑service, reporting‑db, reporting‑service, risk‑engine, transaction‑db, web‑banking]  \n  - *Medium ambiguity* – 30 pts [node_ids: api‑gateway, authentication‑service, card‑service, mobile‑banking]  \n  - *Direct services* – 20 pts [node_ids: api‑gateway, authentication‑service, card‑service, mobile‑banking]\n\n- **Compliance (score 75, high)**  \n  - *Card data* – 30 pts [node_ids: card‑service]  \n  - *PII data* – 20 pts [node_ids: api‑gateway, authentication‑service, card‑service, mobile‑banking]  \n  - *Financial data* – 20 pts [node_ids: api‑gateway, mobile‑banking]\n\n- **Internal Governance (score 45, high)**  \n  - Directly changed components have criticality ≥ 8 and the story changes the authentication flow (findings cite mobile‑banking, api‑gateway, authentication‑service, card‑service).\n\nThese combined high‑scoring factors make the overall sprint risk elevated, with ST‑107 being the sole high‑risk story.",
   "cited_nodes": [
     "atm",
-    "card-service",
-    "fraud-engine"
+    "crm"
   ],
   "cited_factors": [
-    "card data"
+    "pii data",
+    "financial data",
+    "direct services",
+    "owner coordination",
+    "card data",
+    "auth flow change",
+    "external API contract",
+    "medium ambiguity"
   ],
-  "provider": "tokenharbor:deepseek-v4.1-flash:free"
+  "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 }

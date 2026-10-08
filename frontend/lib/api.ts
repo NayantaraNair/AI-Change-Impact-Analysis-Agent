@@ -1,4 +1,4 @@
-import type { ChatRequest, ChatResponse, DebugInfo, DemoSprint, Run, RunStarted, SprintAnalysis, SprintRequest, StoryAnalysis, StoryInput } from "./types";
+import type { CodebaseAnalysis, CodebaseRequest, DebugInfo, DemoSprint, Run, RunStarted, SprintAnalysis, SprintRequest, StoryAnalysis, StoryInput } from "./types";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 const MOCK = process.env.NEXT_PUBLIC_MOCK === "1";
@@ -103,35 +103,6 @@ export function getDemoPortfolio(): Promise<DemoSprint> {
   return request("/demo-portfolio", {}, json<DemoSprint>, () => fixture<DemoSprint>("demo-portfolio.json"));
 }
 
-export const COPILOT_STARTER_QUESTIONS = [
-  "What is impacted?",
-  "Why is risk high?",
-  "What should be tested?",
-  "Which stories are risky?",
-  "Why is release confidence low?",
-] as const;
-
-export function chat(req: ChatRequest, options: { starterIndex?: number } = {}): Promise<ChatResponse> {
-  return request("/chat", post(req), json<ChatResponse>, async () => {
-    const index = options.starterIndex ?? COPILOT_STARTER_QUESTIONS.findIndex((question) => question.toLowerCase() === req.message.trim().toLowerCase());
-    if (index < 0 || index > 4 || !Number.isInteger(index)) {
-      return {
-        answer: "Sample mode has prepared answers for the starter questions. Select a starter question, or start the backend to ask about your own analysis.",
-        cited_nodes: [], cited_factors: [], provider: "sample-fixture",
-      };
-    }
-    try {
-      return await fixture<ChatResponse>(`chat-${encodeURIComponent(req.context_id)}-${index}.json`);
-    } catch (error) {
-      if (!(error instanceof ApiError) || error.status !== 404) throw error;
-      return {
-        answer: "No prepared answer is available for this sample context. Load the demo sprint or start the backend and try again.",
-        cited_nodes: [], cited_factors: [], provider: "sample-fixture",
-      };
-    }
-  }, LLM_TIMEOUT_MS);
-}
-
 // ---------------------------------------------------------------- runs with live progress
 
 const POLL_MS = 1_000;
@@ -209,6 +180,33 @@ export async function runSprint(req: SprintRequest = {}, options: { refresh?: bo
   const run = await trackRun(`/runs/sprint${query}`, req, options.onProgress ?? (() => {}), options.signal);
   if (run?.sprint_result) return { result: run.sprint_result, run };
   return { result: await analyzeSprint(req), run: null };
+}
+
+export async function runCodebase(req: CodebaseRequest, options: { refresh?: boolean; signal?: AbortSignal; onProgress?: (run: Run) => void } = {}): Promise<TrackedResult<CodebaseAnalysis>> {
+  const query = options.refresh ? "?refresh=true" : "";
+  const run = await trackRun(`/runs/codebase${query}`, req, options.onProgress ?? (() => {}), options.signal);
+  if (run?.codebase_result) return { result: run.codebase_result, run };
+  // No sample fallback: a codebase analysis only makes sense against the real repository.
+  let response: Response;
+  try {
+    response = await fetch(apiUrl(`/codebase/analyze${query}`), { ...post(req), cache: "no-store", signal: options.signal ?? AbortSignal.timeout(LLM_TIMEOUT_MS) });
+  } catch {
+    throw new ApiError(503, UNREACHABLE);
+  }
+  if (!response.ok) {
+    const detail = await response.json().then((value: { detail?: unknown }) => (typeof value.detail === "string" ? value.detail : null)).catch(() => null);
+    throw new ApiError(response.status, detail ?? `The analysis server returned ${response.status}.`);
+  }
+  return { result: await response.json() as CodebaseAnalysis, run: null };
+}
+
+export async function getDemoCodebase(): Promise<CodebaseRequest | null> {
+  try {
+    const response = await fetch(apiUrl("/demo-codebase"), { cache: "no-store", signal: AbortSignal.timeout(15_000) });
+    return response.ok ? await response.json() as CodebaseRequest : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function getRun(runId: string): Promise<Run> {
