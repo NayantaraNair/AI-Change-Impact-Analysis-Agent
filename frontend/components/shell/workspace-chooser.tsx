@@ -17,7 +17,7 @@ const options: { id: Workspace; icon: typeof BarChart3; who: string; points: str
   },
   {
     id: "engineering", icon: Wrench, who: "For tech leads, engineers and testers",
-    points: ["Point at a GitHub repository and a user story", "Services, files, classes, APIs and databases the story changes", "A step-by-step AI flow and 5 to 7 developer tests"],
+    points: ["Point at a GitHub repository and a user story", "Services, files, classes, APIs and databases the story changes", "A step-by-step AI flow and developer tests"],
   },
 ];
 
