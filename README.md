@@ -8,22 +8,16 @@ You give it a user story (for example "Add OTP login for mobile banking"), a spr
 
 ![ImpactIQ portfolio view: five KPIs and one row per change](Project/docs/screenshots/02-portfolio-kpis-and-changes.png)
 
-## 🎬 Demo video
-
-A walkthrough of the working prototype: **[Video/ImpactIQ-demo.mp4](Video/ImpactIQ-demo.mp4)** (open it and press play, or use *Download raw file*).
-
 ## What is in this repository
 
 | Folder | Contents |
 |---|---|
-| [`Video/`](Video) | The demo video |
 | [`Project/`](Project) | The full application: backend, frontend, demo data, the demo bank codebase and these screenshots |
 
 ---
 
 ## Contents
 
-- [Demo video](#-demo-video)
 - [Why it exists](#why-it-exists)
 - [The two workspaces](#the-two-workspaces)
 - [Executive workspace: tour](#executive-workspace-tour)
@@ -232,7 +226,7 @@ docker compose up --build
 
 When it is up, open port **3000** of the machine in your browser for the app. The backend API runs on port **8000**.
 
-All commands below run from the `Project/` folder. The demo video is stored with Git LFS; to skip downloading it when cloning, set `GIT_LFS_SKIP_SMUDGE=1` first.
+All commands below run from the `Project/` folder.
 
 **No API keys are needed.** The demo portfolio, the demo sprint and the codebase example open from saved results, and new stories use the built-in rules.
 
@@ -305,7 +299,6 @@ The backend is a FastAPI service with interactive Swagger documentation at **`/d
 ## Project structure
 
 ```
-Video/                ImpactIQ-demo.mp4
 Project/
   backend/app/
     agents/        AI steps: read the story, compliance, tests, release text (each with a rule fallback)
